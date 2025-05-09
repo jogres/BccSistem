@@ -1,0 +1,38 @@
+CREATE DATABASE Bcc;
+CREATE TABLE Fun 
+( 
+ id_fun INT PRIMARY KEY,  
+ nome_fun VARCHAR(n) NOT NULL,  
+ num_tel VARCHAR(n) NOT NULL,  
+ data_nasci DATE NOT NULL,  
+ cpf VARCHAR(n) NOT NULL,  
+ email VARCHAR(n) NOT NULL,  
+ acesso CHAR(n) NOT NULL,  
+ endereco VARCHAR(n) NOT NULL,  
+ UNIQUE (cpf)
+); 
+
+CREATE TABLE Adm 
+( 
+ id_adm INT PRIMARY KEY AUTO_INCREMENT,  
+ cnpj VARCHAR(n),  
+ nome_adm VARCHAR(n) NOT NULL,  
+ UNIQUE (cnpj)
+); 
+
+CREATE TABLE Cliente 
+( 
+ id_cli INT PRIMARY KEY AUTO_INCREMENT,  
+ nome_cli VARCHAR(n) NOT NULL,  
+ cpf VARCHAR(n) NOT NULL,  
+ endereco VARCHAR(n) NOT NULL,  
+ tipo VARCHAR(n) NOT NULL,  
+ id_adm INT,  
+ id_fun INT,  
+ valor_c FLOAT,  
+ tipo_c VARCHAR(n),  
+ UNIQUE (cpf)
+); 
+
+ALTER TABLE Cliente ADD FOREIGN KEY(id_adm) REFERENCES Adm (id_adm)
+ALTER TABLE Cliente ADD FOREIGN KEY(id_fun) REFERENCES Fun (id_fun)
