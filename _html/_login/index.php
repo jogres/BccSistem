@@ -20,7 +20,7 @@
       </div>
     <?php endif; ?>
     <div class="login-form">
-      <form action="" method="POST">
+      <form action="../../_php/_login/checklogin.php" method="POST">
         <fieldset>
           <input type="email" name="email" id="email" placeholder="E-mail">
           <input type="password" name="senha" id="senha" placeholder="senha">   
