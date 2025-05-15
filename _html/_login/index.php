@@ -25,7 +25,7 @@
           <input type="email" name="email" id="email" placeholder="E-mail">
           <input type="password" name="senha" id="senha" placeholder="senha">   
         </fieldset>
-        <button type="submit" id="enviar" name="enviar" class="login-button">enviar</button>               
+        <button type="submit" id="enviar" name="enviar" class="login-button">Enviar</button>               
       </form>
     </div>  
   </div>
