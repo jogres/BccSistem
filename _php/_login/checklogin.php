@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['user_name'] = explode(' ', $user['nome'])[0];
                 $_SESSION['nivel'] = $user['nivel'];
                 $_SESSION['acesso'] = $user['acesso'];
-                header('Location: ../../_html/dashboard.php');
+                header('Location: ../../_html/_dashboard/dashboard.php');
                 exit;
             } else {
                 $_SESSION['error'] = 'Usuário não encontrado.';
