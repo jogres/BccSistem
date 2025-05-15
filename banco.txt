@@ -1,38 +1,87 @@
-CREATE DATABASE Bcc;
-CREATE TABLE Fun 
-( 
- id_fun INT PRIMARY KEY,  
- nome_fun VARCHAR(n) NOT NULL,  
- num_tel VARCHAR(n) NOT NULL,  
- data_nasci DATE NOT NULL,  
- cpf VARCHAR(n) NOT NULL,  
- email VARCHAR(n) NOT NULL,  
- acesso CHAR(n) NOT NULL,  
- endereco VARCHAR(n) NOT NULL,  
- UNIQUE (cpf)
-); 
+CREATE TABLE master (
+  idMaster   INT       PRIMARY KEY,
+  primeira   FLOAT     NOT NULL,
+  segunda    FLOAT     NOT NULL,
+  terceira   FLOAT     NOT NULL,
+  quarta     FLOAT     NOT NULL,
+  nome       VARCHAR(100) NOT NULL
+);
 
-CREATE TABLE Adm 
-( 
- id_adm INT PRIMARY KEY AUTO_INCREMENT,  
- cnpj VARCHAR(n),  
- nome_adm VARCHAR(n) NOT NULL,  
- UNIQUE (cnpj)
-); 
+CREATE TABLE classic (
+  idClassic  INT       PRIMARY KEY,
+  primeira   FLOAT     NOT NULL,
+  segunda    INT       NOT NULL UNIQUE,
+  terceira   FLOAT     NOT NULL,
+  quarta     FLOAT     NOT NULL,
+  nome       VARCHAR(100) NOT NULL
+);
 
-CREATE TABLE Cliente 
-( 
- id_cli INT PRIMARY KEY AUTO_INCREMENT,  
- nome_cli VARCHAR(n) NOT NULL,  
- cpf VARCHAR(n) NOT NULL,  
- endereco VARCHAR(n) NOT NULL,  
- tipo VARCHAR(n) NOT NULL,  
- id_adm INT,  
- id_fun INT,  
- valor_c FLOAT,  
- tipo_c VARCHAR(n),  
- UNIQUE (cpf)
-); 
+CREATE TABLE basic (
+  idBasic    INT       PRIMARY KEY,
+  primeira   FLOAT     NOT NULL,
+  segunda    FLOAT     NOT NULL,
+  terceira   FLOAT     NOT NULL,
+  quarta     FLOAT     NOT NULL,
+  nome       VARCHAR(100) NOT NULL
+);
 
-ALTER TABLE Cliente ADD FOREIGN KEY(id_adm) REFERENCES Adm (id_adm)
-ALTER TABLE Cliente ADD FOREIGN KEY(id_fun) REFERENCES Fun (id_fun)
+-- Tabela de administradores
+CREATE TABLE cad_adm (
+  idAdm      INT            PRIMARY KEY AUTO_INCREMENT,
+  cnpj       VARCHAR(18)    NOT NULL UNIQUE,
+  nome       VARCHAR(150)   NOT NULL,
+  idMaster   INT            NOT NULL,
+  idClassic  INT            NOT NULL,
+  idBasic    INT            NOT NULL,
+  CONSTRAINT fk_cadadm_master   FOREIGN KEY (idMaster)  REFERENCES master  (idMaster),
+  CONSTRAINT fk_cadadm_classic  FOREIGN KEY (idClassic) REFERENCES classic (idClassic),
+  CONSTRAINT fk_cadadm_basic    FOREIGN KEY (idBasic)   REFERENCES basic   (idBasic)
+);
+
+-- Tabela de funcionários
+CREATE TABLE cad_fun (
+  idFun      INT            PRIMARY KEY,
+  nome       VARCHAR(100)   NOT NULL,
+  endereco   VARCHAR(200)   NOT NULL,
+  numero     VARCHAR(20)    NOT NULL,
+  dataN      DATE           NOT NULL,
+  cpf        VARCHAR(14)    NOT NULL UNIQUE,
+  email      VARCHAR(150)   NOT NULL,
+  senha      VARCHAR(255)   NOT NULL,
+  acesso     VARCHAR(100)   NOT NULL,    -- cargo no sistema
+  idMaster   INT            NOT NULL,    -- nível de comissionamento
+  idClassic  INT            NOT NULL,
+  idBasic    INT            NOT NULL,
+  nivel      VARCHAR(50)    NOT NULL,
+  CONSTRAINT fk_cadfun_master   FOREIGN KEY (idMaster)  REFERENCES master  (idMaster),
+  CONSTRAINT fk_cadfun_classic  FOREIGN KEY (idClassic) REFERENCES classic (idClassic),
+  CONSTRAINT fk_cadfun_basic    FOREIGN KEY (idBasic)   REFERENCES basic   (idBasic)
+);
+
+-- Tabela de vendas
+CREATE TABLE venda (
+  idVenda    INT            PRIMARY KEY AUTO_INCREMENT,
+  tipo       VARCHAR(50)    NOT NULL,
+  valor      FLOAT          NOT NULL,
+  dataV      DATE           NOT NULL,
+  idAdm      INT            NOT NULL,
+  idFun      INT            NOT NULL,
+  CONSTRAINT fk_venda_adm FOREIGN KEY (idAdm) REFERENCES cad_adm (idAdm),
+  CONSTRAINT fk_venda_fun FOREIGN KEY (idFun) REFERENCES cad_fun (idFun)
+);
+
+-- Tabela de comissões
+CREATE TABLE comissao (
+  idCom      INT            PRIMARY KEY AUTO_INCREMENT,
+  idVenda    INT            NOT NULL,
+  totalV     FLOAT          NOT NULL,
+  mesC       DATE           NOT NULL,
+  idFun      INT            NOT NULL,
+  primeira   FLOAT          NOT NULL,
+  segunda    FLOAT          NOT NULL,
+  terceira   FLOAT          NOT NULL,
+  quarta     FLOAT          NOT NULL,
+  totalC     FLOAT          NOT NULL,
+  CONSTRAINT fk_comissao_venda FOREIGN KEY (idVenda) REFERENCES venda (idVenda),
+  CONSTRAINT fk_comissao_fun   FOREIGN KEY (idFun)   REFERENCES cad_fun (idFun)
+);
