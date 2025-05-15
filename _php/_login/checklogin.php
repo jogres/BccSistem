@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 header('Location: ../../_html/dashboard.php');
                 exit;
             } else {
-                $_SESSION['error'] = 'Senha incorreta.';
+                $_SESSION['error'] = 'Usuário não encontrado.';
             }
         } else {
             $_SESSION['error'] = 'Usuário não encontrado.';
