@@ -1,41 +1,42 @@
+-- Tabelas de níveis de comissionamento (ajustadas para referência a cad_adm)
 CREATE TABLE master (
-  idMaster   INT       PRIMARY KEY,
-  primeira   FLOAT     NOT NULL,
-  segunda    FLOAT     NOT NULL,
-  terceira   FLOAT     NOT NULL,
-  quarta     FLOAT     NOT NULL,
-  nome       VARCHAR(100) NOT NULL
+  idMaster   INT            PRIMARY KEY,
+  primeira   FLOAT          NOT NULL,
+  segunda    FLOAT          NOT NULL,
+  terceira   FLOAT          NOT NULL,
+  quarta     FLOAT          NOT NULL,
+  nome       VARCHAR(100)   NOT NULL,
+  idAdm      INT            NOT NULL,
+  CONSTRAINT fk_master_adm FOREIGN KEY (idAdm) REFERENCES cad_adm(idAdm)
 );
 
 CREATE TABLE classic (
-  idClassic  INT       PRIMARY KEY,
-  primeira   FLOAT     NOT NULL,
-  segunda    INT       NOT NULL UNIQUE,
-  terceira   FLOAT     NOT NULL,
-  quarta     FLOAT     NOT NULL,
-  nome       VARCHAR(100) NOT NULL
+  idClassic  INT            PRIMARY KEY,
+  primeira   FLOAT          NOT NULL,
+  segunda    INT            NOT NULL UNIQUE,
+  terceira   FLOAT          NOT NULL,
+  quarta     FLOAT          NOT NULL,
+  nome       VARCHAR(100)   NOT NULL,
+  idAdm      INT            NOT NULL,
+  CONSTRAINT fk_classic_adm FOREIGN KEY (idAdm) REFERENCES cad_adm(idAdm)
 );
 
 CREATE TABLE basic (
-  idBasic    INT       PRIMARY KEY,
-  primeira   FLOAT     NOT NULL,
-  segunda    FLOAT     NOT NULL,
-  terceira   FLOAT     NOT NULL,
-  quarta     FLOAT     NOT NULL,
-  nome       VARCHAR(100) NOT NULL
+  idBasic    INT            PRIMARY KEY,
+  primeira   FLOAT          NOT NULL,
+  segunda    FLOAT          NOT NULL,
+  terceira   FLOAT          NOT NULL,
+  quarta     FLOAT          NOT NULL,
+  nome       VARCHAR(100)   NOT NULL,
+  idAdm      INT            NOT NULL,
+  CONSTRAINT fk_basic_adm   FOREIGN KEY (idAdm) REFERENCES cad_adm(idAdm)
 );
 
--- Tabela de administradores
+-- Tabela de administradores (sem referências a níveis)
 CREATE TABLE cad_adm (
   idAdm      INT            PRIMARY KEY AUTO_INCREMENT,
   cnpj       VARCHAR(18)    NOT NULL UNIQUE,
-  nome       VARCHAR(150)   NOT NULL,
-  idMaster   INT            NOT NULL,
-  idClassic  INT            NOT NULL,
-  idBasic    INT            NOT NULL,
-  CONSTRAINT fk_cadadm_master   FOREIGN KEY (idMaster)  REFERENCES master  (idMaster),
-  CONSTRAINT fk_cadadm_classic  FOREIGN KEY (idClassic) REFERENCES classic (idClassic),
-  CONSTRAINT fk_cadadm_basic    FOREIGN KEY (idBasic)   REFERENCES basic   (idBasic)
+  nome       VARCHAR(150)   NOT NULL
 );
 
 -- Tabela de funcionários
@@ -48,8 +49,8 @@ CREATE TABLE cad_fun (
   cpf        VARCHAR(14)    NOT NULL UNIQUE,
   email      VARCHAR(150)   NOT NULL,
   senha      VARCHAR(255)   NOT NULL,
-  acesso     VARCHAR(100)   NOT NULL,    -- cargo no sistema
-  idMaster   INT            NOT NULL,    -- nível de comissionamento
+  acesso     VARCHAR(100)   NOT NULL,
+  idMaster   INT            NOT NULL,
   idClassic  INT            NOT NULL,
   idBasic    INT            NOT NULL,
   nivel      VARCHAR(50)    NOT NULL,
@@ -84,4 +85,18 @@ CREATE TABLE comissao (
   totalC     FLOAT          NOT NULL,
   CONSTRAINT fk_comissao_venda FOREIGN KEY (idVenda) REFERENCES venda (idVenda),
   CONSTRAINT fk_comissao_fun   FOREIGN KEY (idFun)   REFERENCES cad_fun (idFun)
+);
+
+-- Tabela de clientes
+CREATE TABLE cad_cli (
+  idCli     INT            PRIMARY KEY AUTO_INCREMENT,
+  nome      VARCHAR(100)   NOT NULL,
+  cpf       VARCHAR(14)    NOT NULL UNIQUE,
+  idVenda   INT            NOT NULL,
+  idFun     INT            NOT NULL,
+  endereco  VARCHAR(200)   NOT NULL,
+  telefone  VARCHAR(20)    NOT NULL,
+  tipo      VARCHAR(50)    NOT NULL,
+  CONSTRAINT fk_cli_venda FOREIGN KEY (idVenda) REFERENCES venda (idVenda),
+  CONSTRAINT fk_cli_fun   FOREIGN KEY (idFun)   REFERENCES cad_fun (idFun)
 );

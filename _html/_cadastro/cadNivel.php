@@ -6,7 +6,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
+  <title>Cadastro de Nivel</title>
 </head>
 <body>
   <div class="container">
@@ -31,7 +31,7 @@
       </div>
     </nav>
     <div>
-
+      
     </div>
   </div>
 </body>

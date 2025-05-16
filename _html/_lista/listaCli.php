@@ -6,11 +6,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
+  <title>Lista de Clientes</title>
 </head>
 <body>
   <div class="container">
-    <nav class="main-nav">
+    <nav class="main-nav" role="navigation">
       <button class="menu-toggle" aria-label="Abrir menú">&#9776;</button>
       <ul class="nav-links">
         <?php 
@@ -31,7 +31,9 @@
       </div>
     </nav>
     <div>
-
+      <h1>Lista de Clientes</h1>
+      <p>Esta página exibirá a lista de clientes cadastrados.</p>
+      <!-- Placeholder for future content -->
     </div>
   </div>
 </body>
