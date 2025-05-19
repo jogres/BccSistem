@@ -30,9 +30,18 @@
         </form>
       </div>
     </nav>
-    <div>
-      <!-- Placeholder for future content -->
-    </div>
+    <div class="form-container">
+      <form action="../../_php/_cadastro/cadAdm.php" method="post">
+        <fieldset>
+          <legend>Cadastro de Administradores</legend>          
+            <label for="nome">Nome:</label>
+            <input type="text" id="nome" name="nome" required>
+            <label for="cnpj">CNPJ</label>
+            <input type="text" id="cnpj" name="cnpj" required>
+        </fieldset>
+        <button type="submit">Salvar</button>
+      </form>
+    </div>      
   </div>
 </body>
 </html>

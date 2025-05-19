@@ -30,10 +30,21 @@
         </form>
       </div>
     </nav>
-    <div>
-      <h1>Lista de Administradoras</h1>
-      <p>Esta página está em construção.</p>      
-      <!-- Placeholder for future content -->
+    <div class="lista-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>CNPJ</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php
+            include('../../_php/_lista/_listaComum/listaAdm.php');
+          ?>
+        </tbody>
+      </table>     
     </div>
   </div>
 </body>

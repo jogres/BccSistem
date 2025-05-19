@@ -30,7 +30,35 @@
         </form>
       </div>
     </nav>
-    <div>
+    <div class="form-container">
+      <form action="../../_php/_cadastro/cadNivel.php" method="post">
+        <fieldset>
+          <legend>Cadastro de Nível</legend>
+          <label for="nivel">Nivel</label>
+          <select name="select-niveis" id="select-niveis">
+            <option value="master">Master</option>
+            <option value="classic">Classic</option>
+            <option value="basic">Basic</option>
+          </select>
+          <label for="nome">Nome</label>
+          <input type="text" id="nome" name="nome" required>
+          <label for="primeira">1ª</label>
+          <input type="number" min="0.00" step="0.01" id="primeira" name="primeira" required>
+          <label for="segunda">2ª</label>
+          <input type="number" min="0.00" step="0.01" id="segunda" name="segunda" required>
+          <label for="terceira">3ª</label>
+          <input type="number" min="0.00" step="0.01" id="terceira" name="terceira" required>
+          <label for="quarta">4ª</label>
+          <input type="number" min="0.00" step="0.01" id="quarta" name="quarta" required>
+          <label for="adm">Adiministradora</label>
+          <select name="select-adm" id="select-adm">
+            <?php
+              include('../../_php/_buscar/_buscaAdm/buscaAdm.php')
+            ?>
+          </select>
+        </fieldset>
+        <button type="submit">Salvar</button>
+      </form>
       
     </div>
   </div>

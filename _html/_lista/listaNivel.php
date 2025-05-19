@@ -31,8 +31,9 @@
       </div>
     </nav>
     <div>
-      <h1>Lista de Niveis</h1>
-      <!-- Placeholder for future content -->
+          <?php
+            include('../../_php/_lista/_listaComum/listaNivel.php');
+          ?>
     </div>
   </div>
 </body>
