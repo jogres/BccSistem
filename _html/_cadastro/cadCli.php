@@ -1,82 +1,152 @@
 <?php
-include('../../_php/_login/logado.php');
+  include('../../_php/_login/logado.php');
 
-$vendaSelecionada = $_SESSION['venda'] ?? null;
-$mostrarCamposVenda = $vendaSelecionada === 'Sim';
+  // Lê escolha de “Venda” armazenada em sessão
+  $vendaSelecionada  = $_SESSION['venda'] ?? null;
+  $mostrarCamposVenda = $vendaSelecionada === 'Sim';
+
+  // Define quantos selects exibir (quando voltar de formNumFuncs)
+  $num_funcs = isset($_POST['num_funcs'])
+               ? max(1, (int) $_POST['num_funcs'])
+               : 1;
+
+  // Carrega opções de funcionários
+  $conn = mysqli_connect("localhost", "root", "", "bcc");
+  if (!$conn) die("Falha na conexão: " . mysqli_connect_error());
+  $resFun = mysqli_query($conn, "SELECT idFun, nome FROM cad_fun");
+  $options_fun = "";
+  if ($resFun && $resFun->num_rows > 0) {
+    while ($f = $resFun->fetch_assoc()) {
+      $options_fun .= "<option value=\"{$f['idFun']}\">{$f['nome']}</option>";
+    }
+  } else {
+    $options_fun = "<option value=\"\">Nenhum funcionário</option>";
+  }
+  mysqli_close($conn);
 ?>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
   <title>Cadastro de Cliente</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    .hidden { display: none; }
-  </style>
 </head>
 <body>
   <div class="container">
-    <nav class="main-nav">
+    <!-- NAV omitido por brevidade -->
+    <nav class="main-nav" role="navigation">
       <button class="menu-toggle" aria-label="Abrir menú">&#9776;</button>
       <ul class="nav-links">
         <?php 
           foreach ($menu as $link => $nome){
-            echo "<li class='nav-item'><a href=\"$link\" class='nav-link'>$nome</a></li>";
+            echo "<li clsass='nav-item'><a href=\"$link\" class='nav-link'>$nome</a></li>";
           }
         ?>
       </ul>
       <div class="nav-user-actions">
-        <span class="user-name"><?= $nomeP ?></span>
+        <span class="user-name">
+          <?php
+            echo $nomeP;
+          ?>
+        </span>
         <form action="../../_php/_login/deslogar.php" method="post" class="logout-form">
           <button type="submit" class="logout-button">Sair</button>
         </form>
       </div>
     </nav>
+    <!-- FORM “Venda” -->
+    <form id="formVenda" action="../../_php/_vendas/vendaCheck.php" method="post">
+      <label>Venda:</label><br>
+      <input type="radio" name="venda" id="Sim"  value="Sim"
+             <?= $vendaSelecionada==='Sim' ? 'checked':'' ?>>
+      <label for="Sim">Sim</label>
+      <input type="radio" name="venda" id="Nao"  value="Nao"
+             <?= $vendaSelecionada==='Nao' ? 'checked':'' ?>>
+      <label for="Nao">Não</label>
+    </form>
 
-    <div class="form-container">
-       <form action="../../_php/_vendas/vendaCheck.php" method="post" id="formCadastro">
-          <label for="venda">Venda:</label><br>
-          <input type="radio" name="venda" id="Sim" value="Sim" <?= isset($_POST['venda']) && $_POST['venda'] === 'Sim' ? 'checked' : '' ?>>
-          <label for="Sim">Sim</label>
+    <!-- FORM “Quantidade de Vendedores” -->
+    <?php if ($mostrarCamposVenda): ?>
+    <form id="formNumFuncs" action="" method="post">
+      <!-- preserva a escolha de venda -->
+      <input type="hidden" name="venda" value="<?= htmlspecialchars($vendaSelecionada) ?>">
+      <label for="num-funcs">Quantos funcionários participaram?</label>
+      <input
+        type="number"
+        name="num_funcs"
+        id="num-funcs"
+        min="1"
+        value="<?= htmlspecialchars($num_funcs) ?>"
+        required
+      >
+    </form>
+    <?php endif; ?>
 
-          <input type="radio" name="venda" id="Nao" value="Nao" <?= isset($_POST['venda']) && $_POST['venda'] === 'Nao' ? 'checked' : '' ?>>
-          <label for="Nao">Não</label>
-      </form>
-      <form action="" method="post" >
-        <fieldset>
-          <label for="nome">Nome Completo:</label>
-          <input type="text" name="nome" id="nome" required>
+    <!-- FORM “Cadastro” (FINAL, só envia ao clicar) -->
+    <form id="formCadastro" action="../../_php/_cadastro/cadCli.php" method="post">
+      <fieldset>
+        <!-- Dados do cliente -->
+        <label for="nome">Nome Completo:</label>
+        <input type="text" name="nome" id="nome" required>
 
-          <label for="cpf">CPF:</label>
-          <input type="text" name="cpf" id="cpf" required>
+        <label for="cpf">CPF:</label>
+        <input type="text" name="cpf" id="cpf" required>
 
-          <label for="endereco">Endereço Completo:</label>
-          <input type="text" name="endereco" id="endereco" required>
+        <label for="endereco">Endereço:</label>
+        <input type="text" name="endereco" id="endereco" required>
 
-          <label for="telefone">Telefone:</label>
-          <input type="text" name="telefone" id="telefone" required>
+        <label for="telefone">Telefone:</label>
+        <input type="text" name="telefone" id="telefone" required>
 
-          <?php if ($mostrarCamposVenda): ?>
-              <label for="produto">Produto:</label>
-              <input type="text" name="produto" id="produto">
-              <label for="valor">Valor da Venda:</label>
-              <input type="text" name="valor" id="valor">
-          <?php endif; ?>
+        <?php if ($mostrarCamposVenda): ?>
+          <label for="select-adm">Administradora:</label>
+          <select name="select-adm" id="select-adm">
+            <?php include('../../_php/_buscar/_buscaAdm/buscaAdm.php'); ?>
+          </select>
 
+          <!-- Replicação de selects -->
+          <?php for ($i = 1; $i <= $num_funcs; $i++): ?>
+            <div class="func-block">
+              <label for="select-fun-<?= $i ?>">Funcionário <?= $i ?>:</label>
+              <select name="select_fun[]" id="select-fun-<?= $i ?>">
+                <?= $options_fun ?>
+              </select>
+            </div>
+          <?php endfor; ?>
 
-        </fieldset>
-        <button type="submit">Cadastrar</button>
-      </form>
-    </div>
+          <!-- Campos de venda -->
+          <label for="idVenda">Número do Contrato:</label>
+          <input type="number" name="idVenda" id="idVenda" required>
+
+          <label for="select_tipo">Tipo:</label>
+          <select name="select_tipo" id="select_tipo">
+            <option value="tipo1">Normal</option>
+            <option value="tipo2">2%</option>
+          </select>
+
+          <label for="valor">Valor:</label>
+          <input type="number" name="valor" id="valor" required>
+
+          <label for="data">Data:</label>
+          <input type="date" name="data" id="data" required>
+        <?php endif; ?>
+      </fieldset>
+
+      <button type="submit">Cadastrar</button>
+    </form>
   </div>
 
   <script>
-    // Envia automaticamente o formulário quando radio for alterado
-    document.querySelectorAll('input[name="venda"]').forEach(function (radio) {
-      radio.addEventListener('change', function () {
-        document.getElementById('formCadastro').submit();
-      });
+    // 1) Submete só o formVenda ao trocar radio
+    document.querySelectorAll('input[name="venda"]').forEach(rb =>
+      rb.addEventListener('change', () =>
+        document.getElementById('formVenda').submit()
+      )
+    );
+
+    // 2) Submete só o formNumFuncs ao mudar num-funcs
+    document.getElementById('num-funcs')?.addEventListener('change', () => {
+      document.getElementById('formNumFuncs').submit();
     });
   </script>
 </body>
