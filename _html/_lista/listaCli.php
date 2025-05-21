@@ -30,7 +30,7 @@
         </form>
       </div>
     </nav>
-    <div>
+    <div class="lista-container">
       <h1>Lista de Clientes</h1>
       <p>Esta página exibirá a lista de clientes cadastrados.</p>
       <!-- Placeholder for future content -->

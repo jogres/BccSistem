@@ -1,3 +1,10 @@
+-- Tabela de administradores (sem referências a níveis)
+CREATE TABLE cad_adm (
+  idAdm      INT            PRIMARY KEY AUTO_INCREMENT,
+  cnpj       VARCHAR(18)    NOT NULL UNIQUE,
+  nome       VARCHAR(150)   NOT NULL
+);
+
 -- Tabelas de níveis de comissionamento (ajustadas para referência a cad_adm)
 CREATE TABLE master (
   idMaster   INT            PRIMARY KEY,
@@ -32,13 +39,6 @@ CREATE TABLE basic (
   CONSTRAINT fk_basic_adm   FOREIGN KEY (idAdm) REFERENCES cad_adm(idAdm)
 );
 
--- Tabela de administradores (sem referências a níveis)
-CREATE TABLE cad_adm (
-  idAdm      INT            PRIMARY KEY AUTO_INCREMENT,
-  cnpj       VARCHAR(18)    NOT NULL UNIQUE,
-  nome       VARCHAR(150)   NOT NULL
-);
-
 -- Tabela de funcionários
 CREATE TABLE cad_fun (
   idFun      INT            PRIMARY KEY,
@@ -50,9 +50,10 @@ CREATE TABLE cad_fun (
   email      VARCHAR(150)   NOT NULL,
   senha      VARCHAR(255)   NOT NULL,
   acesso     VARCHAR(100)   NOT NULL,
-  idMaster   INT            NOT NULL,
-  idClassic  INT            NOT NULL,
-  idBasic    INT            NOT NULL,
+  ativo      CHAR(10)       NOT NULL,
+  idMaster   INT            ,
+  idClassic  INT            ,
+  idBasic    INT            ,
   nivel      VARCHAR(50)    NOT NULL,
   CONSTRAINT fk_cadfun_master   FOREIGN KEY (idMaster)  REFERENCES master  (idMaster),
   CONSTRAINT fk_cadfun_classic  FOREIGN KEY (idClassic) REFERENCES classic (idClassic),
@@ -61,7 +62,7 @@ CREATE TABLE cad_fun (
 
 -- Tabela de vendas
 CREATE TABLE venda (
-  idVenda    INT            PRIMARY KEY AUTO_INCREMENT,
+  idVenda    INT            PRIMARY KEY,
   tipo       VARCHAR(50)    NOT NULL,
   valor      FLOAT          NOT NULL,
   dataV      DATE           NOT NULL,
@@ -92,7 +93,7 @@ CREATE TABLE cad_cli (
   idCli     INT            PRIMARY KEY AUTO_INCREMENT,
   nome      VARCHAR(100)   NOT NULL,
   cpf       VARCHAR(14)    NOT NULL UNIQUE,
-  idVenda   INT            NOT NULL,
+  idVenda   INT            ,
   idFun     INT            NOT NULL,
   endereco  VARCHAR(200)   NOT NULL,
   telefone  VARCHAR(20)    NOT NULL,

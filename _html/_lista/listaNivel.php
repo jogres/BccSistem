@@ -30,7 +30,7 @@
         </form>
       </div>
     </nav>
-    <div>
+    <div class="lista-container">
           <?php
             include('../../_php/_lista/_listaComum/listaNivel.php');
           ?>

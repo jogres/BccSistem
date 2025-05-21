@@ -30,10 +30,22 @@
         </form>
       </div>
     </nav>
-    <div>
-      <h1>Lista de Funcionarios</h1>
-      <p>Esta página está em construção.</p>
-      <!-- Placeholder for future content -->
+    <div class="lista-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Ativo</th>
+            <th>Nivel</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php
+            include('../../_php/_lista/_listaComum/listaFun.php');
+          ?>
+        </tbody>
+      </table>
+
     </div>
   </div>
 </body>
