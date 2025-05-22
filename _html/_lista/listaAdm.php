@@ -6,6 +6,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../../_css/_menu/menu.css">
+  <link rel="stylesheet" href="../../_css/_listas/listas.css">
   <title>Lista de Adiministradoras</title>
 </head>
 <body>
@@ -15,7 +17,7 @@
       <ul class="nav-links">
         <?php 
           foreach ($menu as $link => $nome){
-            echo "<li clsass='nav-item'><a href=\"$link\" class='nav-link'>$nome</a></li>";
+            echo "<li class='nav-item'><a href=\"$link\" class='nav-link'>$nome</a></li>";
           }
         ?>
       </ul>
@@ -47,5 +49,13 @@
       </table>     
     </div>
   </div>
+  <script>
+    // Toggle do menu em mobile
+    document.querySelector('.menu-toggle')
+      .addEventListener('click', () => {
+        document.querySelector('.nav-links')
+          .classList.toggle('open');
+      });
+  </script>
 </body>
 </html>

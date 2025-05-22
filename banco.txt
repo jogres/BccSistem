@@ -80,10 +80,7 @@ CREATE TABLE cad_fun (
   idBasic    INT            NULL,
   nivel      VARCHAR(50)    NOT NULL,
   created_at DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT fk_cadfun_master   FOREIGN KEY (idMaster)  REFERENCES master  (idMaster)  ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT fk_cadfun_classic  FOREIGN KEY (idClassic) REFERENCES classic (idClassic) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT fk_cadfun_basic    FOREIGN KEY (idBasic)   REFERENCES basic   (idBasic)   ON DELETE SET NULL ON UPDATE CASCADE
+  updated_at DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- 5) Junção vendas ↔ funcionários

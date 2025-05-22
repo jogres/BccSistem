@@ -30,62 +30,63 @@
   <meta charset="UTF-8">
   <title>Cadastro de Cliente</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../../_css/_menu/menu.css">
+  <link rel="stylesheet" href="../../_css/_cadastro/cad.css">
 </head>
 <body>
   <div class="container">
-    <!-- NAV omitido por brevidade -->
+    <!-- NAV -->
     <nav class="main-nav" role="navigation">
       <button class="menu-toggle" aria-label="Abrir menú">&#9776;</button>
       <ul class="nav-links">
         <?php 
           foreach ($menu as $link => $nome){
-            echo "<li clsass='nav-item'><a href=\"$link\" class='nav-link'>$nome</a></li>";
+            echo "<li class='nav-item'><a href=\"$link\" class='nav-link'>$nome</a></li>";
           }
         ?>
       </ul>
       <div class="nav-user-actions">
-        <span class="user-name">
-          <?php
-            echo $nomeP;
-          ?>
-        </span>
+        <span class="user-name"><?= htmlspecialchars($nomeP) ?></span>
         <form action="../../_php/_login/deslogar.php" method="post" class="logout-form">
           <button type="submit" class="logout-button">Sair</button>
         </form>
       </div>
     </nav>
+
     <!-- FORM “Venda” -->
     <form id="formVenda" action="../../_php/_vendas/vendaCheck.php" method="post">
-      <label>Venda:</label><br>
-      <input type="radio" name="venda" id="Sim"  value="Sim"
-             <?= $vendaSelecionada==='Sim' ? 'checked':'' ?>>
-      <label for="Sim">Sim</label>
-      <input type="radio" name="venda" id="Nao"  value="Nao"
-             <?= $vendaSelecionada==='Nao' ? 'checked':'' ?>>
-      <label for="Nao">Não</label>
+      <div class="radio-group">
+        <label for="venda">Venda:</label>
+        <input type="radio" name="venda" id="Sim"  value="Sim"
+               <?= $vendaSelecionada==='Sim' ? 'checked':'' ?>>
+        <label for="Sim">Sim</label>
+        <input type="radio" name="venda" id="Nao"  value="Nao"
+               <?= $vendaSelecionada==='Nao' ? 'checked':'' ?>>
+        <label for="Nao">Não</label>
+      </div>
     </form>
 
     <!-- FORM “Quantidade de Vendedores” -->
     <?php if ($mostrarCamposVenda): ?>
-    <form id="formNumFuncs" action="" method="post">
-      <!-- preserva a escolha de venda -->
-      <input type="hidden" name="venda" value="<?= htmlspecialchars($vendaSelecionada) ?>">
-      <label for="num-funcs">Quantos funcionários participaram?</label>
-      <input
-        type="number"
-        name="num_funcs"
-        id="num-funcs"
-        min="1"
-        value="<?= htmlspecialchars($num_funcs) ?>"
-        required
-      >
-    </form>
+      <form id="formNumFuncs" action="" method="post">
+        <input type="hidden" name="venda" value="<?= htmlspecialchars($vendaSelecionada) ?>">
+        <div class="inline-group">
+          <label for="num-funcs">Quantos funcionários participaram?</label>
+          <input
+            type="number"
+            name="num_funcs"
+            id="num-funcs"
+            min="1"
+            value="<?= htmlspecialchars($num_funcs) ?>"
+            required
+          >
+        </div>
+      </form>
     <?php endif; ?>
 
-    <!-- FORM “Cadastro” (FINAL, só envia ao clicar) -->
+    <!-- FORM “Cadastro” (FINAL) -->
     <form id="formCadastro" action="../../_php/_cadastro/cadCli.php" method="post">
       <fieldset>
-        <!-- Dados do cliente -->
         <label for="nome">Nome Completo:</label>
         <input type="text" name="nome" id="nome" required>
 
@@ -114,7 +115,6 @@
             </div>
           <?php endfor; ?>
 
-          <!-- Campos de venda -->
           <label for="idVenda">Número do Contrato:</label>
           <input type="number" name="idVenda" id="idVenda" required>
 
@@ -137,17 +137,24 @@
   </div>
 
   <script>
-    // 1) Submete só o formVenda ao trocar radio
+    // Submete formVenda ao trocar radio
     document.querySelectorAll('input[name="venda"]').forEach(rb =>
       rb.addEventListener('change', () =>
         document.getElementById('formVenda').submit()
       )
     );
 
-    // 2) Submete só o formNumFuncs ao mudar num-funcs
+    // Submete formNumFuncs ao mudar quantidade
     document.getElementById('num-funcs')?.addEventListener('change', () => {
       document.getElementById('formNumFuncs').submit();
     });
+
+    // Toggle do menu em mobile
+    document.querySelector('.menu-toggle')
+      .addEventListener('click', () => {
+        document.querySelector('.nav-links')
+          .classList.toggle('open');
+      });
   </script>
 </body>
 </html>
