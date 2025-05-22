@@ -1,19 +1,22 @@
 <?php
-   $conn = mysqli_connect("localhost", "root", "", "bcc");
-   if (!$conn) {
-     die("Connection failed: " . mysqli_connect_error());
-   }
-   $list = mysqli_query($conn, "SELECT nome, ativo, nivel FROM cad_fun");
-   if (!$list) {
-     die("Query failed: " . mysqli_error($conn));
-   }
-    if($acesso == 'admin'){
-      while ($row = mysqli_fetch_assoc($list)) {
+require_once __DIR__ . '/../../../config/db.php';
+if ($acesso !== 'admin') exit;
+
+$stmt = $pdo->query("SELECT nome, ativo, nivel FROM cad_fun ORDER BY nome");
+$funcs = $stmt->fetchAll();
+if (!$funcs) {
+    echo "<tr><td colspan='4'>Nenhum funcionário encontrado.</td></tr>";
+} else {
+    foreach ($funcs as $row) {
+        $nomeF   = htmlspecialchars($row['nome'], ENT_QUOTES);
+        $ativoF  = htmlspecialchars($row['ativo'], ENT_QUOTES);
+        $nivelF  = htmlspecialchars($row['nivel'], ENT_QUOTES);
         echo "<tr>";
-        echo "<td>" . $row['nome'] . "</td>";
-        echo "<td>" . $row['ativo'] . "</td>";
-        echo "<td>" . $row['nivel'] . "</td>";
+        echo "<td data-label='Nome'>$nomeF</td>";
+        echo "<td data-label='Ativo'>$ativoF</td>";
+        echo "<td data-label='Nível'>$nivelF</td>";
+        echo "<td data-label='Ações'>-</td>";
         echo "</tr>";
-      }
     }
+}
 ?>

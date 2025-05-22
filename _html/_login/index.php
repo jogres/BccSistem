@@ -1,7 +1,7 @@
 <?php
   session_start();
   $error = $_SESSION['error'] ?? '';
-  unset($_SESSION['error']);
+  unset($_SESSION['error']); // limpa mensagem após exibir
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -13,22 +13,19 @@
 </head>
 <body>
   <div class="login-container">
-    <?php if($error): ?>
-      <div class="error-menssage">
-        <?php 
-          echo htmlspecialchars($error);
-        ?>
-      </div>
+    <?php if ($error): ?>
+      <!-- Mensagem de erro vinda da sessão, sanitizada para evitar XSS -->
+      <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
     <?php endif; ?>
     <div class="login-form">
       <form action="../../_php/_login/checklogin.php" method="POST">
         <fieldset>
-          <input type="email" name="email" id="email" placeholder="E-mail">
-          <input type="password" name="senha" id="senha" placeholder="senha">   
+          <input type="email" name="email" id="email" placeholder="E-mail" required>
+          <input type="password" name="senha" id="senha" placeholder="Senha" required>
         </fieldset>
-        <button type="submit" id="enviar" name="enviar" class="login-button">Enviar</button>               
+        <button type="submit" id="enviar" name="enviar" class="login-button">Enviar</button>
       </form>
-    </div>  
+    </div>
   </div>
 </body>
 </html>

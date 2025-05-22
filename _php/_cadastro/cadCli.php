@@ -1,156 +1,122 @@
 <?php
-// Incluir verificação de login
 include('../../_php/_login/logado.php');
+require_once __DIR__ . '/../../config/db.php';
 
-// Conexão com o banco de dados
-$conn = new mysqli('localhost', 'root', '', 'bcc');
-if ($conn->connect_error) {
-    die('Falha na conexão: ' . $conn->connect_error);
+// 1) Permissão de qualquer usuário logado
+if (!in_array($acesso, ['admin','user','vendedor'])) {
+    exit('Acesso negado.');
 }
-$conn->begin_transaction();
+
+// 2) Coleta e validação dos dados básicos
+$nome     = trim($_POST['nome'] ?? '');
+$cpf      = preg_replace('/\D/', '', $_POST['cpf'] ?? '');
+$endereco = trim($_POST['endereco'] ?? '');
+$telefone = trim($_POST['telefone'] ?? '');
+
+if ($nome === '' || $cpf === '' || $endereco === '' || $telefone === '') {
+    exit('Erro: preencha todos os dados do cliente.');
+}
+if (!preg_match('/^\d{11}$/', $cpf)) {
+    exit('Erro: CPF inválido.');
+}
+if (!preg_match('/^[0-9\s\-\(\)]+$/', $telefone)) {
+    exit('Erro: Telefone inválido.');
+}
 
 try {
-    // 1) Captura dados do cliente
-    $nome     = trim($_POST['nome'] ?? '');
-    $cpf      = trim($_POST['cpf'] ?? '');
-    $endereco = trim($_POST['endereco'] ?? '');
-    $telefone = trim($_POST['telefone'] ?? '');
+    $pdo->beginTransaction();
 
-    // Validação básica de telefone
-    if (!preg_match('/^[0-9\s\-()]+$/', $telefone)) {
-        throw new Exception('Telefone inválido.');
-    }
-
-    // 2) Checa escolha de venda
     if ($_SESSION['venda'] === 'Sim') {
-        // Dados de venda
-        $idAdm      = (int) ($_POST['select-adm'] ?? 0);
-        $fun_ids    = $_POST['select_fun'] ?? [];
-        $businessId = (int) ($_POST['idVenda'] ?? 0);
-        $tipo       = trim($_POST['select_tipo'] ?? '');
-        $valorTot   = (float) ($_POST['valor'] ?? 0);
-        $dataV      = $_POST['data'] ?? date('Y-m-d');
+        // 3) Dados da venda
+        $idAdm     = (int) ($_POST['select-adm']  ?? 0);
+        $fun_ids   = $_POST['select_fun']       ?? [];
+        $numContrato = (int) ($_POST['idVenda'] ?? 0);   // número de contrato
+        $tipoVenda = $_POST['select_tipo']      ?? 'Normal';
+        $valorTot  = (float) ($_POST['valor']    ?? 0);
+        $dataV     = $_POST['data']             ?? date('Y-m-d');
 
-        // Validações
-        if (empty($fun_ids)) {
-            throw new Exception('Selecione ao menos um funcionário.');
+        // validações
+        if (!$idAdm || !$numContrato || $valorTot <= 0 || empty($fun_ids)) {
+            throw new Exception('Dados da venda incompletos ou inválidos.');
         }
-        if ($businessId <= 0) {
-            throw new Exception('O número do contrato (idVenda) é obrigatório.');
-        }
-        if ($valorTot <= 0) {
-            throw new Exception('O valor da venda deve ser maior que zero.');
+        $dt = DateTime::createFromFormat('Y-m-d', $dataV);
+        if (!$dt || $dt > new DateTime()) {
+            throw new Exception('Data da venda inválida ou futura.');
         }
 
-        // 3) Insere cliente (vincula ao primeiro vendedor apenas)
-        $firstFun = $fun_ids[0];
-        $stmtClient = $conn->prepare(
-            'INSERT INTO cad_cli (nome, cpf, idFun, endereco, telefone, tipo)
-             VALUES (?, ?, ?, ?, ?, ?)'
-        );
-        if (!$stmtClient) {
-            throw new Exception('Erro no prepare cad_cli: ' . $conn->error);
-        }
-        $stmtClient->bind_param('ssisss', $nome, $cpf, $firstFun, $endereco, $telefone, $tipo);
-        if (!$stmtClient->execute()) {
-            throw new Exception('Erro ao inserir cliente: ' . $stmtClient->error);
-        }
-        $clientId = $conn->insert_id;
-        $stmtClient->close();
+        // 4) Insere cliente (vendedor principal = primeiro da lista)
+        $firstFun = (int) $fun_ids[0];
+        $stmtCli = $pdo->prepare("
+            INSERT INTO cad_cli (nome, cpf, idFun, endereco, telefone, tipo)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ");
+        $stmtCli->execute([
+            $nome,
+            $cpf,
+            $firstFun,
+            $endereco,
+            $telefone,
+            'com_venda'
+        ]);
+        $idCli = $pdo->lastInsertId();
 
-        // 4) Prepara statements de venda e vínculos
-        $stmtVenda = $conn->prepare(
-            'INSERT INTO venda (idVenda, tipo, valor, dataV, idAdm)
-             VALUES (?, ?, ?, ?, ?)'
-        );
-        if (!$stmtVenda) {
-            throw new Exception('Erro no prepare venda: ' . $conn->error);
-        }
+        // 5) Insere a venda e captura o PK gerado (venda.id)
+        $stmtVenda = $pdo->prepare("
+            INSERT INTO venda (idVenda, tipo, valor, dataV, idAdm)
+            VALUES (?, ?, ?, ?, ?)
+        ");
+        $stmtVenda->execute([
+            $numContrato,
+            $tipoVenda,
+            $valorTot,
+            $dataV,
+            $idAdm
+        ]);
+        // *** Aqui usamos lastInsertId() para obter venda.id ***
+        $vendaPk = $pdo->lastInsertId();
 
-        $stmtLinkFun = $conn->prepare(
-            'INSERT INTO venda_fun (idFun, idVenda) VALUES (?, ?)'
-        );
-        if (!$stmtLinkFun) {
-            throw new Exception('Erro no prepare venda_fun: ' . $conn->error);
-        }
-
-        $stmtLinkCli = $conn->prepare(
-            'INSERT INTO venda_cli (idCli, idVenda) VALUES (?, ?)'
-        );
-        if (!$stmtLinkCli) {
-            throw new Exception('Erro no prepare venda_cli: ' . $conn->error);
-        }
-
-        // 5) Insere as vendas divididas por funcionário
-        $n = count($fun_ids);
-        $valorPorFun = round($valorTot / $n, 2);
-        $firstSaleId = null;
-
-        foreach ($fun_ids as $fun) {
-            // 5.1) Venda
-            $stmtVenda->bind_param('isdsi', $businessId, $tipo, $valorPorFun, $dataV, $idAdm);
-            if (!$stmtVenda->execute()) {
-                throw new Exception('Erro ao inserir venda: ' . $stmtVenda->error);
-            }
-            $saleId = $conn->insert_id;
-            if ($firstSaleId === null) {
-                $firstSaleId = $saleId;
-            }
-
-            // 5.2) Vínculo funcionário ↔ venda
-            $stmtLinkFun->bind_param('ii', $fun, $saleId);
-            if (!$stmtLinkFun->execute()) {
-                throw new Exception('Erro ao inserir venda_fun: ' . $stmtLinkFun->error);
-            }
-
-            // 5.3) Vínculo cliente ↔ venda
-            $stmtLinkCli->bind_param('ii', $clientId, $saleId);
-            if (!$stmtLinkCli->execute()) {
-                throw new Exception('Erro ao inserir venda_cli: ' . $stmtLinkCli->error);
+        // 6) Vincula venda_fun e venda_cli usando o PK
+        $stmtVF = $pdo->prepare("
+            INSERT INTO venda_fun (idFun, idVenda)
+            VALUES (?, ?)
+        ");
+        $stmtVC = $pdo->prepare("
+            INSERT INTO venda_cli (idCli, idVenda)
+            VALUES (?, ?)
+        ");
+        foreach ($fun_ids as $funId) {
+            $fun = (int) $funId;
+            $stmtVF->execute([$fun, $vendaPk]);
+            // vincula cliente apenas uma vez (apenas para o primeiro fun)
+            if ($fun === $firstFun) {
+                $stmtVC->execute([$idCli, $vendaPk]);
             }
         }
-
-        // Fecha statements
-        $stmtVenda->close();
-        $stmtLinkFun->close();
-        $stmtLinkCli->close();
-
-        // 6) Commit e redirecionamento
-        $conn->commit();
-        header('Location: sucesso.php');
-        exit;
 
     } elseif ($_SESSION['venda'] === 'Nao') {
-        // 7) Inserção de cliente sem venda
-        $idFun = $_SESSION['user_id'];
-        $tipo  = 'sem_venda';
-
-        $stmtClient = $conn->prepare(
-            'INSERT INTO cad_cli (nome, cpf, idFun, endereco, telefone, tipo)
-             VALUES (?, ?, ?, ?, ?, ?)'
-        );
-        if (!$stmtClient) {
-            throw new Exception('Erro no prepare cad_cli: ' . $conn->error);
-        }
-        $stmtClient->bind_param('ssisss', $nome, $cpf, $idFun, $endereco, $telefone, $tipo);
-        if (!$stmtClient->execute()) {
-            throw new Exception('Erro ao inserir cliente: ' . $stmtClient->error);
-        }
-        $stmtClient->close();
-
-        $conn->commit();
-        header('Location: sucesso.php');
-        exit;
-
+        // 7) Cadastro de cliente sem venda
+        $stmtCli = $pdo->prepare("
+            INSERT INTO cad_cli (nome, cpf, idFun, endereco, telefone, tipo)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ");
+        $stmtCli->execute([
+            $nome,
+            $cpf,
+            $_SESSION['user_id'],
+            $endereco,
+            $telefone,
+            'sem_venda'
+        ]);
     } else {
-        throw new Exception('Valor inválido para $_SESSION["venda"].');
+        throw new Exception('Selecione Sim ou Não para a venda.');
     }
 
+    $pdo->commit();
+    unset($_SESSION['venda']);
+    header('Location: ../../_html/_cadastro/sucesso.php');
+    exit;
+
 } catch (Exception $e) {
-    // Rollback em caso de erro
-    $conn->rollback();
-    echo 'Erro ao cadastrar: ' . $e->getMessage();
-} finally {
-    $conn->close();
+    $pdo->rollBack();
+    exit('Erro ao cadastrar: ' . htmlspecialchars($e->getMessage()));
 }
-?>

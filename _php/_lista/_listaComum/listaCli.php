@@ -1,48 +1,25 @@
 <?php
-// clientes_list_include.php
-// Arquivo de listagem de clientes com vendas para include em template HTML
+require_once __DIR__ . '/../../../config/db.php';
+if ($acesso !== 'admin') exit;
 
-// Conexão com o banco de dados
-$conn = mysqli_connect("localhost", "root", "", "bcc");
-if (!$conn) {
-    die("Falha na conexão: " . mysqli_connect_error());
-}
-
-// Verifica permissão de acesso
-if (!isset($acesso) || $acesso !== 'admin') {
-    exit;
-}
-
-// Consulta de clientes que efetuaram vendas
-$sql = "
-SELECT DISTINCT
-    cli.nome     AS cliente,
-    cli.cpf      AS cpf,
-    cli.telefone AS telefone,
-    cli.endereco AS endereco
-FROM cad_cli cli
-";
-
-$result = mysqli_query($conn, $sql);
-if (!$result) {
-    die("Erro na consulta de clientes: " . mysqli_error($conn));
-}
-
-// Exibe resultado ou mensagem de nenhum registro
-if (mysqli_num_rows($result) === 0) {
-    echo '<tr><td colspan="4">Nenhum cliente encontrado.</td></tr>';
+// Seleciona clientes (poderia filtrar apenas os associados ao usuário, mas admin vê todos)
+$stmt = $pdo->query("SELECT nome, cpf, telefone, endereco FROM cad_cli ORDER BY nome");
+$clientes = $stmt->fetchAll();
+if (!$clientes) {
+    echo "<tr><td colspan='5'>Nenhum cliente encontrado.</td></tr>";
 } else {
-    while ($row = mysqli_fetch_assoc($result)) {
-        echo '<tr>';
-        echo '<td>' . htmlspecialchars($row['cliente'], ENT_QUOTES)   . '</td>';
-        echo '<td>' . htmlspecialchars($row['cpf'], ENT_QUOTES)       . '</td>';
-        echo '<td>' . htmlspecialchars($row['telefone'], ENT_QUOTES) . '</td>';
-        echo '<td>' . htmlspecialchars($row['endereco'], ENT_QUOTES) . '</td>';
-        echo '</tr>';
+    foreach ($clientes as $row) {
+        $nomeC  = htmlspecialchars($row['nome'], ENT_QUOTES);
+        $cpfC   = htmlspecialchars($row['cpf'], ENT_QUOTES);
+        $telC   = htmlspecialchars($row['telefone'], ENT_QUOTES);
+        $endC   = htmlspecialchars($row['endereco'], ENT_QUOTES);
+        echo "<tr>";
+        echo "<td data-label='Nome'>$nomeC</td>";
+        echo "<td data-label='CPF'>$cpfC</td>";
+        echo "<td data-label='Telefone'>$telC</td>";
+        echo "<td data-label='Endereço'>$endC</td>";
+        echo "<td data-label='Ações'>-</td>";
+        echo "</tr>";
     }
 }
-
-// Libera recursos e fecha conexão
-mysqli_free_result($result);
-mysqli_close($conn);
 ?>

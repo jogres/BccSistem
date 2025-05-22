@@ -1,56 +1,48 @@
 <?php
 session_start();
+require_once __DIR__ . '/../../config/db.php';  // conexão PDO
 
-$host = 'localhost';
-$user = 'root';
-$pass = '';
-$db   = 'bcc';
+// 1. Obter dados do formulário
+$email = trim($_POST['email'] ?? '');
+$senha = $_POST['senha'] ?? '';
 
-$conn = new mysqli($host, $user, $pass, $db);
-if ($conn->connect_errno) {
-    die('Falha na conexão: ' . $conn->connect_error);
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = isset($_POST['email']) ? trim($_POST['email']) : '';
-    $senha = isset($_POST['senha']) ? $_POST['senha'] : '';
-
-    if ($email === '' || $senha === '') {
-        $_SESSION['error'] = 'Por favor, preencha email e senha.';
-        header('Location: ../../_html/_login/index.php');
-        exit;
-    }
-
-    $stmt = $conn->prepare("SELECT idFun, senha, nome, nivel, acesso FROM cad_fun WHERE email = ?");
-    if ($stmt) {
-        $stmt->bind_param('s', $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result && $user = $result->fetch_assoc()) {
-            // A senha está armazenada como hash MD5 no banco de dados
-            if (md5($senha) === $user['senha']) {
-                $_SESSION['user_id'] = $user['idFun'];
-                $_SESSION['user_name'] = explode(' ', $user['nome'])[0];
-                $_SESSION['nivel'] = $user['nivel'];
-                $_SESSION['acesso'] = $user['acesso'];
-                header('Location: ../../_html/_dashboard/dashboard.php');
-                exit;
-            } else {
-                $_SESSION['error'] = 'Usuário não encontrado.';
-            }
-        } else {
-            $_SESSION['error'] = 'Usuário não encontrado.';
-        }
-
-        $stmt->close();
-    } else {
-        $_SESSION['error'] = 'Erro na preparação da consulta.';
-    }
-
+if ($email === '' || $senha === '') {
+    $_SESSION['error'] = 'Por favor, preencha email e senha.';
     header('Location: ../../_html/_login/index.php');
     exit;
 }
 
-$conn->close();
+try {
+    // 2. Consulta preparada para encontrar usuário pelo email
+    $stmt = $pdo->prepare("SELECT idFun, senha, nome, nivel, acesso FROM cad_fun WHERE email = ?");
+    $stmt->execute([$email]);
+    $user = $stmt->fetch();
+    
+    if ($user) {
+        // Verifica a senha usando password_verify (senha armazenada agora com password_hash)
+        if (password_verify($senha, $user['senha'])) {
+            // Credenciais corretas -> inicia sessão do usuário
+            session_regenerate_id(true);  // previne fixação de sessão
+            $_SESSION['user_id']   = $user['idFun'];
+            // Guarda primeiro nome para exibir no menu
+            $_SESSION['user_name'] = explode(' ', $user['nome'])[0] ?? $user['nome'];
+            $_SESSION['nivel']     = $user['nivel'];
+            $_SESSION['acesso']    = $user['acesso'];
+            header('Location: ../../_html/_dashboard/dashboard.php');
+            exit;
+        } else {
+            // Senha incorreta
+            $_SESSION['error'] = 'Senha inválida.';
+        }
+    } else {
+        // Usuário não encontrado
+        $_SESSION['error'] = 'Usuário não encontrado.';
+    }
+} catch (Exception $e) {
+    // Em caso de erro na consulta
+    $_SESSION['error'] = 'Erro no login: '.$e->getMessage();
+}
+// Redireciona de volta para o login em caso de falha
+header('Location: ../../_html/_login/index.php');
+exit;
 ?>
