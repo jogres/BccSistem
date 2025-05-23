@@ -7,6 +7,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../../_css/_menu/menu.css">
+  <link rel="stylesheet" href="../../_css/_menu/paginacao.css">
   <link rel="stylesheet" href="../../_css/_listas/listas.css">
   <title>Lista de Vendas</title>
 </head>
@@ -32,17 +33,9 @@
         </form>
       </div>
     </nav>
-    <div class="lista-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Contrato</th><th>Cliente</th><th>Vendedor</th><th>Valor</th><th>Data</th><th>Adiministradora</th>
-          </tr>
-        </thead>
-        <tbody>
+    <div class="lista-container">     
+        
           <?php include '../../_php/_lista/_listaComum/listaVendas.php'; ?>
-        </tbody>
-      </table>
 
     </div>
   </div>

@@ -1,10 +1,9 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../config/db.php';  // conexão PDO
+require_once __DIR__ . '/../../config/db.php';
 
-// 1. Obter dados do formulário
 $email = trim($_POST['email'] ?? '');
-$senha = $_POST['senha'] ?? '';
+$senha = trim($_POST['senha'] ?? '');
 
 if ($email === '' || $senha === '') {
     $_SESSION['error'] = 'Por favor, preencha email e senha.';
@@ -13,36 +12,60 @@ if ($email === '' || $senha === '') {
 }
 
 try {
-    // 2. Consulta preparada para encontrar usuário pelo email
-    $stmt = $pdo->prepare("SELECT idFun, senha, nome, nivel, acesso FROM cad_fun WHERE email = ?");
+    $stmt = $pdo->prepare(
+        "SELECT idFun, senha, nome, nivel, acesso 
+         FROM cad_fun 
+         WHERE email = ?"
+    );
     $stmt->execute([$email]);
-    $user = $stmt->fetch();
-    
-    if ($user) {
-        // Verifica a senha usando password_verify (senha armazenada agora com password_hash)
-        if (password_verify($senha, $user['senha'])) {
-            // Credenciais corretas -> inicia sessão do usuário
-            session_regenerate_id(true);  // previne fixação de sessão
-            $_SESSION['user_id']   = $user['idFun'];
-            // Guarda primeiro nome para exibir no menu
-            $_SESSION['user_name'] = explode(' ', $user['nome'])[0] ?? $user['nome'];
-            $_SESSION['nivel']     = $user['nivel'];
-            $_SESSION['acesso']    = $user['acesso'];
-            header('Location: ../../_html/_dashboard/dashboard.php');
-            exit;
-        } else {
-            // Senha incorreta
-            $_SESSION['error'] = 'Senha inválida.';
-        }
-    } else {
-        // Usuário não encontrado
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$user) {
         $_SESSION['error'] = 'Usuário não encontrado.';
+        header('Location: ../../_html/_login/index.php');
+        exit;
     }
+
+    $dbHash = $user['senha'];
+    $ok = false;
+
+    // 1) Se for MD5 (32 caracteres hexadecimais)
+    if (preg_match('/^[0-9a-f]{32}$/i', $dbHash)) {
+        if (md5($senha) === $dbHash) {
+            $ok = true;
+            // Re-hash em bcrypt para migrar do MD5
+            $newHash = password_hash($senha, PASSWORD_BCRYPT);
+            $upd = $pdo->prepare("UPDATE cad_fun SET senha = ? WHERE idFun = ?");
+            $upd->execute([$newHash, $user['idFun']]);
+        }
+    }
+    // 2) Senão, assumimos hash bcrypt/PHP >=5.5
+    elseif (password_verify($senha, $dbHash)) {
+        $ok = true;
+        // Opcional: se usar cost diferente, podemos re-hashar para ajustar cost
+        if (password_needs_rehash($dbHash, PASSWORD_BCRYPT)) {
+            $rehash = password_hash($senha, PASSWORD_BCRYPT);
+            $pdo->prepare("UPDATE cad_fun SET senha = ? WHERE idFun = ?")
+                ->execute([$rehash, $user['idFun']]);
+        }
+    }
+
+    if ($ok) {
+        session_regenerate_id(true);
+        $_SESSION['user_id']   = $user['idFun'];
+        $_SESSION['user_name'] = explode(' ', $user['nome'])[0];
+        $_SESSION['nivel']     = $user['nivel'];
+        $_SESSION['acesso']    = $user['acesso'];
+        header('Location: ../../_html/_dashboard/dashboard.php');
+        exit;
+    } else {
+        $_SESSION['error'] = 'Senha inválida.';
+        header('Location: ../../_html/_login/index.php');
+        exit;
+    }
+    
 } catch (Exception $e) {
-    // Em caso de erro na consulta
-    $_SESSION['error'] = 'Erro no login: '.$e->getMessage();
+    $_SESSION['error'] = 'Erro no login: ' . $e->getMessage();
+    header('Location: ../../_html/_login/index.php');
+    exit;
 }
-// Redireciona de volta para o login em caso de falha
-header('Location: ../../_html/_login/index.php');
-exit;
-?>

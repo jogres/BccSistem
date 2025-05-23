@@ -1,4 +1,34 @@
 <?php include('../../_php/_login/logado.php'); ?>
+<?php
+require_once __DIR__ . '/../../config/db.php';
+
+// Detecta edição de funcionário
+$editing = false;
+$funcData = [
+    'idFun'    => '',
+    'nome'     => '',
+    'endereco' => '',
+    'numero'   => '',
+    'dataN'    => '',
+    'cpf'      => '',
+    'email'    => '',
+    'acesso'   => '',
+    'ativo'    => ''
+];
+if (isset($_GET['idFun']) && is_numeric($_GET['idFun'])) {
+    $editing = true;
+    $idFun = (int) $_GET['idFun'];
+    $stmt = $pdo->prepare(
+        "SELECT idFun, nome, endereco, numero, dataN, cpf, email, acesso, ativo
+         FROM cad_fun
+         WHERE idFun = ?"
+    );
+    $stmt->execute([$idFun]);
+    if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $funcData = $row;
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -6,10 +36,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="../../_css/_menu/menu.css" />
   <link rel="stylesheet" href="../../_css/_cadastro/cad.css" />
-  <title>Cadastro de Funcionário</title>
+  <title><?= $editing ? 'Editar Funcionário' : 'Cadastro de Funcionário' ?></title>
 </head>
 <body>
   <div class="container">
+    <!-- Menu -->
     <nav class="main-nav" role="navigation">
       <button class="menu-toggle" aria-label="Abrir menu">&#9776;</button>
       <ul class="nav-links">
@@ -24,45 +55,126 @@
         </form>
       </div>
     </nav>
+
     <div class="form-container">
       <form action="../../_php/_cadastro/cadFun.php" method="post">
         <fieldset>
-          <legend>Cadastro de Funcionário</legend>
-          <label for="idFun">Código:</label>
-          <input type="number" name="idFun" id="idFun" min="1" 
-                 placeholder="Opcional (gerado automaticamente se vazio)" />
+          <legend><?= $editing ? 'Editar Funcionário' : 'Cadastro de Funcionário' ?></legend>
+
+          <?php if (!$editing): // exibe matrícula apenas no cadastro ?>
+          <label for="matricula">Matrícula:</label>
+          <input
+            type="number"
+            name="idFun"
+            id="matricula"
+            min="1"
+            required
+            value="<?= htmlspecialchars($funcData['idFun'], ENT_QUOTES) ?>"
+          />
+          <?php else: // mantém idFun oculto na edição ?>
+          <input type="hidden" name="idFun" value="<?= $funcData['idFun'] ?>" />
+          <?php endif; ?>
+
           <label for="nome">Nome Completo:</label>
-          <input type="text" name="nome" id="nome" maxlength="100" required />
+          <input
+            type="text"
+            name="nome"
+            id="nome"
+            maxlength="100"
+            required
+            value="<?= htmlspecialchars($funcData['nome'], ENT_QUOTES) ?>"
+          />
+
           <label for="endereco">Endereço Completo:</label>
-          <input type="text" name="endereco" id="endereco" maxlength="200" required />
-          <label for="telefone">Telefone:</label>
-          <input type="text" name="numero" id="telefone" maxlength="20" required 
-                 pattern="\d+[\d\s\-()]*" title="Digite um telefone válido" />
+          <input
+            type="text"
+            name="endereco"
+            id="endereco"
+            maxlength="200"
+            required
+            value="<?= htmlspecialchars($funcData['endereco'], ENT_QUOTES) ?>"
+          />
+
+          <label for="numero">Telefone:</label>
+          <input
+            type="text"
+            name="numero"
+            id="numero"
+            maxlength="20"
+            required
+            pattern="\d+[\d\s\-()]*"
+            title="Digite um telefone válido"
+            value="<?= htmlspecialchars($funcData['numero'], ENT_QUOTES) ?>"
+          />
+
           <label for="dataN">Data de Nascimento:</label>
-          <input type="date" name="dataN" id="dataN" required />
+          <input
+            type="date"
+            name="dataN"
+            id="dataN"
+            required
+            value="<?= htmlspecialchars($funcData['dataN'], ENT_QUOTES) ?>"
+          />
+
           <label for="cpf">CPF:</label>
-          <input type="text" name="cpf" id="cpf" maxlength="14" required 
-                 pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}" title="Digite um CPF válido" />
+          <input
+            type="text"
+            name="cpf"
+            id="cpf"
+            maxlength="14"
+            required
+            pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}"
+            title="Digite um CPF válido"
+            value="<?= htmlspecialchars($funcData['cpf'], ENT_QUOTES) ?>"
+          />
+
           <label for="email">E-mail:</label>
-          <input type="email" name="email" id="email" maxlength="150" required />
-          <label for="senha">Senha:</label>
-          <input type="password" name="senha" id="senha" required />
+          <input
+            type="email"
+            name="email"
+            id="email"
+            maxlength="150"
+            required
+            value="<?= htmlspecialchars($funcData['email'], ENT_QUOTES) ?>"
+          />
+
+          <label for="senha">
+            <?= $editing ? 'Nova Senha (deixe em branco para manter)' : 'Senha' ?>:
+          </label>
+          <input
+            type="password"
+            name="senha"
+            id="senha"
+            <?= $editing ? '' : 'required' ?>
+          />
+
           <label for="acesso">Perfil:</label>
           <select name="acesso" id="acesso">
-            <option value="admin">Administrador</option>
-            <option value="user">Funcionário</option>
-            <option value="vendedor">Vendedor</option>
+            <option value="admin"    <?= $funcData['acesso']==='admin'?'selected':'' ?>>Administrador</option>
+            <option value="user"     <?= $funcData['acesso']==='user'?'selected':'' ?>>Funcionário</option>
+            <option value="vendedor" <?= $funcData['acesso']==='vendedor'?'selected':'' ?>>Vendedor</option>
           </select>
+
           <label for="ativo">Ativo:</label>
           <select name="ativo" id="ativo">
-            <option value="Sim">Sim</option>
-            <option value="Nao">Não</option>
+            <option value="Sim" <?= $funcData['ativo']==='Sim'?'selected':'' ?>>Sim</option>
+            <option value="Nao" <?= $funcData['ativo']==='Nao'?'selected':'' ?>>Não</option>
           </select>
+
         </fieldset>
-        <button type="submit">Cadastrar</button>
+
+        <div class="form-buttons">
+          <button type="submit" class="btn btn-primary">
+            <?= $editing ? 'Salvar Alterações' : 'Cadastrar' ?>
+          </button>
+          <?php if ($editing): ?>
+            <a href="../../_html/_lista/listaFun.php" class="btn btn-secondary">Cancelar</a>
+          <?php endif; ?>
+        </div>
       </form>
     </div>
   </div>
+
   <script>
     document.querySelector('.menu-toggle').addEventListener('click', () => {
       document.querySelector('.nav-links').classList.toggle('open');
