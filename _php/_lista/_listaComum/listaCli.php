@@ -30,9 +30,7 @@ if (!$clientes) {
         echo "  <td data-label='CPF'>$cpfC</td>";
         echo "  <td data-label='Telefone'>$telC</td>";
         echo "  <td data-label='Endereço'>$endC</td>";
-        echo "  <td data-label='Ações'>";
-        echo "    <a href='../../_html/_cadastro/cadCli.php?idCli=$idCli' class='btn btn-sm btn-warning'>Editar</a>";
-        echo "  </td>";
+        echo "  <td data-label='Ações'><a href='../../_html/_cadastro/cadCli.php?idCli=$idCli' class='btn btn-sm btn-warning'>Editar</a> </td>";
         echo "</tr>";
     }
 }

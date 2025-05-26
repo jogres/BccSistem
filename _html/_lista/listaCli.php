@@ -36,7 +36,7 @@
       <table>
         <thead>
           <tr>
-            <th>Nome</th><th>CPF</th><th>Telefone</th><th>Endereço</th>
+            <th>Nome</th><th>CPF</th><th>Telefone</th><th>Endereço</th><th>Ações</th>
           </tr>
         </thead>
         <tbody>
