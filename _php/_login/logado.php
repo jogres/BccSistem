@@ -24,11 +24,7 @@ $permis = [
         '../_dashboard/dashboard.php' => 'Dashboard'
     ],
     'user' => [
-        '../_lista/listaCli.php'   => 'Clientes',
-        '../_dashboard/dashboard.php' => 'Dashboard'
-    ],
-    'vendedor' => [  // "vendedor" tratado igual a "user" aqui
-        '../_lista/listaCli.php'   => 'Clientes',
+        '../_cadastro/cadCli.php'   => 'Clientes',
         '../_dashboard/dashboard.php' => 'Dashboard'
     ]
 ];

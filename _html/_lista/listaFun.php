@@ -39,6 +39,7 @@
             <th>Nome</th>
             <th>Ativo</th>
             <th>Nivel</th>
+            <th>Ações</th>
           </tr>
         </thead>
         <tbody>

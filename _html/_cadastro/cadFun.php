@@ -1,46 +1,78 @@
-<?php include('../../_php/_login/logado.php'); ?>
 <?php
+include('../../_php/_login/logado.php');
 require_once __DIR__ . '/../../config/db.php';
 
-// Detecta edição de funcionário
+// 1) Detecção de edição
 $editing = false;
-$funcData = [
-    'idFun'    => '',
-    'nome'     => '',
-    'endereco' => '',
-    'numero'   => '',
-    'dataN'    => '',
-    'cpf'      => '',
-    'email'    => '',
-    'acesso'   => '',
-    'ativo'    => ''
-];
-if (isset($_GET['idFun']) && is_numeric($_GET['idFun'])) {
+$idCli    = null;
+$cliente  = ['nome'=>'','cpf'=>'','endereco'=>'','telefone'=>''];
+$sale     = ['idAdm'=>null,'fun_ids'=>[], 'idVenda'=>'','select_tipo'=>'Normal','valor'=>'','data'=>date('Y-m-d')];
+
+// Propaga seleção de venda e número de funcs nas etapas
+$postVenda   = $_POST['venda']     ?? ($_SESSION['venda'] ?? 'Nao');
+$postNumFunc = (int)($_POST['num_funcs'] ?? 1);
+
+$_SESSION['venda'] = $_SESSION['venda'] ?? null;
+
+if (isset($_GET['idCli']) && is_numeric($_GET['idCli'])) {
     $editing = true;
-    $idFun = (int) $_GET['idFun'];
-    $stmt = $pdo->prepare(
-        "SELECT idFun, nome, endereco, numero, dataN, cpf, email, acesso, ativo
-         FROM cad_fun
-         WHERE idFun = ?"
-    );
-    $stmt->execute([$idFun]);
+    $idCli    = (int) $_GET['idCli'];
+    // busca cliente
+    $stmt = $pdo->prepare("SELECT nome, cpf, endereco, telefone, tipo FROM cad_cli WHERE idCli = ?");
+    $stmt->execute([$idCli]);
     if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $funcData = $row;
+        $cliente = $row;
+        $_SESSION['venda'] = ($cliente['tipo']==='com_venda') ? 'Sim' : 'Nao';
+        $postVenda = $_SESSION['venda'];
+    }
+    // se tinha venda, carrega venda e funcionários
+    if ($_SESSION['venda']==='Sim') {
+        $stmt = $pdo->prepare(
+            "SELECT v.idAdm, v.idVenda, v.tipo, v.valor, v.dataV
+             FROM venda v
+             JOIN venda_cli vc ON vc.idVenda = v.id
+             WHERE vc.idCli = ?
+             LIMIT 1"
+        );
+        $stmt->execute([$idCli]);
+        if ($v = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $sale['idAdm']       = $v['idAdm'];
+            $sale['idVenda']     = $v['idVenda'];
+            $sale['select_tipo'] = $v['tipo'];
+            $sale['valor']       = $v['valor'];
+            $sale['data']        = $v['dataV'];
+            // busca todos os vendedores
+            $stmt2 = $pdo->prepare("SELECT idFun FROM venda_fun WHERE idVenda = ?");
+            $stmt2->execute([$v['idVenda']]);
+            $sale['fun_ids'] = array_column($stmt2->fetchAll(), 'idFun');
+            $postNumFunc = count($sale['fun_ids']);
+        }
     }
 }
+
+// lógica de etapas
+$vendaSelecionada = $postVenda;
+$mostrarVenda     = ($vendaSelecionada==='Sim');
+$num_funcs        = $mostrarVenda
+                   ? $postNumFunc
+                   : max(1, $postNumFunc);
+
+// carrega selects
+ob_start(); include('../../_php/_buscar/_buscaAdm/buscaAdm.php'); $optAdm = ob_get_clean();
+ob_start(); include('../../_php/_buscar/_buscaFun/buscaFun.php'); $optFun = ob_get_clean();
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <link rel="stylesheet" href="../../_css/_menu/menu.css" />
   <link rel="stylesheet" href="../../_css/_cadastro/cad.css" />
-  <title><?= $editing ? 'Editar Funcionário' : 'Cadastro de Funcionário' ?></title>
+  <title><?= $editing?'Editar Cliente':'Cadastro de Cliente' ?></title>
 </head>
 <body>
   <div class="container">
-    <!-- Menu -->
+    <!-- Menu omitido -->
     <nav class="main-nav" role="navigation">
       <button class="menu-toggle" aria-label="Abrir menu">&#9776;</button>
       <ul class="nav-links">
@@ -50,135 +82,96 @@ if (isset($_GET['idFun']) && is_numeric($_GET['idFun'])) {
       </ul>
       <div class="nav-user-actions">
         <span class="user-name"><?= htmlspecialchars($nomeP) ?></span>
-        <form action="../../_php/_login/deslogar.php" method="post" class="logout-form">
+        <form action="../../_php/_login/deslogar.php" method="post">
           <button type="submit" class="logout-button">Sair</button>
         </form>
       </div>
-    </nav>
+    </nav>    
+    <!-- Etapa 1: venda Sim/Não -->
+    <form id="formVenda" action="" method="post" class="radio-group">
+      <input type="radio" name="venda" value="Sim" <?= $vendaSelecionada==='Sim'?'checked':'' ?>/> Sim
+      <input type="radio" name="venda" value="Nao" <?= $vendaSelecionada==='Nao'?'checked':'' ?>/> Não
+    </form>
 
-    <div class="form-container">
-      <form action="../../_php/_cadastro/cadFun.php" method="post">
-        <fieldset>
-          <legend><?= $editing ? 'Editar Funcionário' : 'Cadastro de Funcionário' ?></legend>
+    <!-- Etapa 2: número de funcionários -->
+    <?php if ($mostrarVenda): ?>
+    <form id="formNumFuncs" action="" method="post" class="inline-group">
+      <input type="hidden" name="venda" value="Sim"/>
+      <label>Funcionários:</label>
+      <input type="number" name="num_funcs" min="1" value="<?= $num_funcs ?>" required/>
+    </form>
+    <?php endif; ?>
 
-          <?php if (!$editing): // exibe matrícula apenas no cadastro ?>
-          <label for="matricula">Matrícula:</label>
-          <input
-            type="number"
-            name="idFun"
-            id="matricula"
-            min="1"
-            required
-            value="<?= htmlspecialchars($funcData['idFun'], ENT_QUOTES) ?>"
-          />
-          <?php else: // mantém idFun oculto na edição ?>
-          <input type="hidden" name="idFun" value="<?= $funcData['idFun'] ?>" />
-          <?php endif; ?>
+    <!-- Etapa 3: formulário principal -->
+    <form action="../../_php/_cadastro/cadCli.php" method="post">
+      <!-- hidden para propagar etapas -->
+      <input type="hidden" name="venda" value="<?= htmlspecialchars($vendaSelecionada) ?>" />
+      <input type="hidden" name="num_funcs" value="<?= $num_funcs ?>" />
+      <?php if ($editing): ?>
+        <input type="hidden" name="idCli" value="<?= $idCli ?>"/>
+      <?php endif; ?>
+      <fieldset>
+        <legend><?= $editing?'Editar':'Cadastrar' ?> Cliente<?= $mostrarVenda?' e Venda':'' ?></legend>
 
-          <label for="nome">Nome Completo:</label>
-          <input
-            type="text"
-            name="nome"
-            id="nome"
-            maxlength="100"
-            required
-            value="<?= htmlspecialchars($funcData['nome'], ENT_QUOTES) ?>"
-          />
+        <label>Nome:</label>
+        <input type="text" name="nome" required value="<?= htmlspecialchars($cliente['nome']) ?>"/>
 
-          <label for="endereco">Endereço Completo:</label>
-          <input
-            type="text"
-            name="endereco"
-            id="endereco"
-            maxlength="200"
-            required
-            value="<?= htmlspecialchars($funcData['endereco'], ENT_QUOTES) ?>"
-          />
+        <label>CPF:</label>
+        <input type="text" name="cpf" pattern="\d{11}" required
+               value="<?= htmlspecialchars($cliente['cpf']) ?>"/>
 
-          <label for="numero">Telefone:</label>
-          <input
-            type="text"
-            name="numero"
-            id="numero"
-            maxlength="20"
-            required
-            pattern="\d+[\d\s\-()]*"
-            title="Digite um telefone válido"
-            value="<?= htmlspecialchars($funcData['numero'], ENT_QUOTES) ?>"
-          />
+        <label>Endereço:</label>
+        <input type="text" name="endereco" required value="<?= htmlspecialchars($cliente['endereco']) ?>"/>
 
-          <label for="dataN">Data de Nascimento:</label>
-          <input
-            type="date"
-            name="dataN"
-            id="dataN"
-            required
-            value="<?= htmlspecialchars($funcData['dataN'], ENT_QUOTES) ?>"
-          />
+        <label>Telefone:</label>
+        <input type="text" name="telefone" required value="<?= htmlspecialchars($cliente['telefone']) ?>"/>
 
-          <label for="cpf">CPF:</label>
-          <input
-            type="text"
-            name="cpf"
-            id="cpf"
-            maxlength="14"
-            required
-            pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}"
-            title="Digite um CPF válido"
-            value="<?= htmlspecialchars($funcData['cpf'], ENT_QUOTES) ?>"
-          />
+        <?php if ($mostrarVenda): ?>
+          <label>Administradora:</label>
+          <select name="select-adm" required><?= $optAdm ?></select>
 
-          <label for="email">E-mail:</label>
-          <input
-            type="email"
-            name="email"
-            id="email"
-            maxlength="150"
-            required
-            value="<?= htmlspecialchars($funcData['email'], ENT_QUOTES) ?>"
-          />
+          <?php for ($i=0; $i<$num_funcs; $i++):
+            $fid = $sale['fun_ids'][$i] ?? null; ?>
+            <label>Funcionário <?= $i+1 ?>:</label>
+            <select name="select_fun[]" required>
+              <?php foreach (explode("\n",trim($optFun)) as $o):
+                if ($fid && strpos($o,"value=\"$fid\"")!==false) echo str_replace('<option','<option selected',$o);
+                else echo $o;
+              endforeach;?>
+            </select>
+          <?php endfor;?>
 
-          <label for="senha">
-            <?= $editing ? 'Nova Senha (deixe em branco para manter)' : 'Senha' ?>:
-          </label>
-          <input
-            type="password"
-            name="senha"
-            id="senha"
-            <?= $editing ? '' : 'required' ?>
-          />
+          <label>Contrato (nº):</label>
+          <input type="number" name="idVenda" required value="<?= htmlspecialchars($sale['idVenda']) ?>"/>
 
-          <label for="acesso">Perfil:</label>
-          <select name="acesso" id="acesso">
-            <option value="admin"    <?= $funcData['acesso']==='admin'?'selected':'' ?>>Administrador</option>
-            <option value="user"     <?= $funcData['acesso']==='user'?'selected':'' ?>>Funcionário</option>
-            <option value="vendedor" <?= $funcData['acesso']==='vendedor'?'selected':'' ?>>Vendedor</option>
+          <label>Tipo:</label>
+          <select name="select_tipo">
+            <option <?= $sale['select_tipo']==='Normal'?'selected':'' ?>>Normal</option>
+            <option <?= $sale['select_tipo']==='2%'?'selected':'' ?>>2%</option>
           </select>
 
-          <label for="ativo">Ativo:</label>
-          <select name="ativo" id="ativo">
-            <option value="Sim" <?= $funcData['ativo']==='Sim'?'selected':'' ?>>Sim</option>
-            <option value="Nao" <?= $funcData['ativo']==='Nao'?'selected':'' ?>>Não</option>
-          </select>
+          <label>Valor:</label>
+          <input type="number" name="valor" step="0.01" required value="<?= htmlspecialchars($sale['valor']) ?>"/>
 
-        </fieldset>
+          <label>Data:</label>
+          <input type="date" name="data" required value="<?= htmlspecialchars($sale['data']) ?>"/>
+        <?php endif;?>
+      </fieldset>
 
-        <div class="form-buttons">
-          <button type="submit" class="btn btn-primary">
-            <?= $editing ? 'Salvar Alterações' : 'Cadastrar' ?>
-          </button>
-          <?php if ($editing): ?>
-            <a href="../../_html/_lista/listaFun.php" class="btn btn-secondary">Cancelar</a>
-          <?php endif; ?>
-        </div>
-      </form>
-    </div>
+      <div class="form-buttons">
+        <button type="submit" class="btn btn-primary">
+          <?= $editing?'Salvar Alterações':'Cadastrar' ?>
+        </button>
+        <?php if ($editing): ?>
+          <a href="../../_html/_lista/listaCli.php" class="btn btn-secondary">Cancelar</a>
+        <?php endif;?>
+      </div>
+    </form>
   </div>
 
   <script>
-    document.querySelector('.menu-toggle').addEventListener('click', () => {
-      document.querySelector('.nav-links').classList.toggle('open');
-    });
+    document.querySelectorAll('input[name=venda]').forEach(rb=>rb.onchange=_=>document.getElementById('formVenda').submit());
+    document.querySelector('input[name=num_funcs]')?.addEventListener('change',_=>document.getElementById('formNumFuncs').submit());
   </script>
 </body>
 </html>
