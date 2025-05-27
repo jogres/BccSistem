@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../config/db.php';
-if ($acesso !== 'admin') exit;
+if ($acesso !== 'admin' && $acesso !== 'user') exit;
 
 // Seleciona clientes (agora incluindo o idCli)
 $stmt = $pdo->query("

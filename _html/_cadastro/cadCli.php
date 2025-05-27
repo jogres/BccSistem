@@ -90,7 +90,8 @@ ob_start(); include('../../_php/_buscar/_buscaFun/buscaFun.php'); $optFun = ob_g
           <button type="submit" class="logout-button">Sair</button>
         </form>
       </div>
-    </nav>     
+    </nav>
+    
     <!-- Etapa 1: Venda Sim/Não -->
     <form id="formVenda" action="?idCli=<?= $editing ? $idCli : '' ?>" method="post" class="radio-group">
       <?php if ($editing): ?><input type="hidden" name="idCli" value="<?= $idCli ?>" /><?php endif; ?>
@@ -184,6 +185,9 @@ ob_start(); include('../../_php/_buscar/_buscaFun/buscaFun.php'); $optFun = ob_g
     // auto-submit ao mudar número de funcionários
     document.querySelector('#formNumFuncs input[name="num_funcs"]')?.addEventListener('change', () => {
       document.getElementById('formNumFuncs').submit();
+    });
+    document.querySelector('.menu-toggle').addEventListener('click', () => {
+      document.querySelector('.nav-links').classList.toggle('open');
     });
   </script>
 </body>

@@ -67,17 +67,7 @@ if (isset($_GET['idAdm']) && is_numeric($_GET['idAdm'])) {
             <?= $editing ? 'Editar Administradora' : 'Cadastro de Administradora' ?>
           </legend>
 
-          <!-- Código só no cadastro -->
-          <?php if (! $editing): ?>
-            <label for="idAdm">Código da Administradora:</label>
-            <input
-              type="number"
-              name="idAdm"
-              id="idAdm"
-              min="1"
-              required
-            />
-          <?php endif; ?>
+          
 
           <label for="nome">Nome:</label>
           <input
