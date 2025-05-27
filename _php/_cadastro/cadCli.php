@@ -143,7 +143,8 @@ try {
             $nomeFun = $funData ? $funData['nome'] : 'Funcionário desconhecido';
             
             // Preparar a inserção da notificação
-            $stmtNotif = $pdo->prepare("INSERT INTO notificacoes (idFun, mensagem, link, lida, data_criacao) VALUES (?, ?, ?, 0, NOW())");
+            $stmtNotif = $pdo->prepare("INSERT INTO notificacoes (idFun, mensagem, link, lida, data_criacao, idVenda) VALUES (?, ?, ?, 0, NOW(), ?)");
+            $VendaID = (int) $vendaPk;
             
             // Criar a mensagem de notificação
             $mensagem = "Nova venda realizada por $nomeFun no valor de R$ " . number_format($valorTot, 2, ',', '.');
@@ -151,7 +152,7 @@ try {
             
             // Inserir a notificação para cada administrador
             foreach ($admins as $idAdmin) {
-                $stmtNotif->execute([$idAdmin, $mensagem, $link]);
+                $stmtNotif->execute([$idAdmin, $mensagem, $link, $VendaID]);
             }
         } else {
             $stmtCli = $pdo->prepare("INSERT INTO cad_cli (nome, cpf, idFun, endereco, telefone, tipo) VALUES (?, ?, ?, ?, ?, ?)");
