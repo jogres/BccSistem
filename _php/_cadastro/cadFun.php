@@ -9,8 +9,8 @@ $editing = isset($_POST['editing']) && $_POST['editing'] === '1';
 // 2) Coleta dados
 $idFun      = isset($_POST['idFun']) && is_numeric($_POST['idFun']) ? (int) $_POST['idFun'] : null;
 $nome       = trim($_POST['nome']     ?? '');
-$endereco   = trim($_POST['endereco'] ?? '');
-$telefone   = trim($_POST['numero']   ?? '');
+$endereco   = trim($_POST['rua'].', '.$_POST['numero'].', '.$_POST['bairro'].', '.$_POST['cidade'].', '.$_POST['estado'].', '.$_POST['cep'] ?? '');
+$telefone   = trim($_POST['telefone']   ?? '');
 $dataN      = $_POST['dataN']         ?? '';
 $cpf        = preg_replace('/\D/', '', $_POST['cpf'] ?? '');
 $email      = trim($_POST['email']    ?? '');

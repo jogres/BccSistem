@@ -80,16 +80,53 @@ if (isset($_GET['idFun']) && is_numeric($_GET['idFun'])) {
             type="text" name="nome" id="nome" maxlength="100" required
             value="<?= htmlspecialchars($funcData['nome'], ENT_QUOTES) ?>"
           />
+          <?php if (!$editing): ?>
+             <label for="rua">Rua:</label>
+             <input 
+               type="text" name="rua" id="rua" maxlength="100" required
+             />
+             
+             <label for="numero">Número:</label>
+             <input 
+               type="text" name="numero" id="numero" maxlength="10" required
+               
+             />
+             
+             <label for="bairro">Bairro:</label>
+             <input 
+               type="text" name="bairro" id="bairro" maxlength="50" required
+               
+             />
+             
+             <label for="cidade">Cidade:</label>
+             <input 
+               type="text" name="cidade" id="cidade" maxlength="50" required
+               
+             />
+             
+             <label for="estado">Estado:</label>
+             <input 
+               type="text" name="estado" id="estado" maxlength="2" required
+               placeholder="UF"
+               
+             />
+             
+             <label for="cep">CEP:</label>
+             <input 
+               type="text" name="cep" id="cep" maxlength="9" required
+               placeholder="00000-000"
+               />
+          <?php else: ?>
+            <label for="endereco">Endereço:</label>
+            <input
+              type="text" name="endereco" id="endereco" maxlength="200" required
+              value="<?= htmlspecialchars($funcData['endereco'], ENT_QUOTES) ?>"
+            />
+          <?php endif; ?>
 
-          <label for="endereco">Endereço Completo:</label>
+          <label for="telefone">Telefone:</label>
           <input
-            type="text" name="endereco" id="endereco" maxlength="200" required
-            value="<?= htmlspecialchars($funcData['endereco'], ENT_QUOTES) ?>"
-          />
-
-          <label for="numero">Telefone:</label>
-          <input
-            type="text" name="numero" id="numero" maxlength="20" required
+            type="text" name="telefone" id="telefone" maxlength="20" required
             pattern="\d+[\d\s\-()]*" title="Digite um telefone válido"
             value="<?= htmlspecialchars($funcData['numero'], ENT_QUOTES) ?>"
           />
