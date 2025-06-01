@@ -36,8 +36,9 @@ if ($isAdmin) {
 </head>
 <body>
   <div class="container">
+    <button class="menu-toggle float" aria-label="Abrir menu">&#9776;</button>
     <nav class="main-nav">
-      <button class="menu-toggle" aria-label="Abrir menu">&#9776;</button>
+      <button class="menu-toggle inmenu" aria-label="Fechar menu">&#9776;</button>
       <ul class="nav-links">
         <?php foreach ($menu as $link => $nome): ?>
           <li class="nav-item"><a href="<?= $link ?>" class="nav-link"><?= $nome ?></a></li>
@@ -52,6 +53,7 @@ if ($isAdmin) {
     </nav>
 
     <main class="dashboard">
+      <h2>Bem-vindo, <?= htmlspecialchars($nomeP) ?></h2>
 
       <?php if ($isAdmin && !empty($notificacoes)): ?>
         <section class="notificacoes">
@@ -65,50 +67,113 @@ if ($isAdmin) {
           <?php endforeach; ?>
         </section>
       <?php endif; ?>
-
-      <section class="stats">
+          
+      <!-- Grid dos cards principais (dois grandes em cima, dois menores embaixo) -->
+      <div class="stats">
         <div class="stat-card">
           <h3>Total de Vendas (Mês)</h3>
           <p>R$ <?= number_format($totalVendas, 2, ',', '.') ?></p>
         </div>
-        <?php if (!$isAdmin): ?>
-        <div class="stat-card">
-          <h3>Total Clientes (Mês)</h3>
-          <p><?= array_sum(array_values($clientesData)) ?></p>
-        </div>
-        <?php endif; ?>
-        <?php if ($isAdmin): ?>
-        <div class="stat-card">
-          <h3>Total Clientes Cadastrados</h3>
-          <p><?= $totalClientes ?></p>
-        </div>
-        <?php endif; ?>
         <div class="stat-card">
           <h3>Total Comissão (Mês)</h3>
           <p>R$ <?= number_format($totalComissao, 2, ',', '.') ?></p>
         </div>
-      </section>
-
-      <section class="charts">
+        <div class="stat-card">
+          <h3>
+            <?php if ($isAdmin): ?>
+              Total Clientes Cadastrados
+            <?php else: ?>
+              Total Clientes (Mês)
+            <?php endif; ?>
+          </h3>
+          <p>
+            <?php if ($isAdmin): ?>
+              <?= $totalClientes ?>
+            <?php else: ?>
+              <?= array_sum(array_values($clientesData)) ?>
+            <?php endif; ?>
+          </p>
+        </div>
+        <div class="stat-card aniversariantes">
+          <h3>Aniversariantes do Dia</h3>
+          <p>
+            <?php
+              // Exemplo de array de aniversariantes
+              if (!empty($aniversariantes)) {
+                foreach ($aniversariantes as $aniv) {
+                  echo htmlspecialchars($aniv) . '<br>';
+                }
+              } else {
+                echo "Nenhum aniversariante hoje";
+              }
+            ?>
+          </p>
+        </div>
+      </div>
+            
+      <div class="charts">
         <div class="chart-container">
           <h4><?= $isAdmin ? 'Vendas Totais por Dia' : 'Minhas Vendas por Dia' ?></h4>
           <canvas id="salesChart"></canvas>
         </div>
         <?php if (!$isAdmin): ?>
-        <div class="chart-container">
-          <h4>Meus Clientes por Dia</h4>
-          <canvas id="clientsChart"></canvas>
-        </div>
+          <div class="chart-container">
+            <h4>Meus Clientes por Dia</h4>
+            <canvas id="clientsChart"></canvas>
+          </div>
         <?php endif; ?>
-      </section>
+      </div>
     </main>
+        
   </div>
 
   <script>
-    document.querySelector('.menu-toggle').addEventListener('click', () => {
-      document.querySelector('.nav-links').classList.toggle('open');
+    const toggle = document.querySelector('.menu-toggle');
+    const menu = document.querySelector('.main-nav');
+    toggle.addEventListener('click', () => {
+      menu.classList.toggle('open');
+    });
+    // Fechar o menu ao clicar fora dele (opcional)
+    document.addEventListener('click', e => {
+      if (window.innerWidth <= 900 && menu.classList.contains('open')) {
+        if (!menu.contains(e.target) && !toggle.contains(e.target)) {
+          menu.classList.remove('open');
+        }
+      }
+    });
+    const floatBtn = document.querySelector('.menu-toggle.float');
+    const nav = document.querySelector('.main-nav');
+    const inMenuBtn = document.querySelector('.menu-toggle.inmenu');
+
+    // Mostrar menu
+    floatBtn.addEventListener('click', (e) => {
+      nav.classList.add('open');
+      floatBtn.style.display = 'none'; // Esconde ao abrir
+      e.stopPropagation();
     });
 
+    // Fechar menu pelo botão interno
+    inMenuBtn.addEventListener('click', (e) => {
+      nav.classList.remove('open');
+      floatBtn.style.display = 'block'; // Mostra ao fechar
+      e.stopPropagation();
+    });
+
+    // Fechar menu ao clicar fora
+    document.addEventListener('click', (e) => {
+      if (
+        nav.classList.contains('open') &&
+        window.innerWidth < 1920 &&
+        !nav.contains(e.target) &&
+        !floatBtn.contains(e.target)
+      ) {
+        nav.classList.remove('open');
+        floatBtn.style.display = 'block'; // Mostra novamente
+      }
+    });
+
+// Previne que cliques no menu fechem ele
+    nav.addEventListener('click', (e) => e.stopPropagation());
     const dias = <?= json_encode($dias) ?>;
     const vendasData = <?= json_encode($vendasData) ?>;
 
@@ -156,6 +221,7 @@ document.querySelectorAll('.btn-marcar-lida').forEach(button => {
   });
 });
 </script>
+
 
 </body>
 </html>
