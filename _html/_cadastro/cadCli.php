@@ -135,8 +135,49 @@ ob_start(); include('../../_php/_buscar/_buscaFun/buscaFun.php'); $optFun = ob_g
         <label>CPF:</label>
         <input type="text" name="cpf" pattern="\d{11}" required value="<?= htmlspecialchars($cliente['cpf']) ?>" />
 
-        <label>Endereço:</label>
-        <input type="text" name="endereco" required value="<?= htmlspecialchars($cliente['endereco']) ?>" />
+                  <?php if (!$editing): ?>
+             <label for="rua">Rua:</label>
+             <input 
+               type="text" name="rua" id="rua" maxlength="100" required
+             />
+             
+             <label for="numero">Número:</label>
+             <input 
+               type="text" name="numero" id="numero" maxlength="10" required
+               
+             />
+             
+             <label for="bairro">Bairro:</label>
+             <input 
+               type="text" name="bairro" id="bairro" maxlength="50" required
+               
+             />
+             
+             <label for="cidade">Cidade:</label>
+             <input 
+               type="text" name="cidade" id="cidade" maxlength="50" required
+               
+             />
+             
+             <label for="estado">Estado:</label>
+             <input 
+               type="text" name="estado" id="estado" maxlength="2" required
+               placeholder="UF"
+               
+             />
+             
+             <label for="cep">CEP:</label>
+             <input 
+               type="text" name="cep" id="cep" maxlength="9" required
+               placeholder="00000-000"
+               />
+          <?php else: ?>
+            <label for="endereco">Endereço:</label>
+            <input
+              type="text" name="endereco" id="endereco" maxlength="200" required
+              value="<?= htmlspecialchars($cliente['endereco'], ENT_QUOTES) ?>"
+            />
+          <?php endif; ?>
 
         <label>Telefone:</label>
         <input type="text" name="telefone" required value="<?= htmlspecialchars($cliente['telefone']) ?>" />
@@ -178,61 +219,7 @@ ob_start(); include('../../_php/_buscar/_buscaFun/buscaFun.php'); $optFun = ob_g
       </div>
     </form>
   </div>
-  <script>
-    // auto-submit ao mudar venda
-    document.querySelectorAll('#formVenda input[name="venda"]').forEach(rb => {
-      rb.addEventListener('change', () => document.getElementById('formVenda').submit());
-    });
-    // auto-submit ao mudar número de funcionários
-    document.querySelector('#formNumFuncs input[name="num_funcs"]')?.addEventListener('change', () => {
-      document.getElementById('formNumFuncs').submit();
-    });
-const toggle = document.querySelector('.menu-toggle');
-    const menu = document.querySelector('.main-nav');
-    toggle.addEventListener('click', () => {
-      menu.classList.toggle('open');
-    });
-    // Fechar o menu ao clicar fora dele (opcional)
-    document.addEventListener('click', e => {
-      if (window.innerWidth <= 900 && menu.classList.contains('open')) {
-        if (!menu.contains(e.target) && !toggle.contains(e.target)) {
-          menu.classList.remove('open');
-        }
-      }
-    });
-    const floatBtn = document.querySelector('.menu-toggle.float');
-    const nav = document.querySelector('.main-nav');
-    const inMenuBtn = document.querySelector('.menu-toggle.inmenu');
-
-    // Mostrar menu
-    floatBtn.addEventListener('click', (e) => {
-      nav.classList.add('open');
-      floatBtn.style.display = 'none'; // Esconde ao abrir
-      e.stopPropagation();
-    });
-
-    // Fechar menu pelo botão interno
-    inMenuBtn.addEventListener('click', (e) => {
-      nav.classList.remove('open');
-      floatBtn.style.display = 'block'; // Mostra ao fechar
-      e.stopPropagation();
-    });
-
-    // Fechar menu ao clicar fora
-    document.addEventListener('click', (e) => {
-      if (
-        nav.classList.contains('open') &&
-        window.innerWidth < 1920 &&
-        !nav.contains(e.target) &&
-        !floatBtn.contains(e.target)
-      ) {
-        nav.classList.remove('open');
-        floatBtn.style.display = 'block'; // Mostra novamente
-      }
-    });
-
-// Previne que cliques no menu fechem ele
-    nav.addEventListener('click', (e) => e.stopPropagation());
-  </script>
+  <script src="../../_js/_cadastro/cadCli.js"></script>
+  <script src="../../_js/_menu/menu.js"></script>
 </body>
 </html>

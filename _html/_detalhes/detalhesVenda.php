@@ -12,9 +12,10 @@ include('../../_php/_detalhe/detalhesVenda.php');
   <link rel="stylesheet" href="../../_css/_menu/menu.css">
 </head>
 <body>
-  <div class="container"> <!-- TROQUEI container por detalhes-container -->
-    <nav class="main-nav" role="navigation">
-      <button class="menu-toggle" aria-label="Abrir menu">&#9776;</button>
+  <div class="container"> 
+    <button class="menu-toggle float" aria-label="Abrir menu">&#9776;</button>
+    <nav class="main-nav">
+      <button class="menu-toggle inmenu" aria-label="Fechar menu">&#9776;</button>
       <ul class="nav-links">
         <?php foreach ($menu as $link => $nome): ?>
           <li class="nav-item"><a href="<?= $link ?>" class="nav-link"><?= $nome ?></a></li>
@@ -22,7 +23,7 @@ include('../../_php/_detalhe/detalhesVenda.php');
       </ul>
       <div class="nav-user-actions">
         <span class="user-name"><?= htmlspecialchars($nomeP) ?></span>
-        <form action="../../_php/_login/deslogar.php" method="post">
+        <form action="../../_php/_login/deslogar.php" method="post" class="logout-form">
           <button type="submit" class="logout-button">Sair</button>
         </form>
       </div>
@@ -55,5 +56,6 @@ include('../../_php/_detalhe/detalhesVenda.php');
           <?php endif; ?>
     </div>
   </div>
+  <script src="../../_js/_menu/menu.js"></script>
 </body>
 </html>

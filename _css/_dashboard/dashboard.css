@@ -1,5 +1,5 @@
 .dashboard {
-  max-width: 1200px;
+  max-width: 100vw;
   margin-left: 260px; /* Espaço para menu lateral fixo */
   padding: 2rem 2rem 2rem 2.5rem;
   font-family: 'Segoe UI', Arial, sans-serif;
@@ -68,9 +68,9 @@
   margin-bottom: 1rem;
 }
 /* Responsividade */
-@media (max-width: 1050px) {
+@media (max-width: 1919px) {
   .dashboard {
-    margin: 0;
+    margin-left: 100px;
     padding: 1rem 0.5rem;
   }
   .stats, .charts {

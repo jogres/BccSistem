@@ -9,7 +9,7 @@ if (!in_array($acesso, ['admin','user','vendedor'])) {
 $idCli    = isset($_POST['idCli']) ? (int) $_POST['idCli'] : null;
 $nome     = trim($_POST['nome']     ?? '');
 $cpf      = preg_replace('/\D/', '', $_POST['cpf'] ?? '');
-$endereco = trim($_POST['endereco'] ?? '');
+$endereco = $endereco   = trim($_POST['rua'].', '.$_POST['numero'].', '.$_POST['bairro'].', '.$_POST['cidade'].', '.$_POST['estado'].', '.$_POST['cep'] ?? '');
 $telefone = trim($_POST['telefone'] ?? '');
 $tipo     = $_SESSION['venda'] === 'Sim' ? 'com_venda' : 'sem_venda';
 

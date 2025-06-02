@@ -23,7 +23,7 @@ if ($acesso === 'admin' && isset($_GET['idFun'])) {
 }
 
 // 3) Paginação
-$limit = 10;
+$limit = 15;
 $page  = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
 if ($page < 1) { $page = 1; }
 $offset = ($page - 1) * $limit;

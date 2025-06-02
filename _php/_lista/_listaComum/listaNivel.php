@@ -2,6 +2,11 @@
 require_once __DIR__ . '/../../../config/db.php';
 if ($acesso !== 'admin') exit;
 
+$limit = 10; // Número de registros por página
+$page  = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($page < 1) { $page = 1; }
+$offset = ($page - 1) * $limit;
+
 $tiposNivel = [
     'master'  => ['label' => 'Master',  'pk' => 'idMaster'],
     'classic' => ['label' => 'Classic', 'pk' => 'idClassic'],
@@ -12,7 +17,13 @@ foreach ($tiposNivel as $tabela => $info) {
     $rotulo = $info['label'];
     $pk     = $info['pk'];
 
-    $stmt = $pdo->query(
+    // Obter o total de registros
+    $stmtTotal = $pdo->query("SELECT COUNT(*) FROM {$tabela}");
+    $totalRows = $stmtTotal->fetchColumn();
+    $totalPages = ceil($totalRows / $limit);
+
+    // Obter os registros da página atual
+    $stmt = $pdo->prepare(
         "SELECT n.{$pk} AS idPlano,
                 n.nome,
                 n.primeira,
@@ -22,8 +33,12 @@ foreach ($tiposNivel as $tabela => $info) {
                 a.nome AS adm_nome
          FROM {$tabela} n
          JOIN cad_adm a ON a.idAdm = n.idAdm
-         ORDER BY n.nome"
+         ORDER BY n.nome
+         LIMIT :limit OFFSET :offset"
     );
+    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $stmt->execute();
     $planos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     echo "<h3>{$rotulo}</h3>";
@@ -68,5 +83,22 @@ foreach ($tiposNivel as $tabela => $info) {
     }
 
     echo "</tbody></table><br/>";
+
+    // Exibir a paginação se houver mais de uma página
+  
 }
+  if ($totalPages > 1) {
+        echo "<nav aria-label='Paginação de {$rotulo}'><ul class='pagination'>";
+        $prevPage = max(1, $page - 1);
+        echo "<li class='page-item". ($page==1? ' disabled':'') ."'>";
+        echo "<a class='page-link' href='?page=$prevPage' aria-label='Anterior'>Anterior</a></li>";
+        for ($p=1; $p<=$totalPages; $p++) {
+            echo "<li class='page-item". ($p==$page? ' active':'') ."'>";
+            echo "<a class='page-link' href='?page=$p'>$p</a></li>";
+        }
+        $nextPage = min($totalPages, $page + 1);
+        echo "<li class='page-item". ($page==$totalPages? ' disabled':'') ."'>";
+        echo "<a class='page-link' href='?page=$nextPage' aria-label='Próximo'>Próximo</a></li>";
+        echo "</ul></nav>";
+    }
 ?>
