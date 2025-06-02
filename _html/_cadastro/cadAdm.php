@@ -69,7 +69,7 @@ if (isset($_GET['idAdm']) && is_numeric($_GET['idAdm'])) {
           
 
           <label for="nome">Nome:</label>
-          <input
+          <input class="nome"
             type="text"
             name="nome"
             id="nome"
@@ -79,7 +79,7 @@ if (isset($_GET['idAdm']) && is_numeric($_GET['idAdm'])) {
           />
 
           <label for="cnpj">CNPJ:</label>
-          <input
+          <input class="cnpj"
             type="text"
             name="cnpj"
             id="cnpj"

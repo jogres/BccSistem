@@ -12,6 +12,7 @@ $cpf      = preg_replace('/\D/', '', $_POST['cpf'] ?? '');
 $endereco = $endereco   = trim($_POST['rua'].', '.$_POST['numero'].', '.$_POST['bairro'].', '.$_POST['cidade'].', '.$_POST['estado'].', '.$_POST['cep'] ?? '');
 $telefone = trim($_POST['telefone'] ?? '');
 $tipo     = $_SESSION['venda'] === 'Sim' ? 'com_venda' : 'sem_venda';
+$descricao = trim($_POST['descricao'] ?? '');
 
 if ($nome === '' || $cpf === '' || $endereco === '' || $telefone === '') {
     exit('Erro: preencha todos os dados do cliente.');
@@ -27,8 +28,8 @@ try {
     $pdo->beginTransaction();
 
     if ($idCli) {
-        $stmt = $pdo->prepare("UPDATE cad_cli SET nome = ?, cpf = ?, endereco = ?, telefone = ?, tipo = ? WHERE idCli = ?");
-        $stmt->execute([$nome, $cpf, $endereco, $telefone, $tipo, $idCli]);
+        $stmt = $pdo->prepare("UPDATE cad_cli SET nome = ?, cpf = ?, endereco = ?, telefone = ?, tipo = ?, descricao = ? WHERE idCli = ?");
+        $stmt->execute([$nome, $cpf, $endereco, $telefone, $tipo, $descricao, $idCli]);
 
         if ($_SESSION['venda'] === 'Sim') {
             $idAdm       = (int) ($_POST['select-adm']  ?? 0);
@@ -114,8 +115,8 @@ try {
 
             $firstFun = (int) $fun_ids[0];
 
-            $stmtCli = $pdo->prepare("INSERT INTO cad_cli (nome, cpf, idFun, endereco, telefone, tipo) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmtCli->execute([$nome, $cpf, $firstFun, $endereco, $telefone, 'com_venda']);
+            $stmtCli = $pdo->prepare("INSERT INTO cad_cli (nome, cpf, idFun, endereco, telefone, tipo, descricao) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmtCli->execute([$nome, $cpf, $firstFun, $endereco, $telefone, 'com_venda', $descricao]);
             $idCli = $pdo->lastInsertId();
 
             $stmtVenda = $pdo->prepare("INSERT INTO venda (idVenda, tipo, valor, dataV, idAdm) VALUES (?, ?, ?, ?, ?)");
@@ -155,8 +156,8 @@ try {
                 $stmtNotif->execute([$idAdmin, $mensagem, $link, $VendaID]);
             }
         } else {
-            $stmtCli = $pdo->prepare("INSERT INTO cad_cli (nome, cpf, idFun, endereco, telefone, tipo) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmtCli->execute([$nome, $cpf, $_SESSION['user_id'], $endereco, $telefone, 'sem_venda']);
+            $stmtCli = $pdo->prepare("INSERT INTO cad_cli (nome, cpf, idFun, endereco, telefone, tipo, descricao) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmtCli->execute([$nome, $cpf, $_SESSION['user_id'], $endereco, $telefone, 'sem_venda', $descricao]);
             $idCli = $pdo->lastInsertId();
         }
     }

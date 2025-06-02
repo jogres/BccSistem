@@ -85,23 +85,23 @@ $options_adm = ob_get_clean();
           </select>
 
           <label for="nome">Nome do Plano:</label>
-          <input type="text" id="nome" name="nome" maxlength="100" required
+          <input class="nome" type="text" id="nome" name="nome" maxlength="100" required
                  value="<?= htmlspecialchars($nivelData['nome'], ENT_QUOTES) ?>">
 
           <label for="primeira">1ª (%):</label>
-          <input type="number" id="primeira" name="primeira" min="0" max="100" step="0.01" required
+          <input class="primeira" type="number" id="primeira" name="primeira" min="0" max="100" step="0.01" required
                  value="<?= htmlspecialchars($nivelData['primeira'], ENT_QUOTES) ?>">
 
           <label for="segunda">2ª (%):</label>
-          <input type="number" id="segunda" name="segunda" min="0" max="100" step="0.01" required
+          <input class="segunda" type="number" id="segunda" name="segunda" min="0" max="100" step="0.01" required
                  value="<?= htmlspecialchars($nivelData['segunda'], ENT_QUOTES) ?>">
 
           <label for="terceira">3ª (%):</label>
-          <input type="number" id="terceira" name="terceira" min="0" max="100" step="0.01" required
+          <input class="terceira" type="number" id="terceira" name="terceira" min="0" max="100" step="0.01" required
                  value="<?= htmlspecialchars($nivelData['terceira'], ENT_QUOTES) ?>">
 
           <label for="quarta">4ª (%):</label>
-          <input type="number" id="quarta" name="quarta" min="0" max="100" step="0.01" required
+          <input class="quarta" type="number" id="quarta" name="quarta" min="0" max="100" step="0.01" required
                  value="<?= htmlspecialchars($nivelData['quarta'], ENT_QUOTES) ?>">
 
           <label for="select-adm">Administradora:</label>

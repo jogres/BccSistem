@@ -12,6 +12,8 @@
   color: #002060;
   font-weight: bold;
   margin-bottom: 1.6rem;
+  display: flex;
+  flex-direction: row-reverse;
 }
 .stats {
   display: grid;
@@ -67,8 +69,97 @@
   font-weight: bold;
   margin-bottom: 1rem;
 }
+/* Container principal das notificações */
+.notificacoes {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  max-width: 600px;
+  margin: 2rem auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Título da seção */
+.notificacoes h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+/* Cada notificação individual */
+.notificacao {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-left: 4px solid #007bff; /* Cor de destaque */
+  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.notificacao:hover {
+  background-color: #f1f9ff;
+}
+
+/* Link da notificação */
+.notificacao a {
+  text-decoration: none;
+  color: #007bff;
+  font-weight: 500;
+}
+
+.notificacao a:hover {
+  text-decoration: underline;
+}
+
+/* Data da notificação */
+.notificacao small {
+  display: block;
+  color: #666;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* Botão para marcar como lida */
+.btn-marcar-lida {
+  margin-top: 0.75rem;
+  padding: 0.5rem 1rem;
+  background-color: #28a745;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.3s ease;
+}
+
+.btn-marcar-lida:hover {
+  background-color: #218838;
+}
+
 /* Responsividade */
-@media (max-width: 1919px) {
+@media (max-width: 600px) {
+  .notificacoes {
+    padding: 1rem;
+    margin: 1rem;
+  }
+
+  .btn-marcar-lida {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Responsividade */
+@media(max-width:1919px){
+  .dashboard {
+    margin-left: 100px;
+    padding: 1rem 0.5rem;
+  }
+}
+@media (max-width: 1050px) {
   .dashboard {
     margin-left: 100px;
     padding: 1rem 0.5rem;

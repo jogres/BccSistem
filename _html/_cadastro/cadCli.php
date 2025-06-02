@@ -5,8 +5,11 @@ require_once __DIR__ . '/../../config/db.php';
 // 1) Detecção de edição
 $editing = false;
 $idCli   = null;
-$cliente = ['nome'=>'','cpf'=>'','endereco'=>'','telefone'=>''];
+$cliente = ['nome'=>'','cpf'=>'','endereco'=>'','telefone'=>'','descricao'=>''];
 $sale    = ['idAdm'=>null,'fun_ids'=>[],'idVenda'=>'','select_tipo'=>'Normal','valor'=>'','data'=>date('Y-m-d')];
+
+
+
 
 // 2) Captura POST para etapas
 $postVenda   = $_POST['venda']     ?? ($_SESSION['venda'] ?? 'Nao');
@@ -17,14 +20,16 @@ if (isset($_GET['idCli']) && is_numeric($_GET['idCli'])) {
     $editing = true;
     $idCli   = (int) $_GET['idCli'];
     // Cliente
-    $stmt = $pdo->prepare("SELECT nome, cpf, endereco, telefone, tipo FROM cad_cli WHERE idCli = ?");
+    $stmt = $pdo->prepare("SELECT nome, cpf, endereco, telefone, tipo, descricao FROM cad_cli WHERE idCli = ?");
     $stmt->execute([$idCli]);
     if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $cliente = [
             'nome'     => $row['nome'],
             'cpf'      => $row['cpf'],
             'endereco' => $row['endereco'],
-            'telefone' => $row['telefone']
+            'telefone' => $row['telefone'],
+            'descricao'=> $row['descricao'] ?? '',
+            'tipo'     => $row['tipo'] === 'com_venda' ? 'Sim' : 'Nao'
         ];
         $postVenda = 'Sim';
     }
@@ -108,17 +113,19 @@ ob_start(); include('../../_php/_buscar/_buscaFun/buscaFun.php'); $optFun = ob_g
     </form>
 
     <!-- Etapa 2: Número de funcionários -->
-    <form id="formNumFuncs" action="?idCli=<?= $editing ? $idCli : '' ?>" method="post" class="inline-group">
-      <?php if ($editing): ?><input type="hidden" name="idCli" value="<?= $idCli ?>" /><?php endif; ?>
-      <input type="hidden" name="venda" value="<?= $vendaSelecionada ?>" />
-      <label>Quantos funcionários?</label>
-      <input type="number" name="num_funcs" min="1" value="<?= $num_funcs ?>" required />
-      <script>
-        document.querySelector('#formNumFuncs input[name=num_funcs]').addEventListener('change', () =>
-          document.getElementById('formNumFuncs').submit()
-        );
-      </script>
-    </form>
+    <?php if ($vendaSelecionada === 'Sim'): ?>
+        <form id="formNumFuncs" action="?idCli=<?= $editing ? $idCli : '' ?>" method="post" class="inline-group">
+          <?php if ($editing): ?><input type="hidden" name="idCli" value="<?= $idCli ?>" /><?php endif; ?>
+          <input type="hidden" name="venda" value="<?= $vendaSelecionada ?>" />
+          <label>Quantos Vendedores?</label>
+          <input class="num-funcs" type="number" name="num_funcs" min="1" value="<?= $num_funcs ?>" required />
+          <script>
+            document.querySelector('#formNumFuncs input[name=num_funcs]').addEventListener('change', () =>
+              document.getElementById('formNumFuncs').submit()
+            );
+          </script>
+        </form>
+    <?php endif; ?>
 
     <!-- Etapa 3: Formulário Cliente e Venda -->
     <form action="../../_php/_cadastro/cadCli.php" method="post">
@@ -130,57 +137,57 @@ ob_start(); include('../../_php/_buscar/_buscaFun/buscaFun.php'); $optFun = ob_g
         <legend><?= $editing ? 'Editar Cliente' : 'Cadastrar Cliente' ?><?= $mostrarVenda ? ' e Venda' : '' ?></legend>
 
         <label>Nome:</label>
-        <input type="text" name="nome" required value="<?= htmlspecialchars($cliente['nome']) ?>" />
+        <input class="nome" type="text" name="nome" required value="<?= htmlspecialchars($cliente['nome']) ?>" />
 
         <label>CPF:</label>
-        <input type="text" name="cpf" pattern="\d{11}" required value="<?= htmlspecialchars($cliente['cpf']) ?>" />
+        <input class="cpf" type="text" name="cpf" pattern="\d{11}" required value="<?= htmlspecialchars($cliente['cpf']) ?>" />
 
-                  <?php if (!$editing): ?>
-             <label for="rua">Rua:</label>
-             <input 
-               type="text" name="rua" id="rua" maxlength="100" required
-             />
-             
-             <label for="numero">Número:</label>
-             <input 
-               type="text" name="numero" id="numero" maxlength="10" required
-               
-             />
-             
-             <label for="bairro">Bairro:</label>
-             <input 
-               type="text" name="bairro" id="bairro" maxlength="50" required
-               
-             />
-             
-             <label for="cidade">Cidade:</label>
-             <input 
-               type="text" name="cidade" id="cidade" maxlength="50" required
-               
-             />
-             
-             <label for="estado">Estado:</label>
-             <input 
-               type="text" name="estado" id="estado" maxlength="2" required
-               placeholder="UF"
-               
-             />
-             
-             <label for="cep">CEP:</label>
-             <input 
-               type="text" name="cep" id="cep" maxlength="9" required
-               placeholder="00000-000"
-               />
+          <?php if (!$editing): ?>
+            <div class="endereco-group">
+              <label for="rua">Rua:</label>
+              <input class="endereco"
+                type="text" name="rua" id="rua" maxlength="100" required
+              />
+
+              <label for="numero">Número:</label>
+              <input class="endereco"
+                type="text" name="numero" id="numero" maxlength="10" required
+
+              />
+
+              <label for="bairro">Bairro:</label>
+              <input class="endereco"
+                type="text" name="bairro" id="bairro" maxlength="50" required
+              />
+
+              <label for="cidade">Cidade:</label>
+              <input class="endereco"
+                type="text" name="cidade" id="cidade" maxlength="50" required
+
+              />
+
+              <label for="estado">Estado:</label>
+              <input class="endereco"
+                type="text" name="estado" id="estado" maxlength="2" required
+                placeholder="UF"
+
+              />
+
+              <label for="cep">CEP:</label>
+              <input class="endereco"
+                type="text" name="cep" id="cep" maxlength="9" required
+                placeholder="00000-000"
+                />
+            </div>
           <?php else: ?>
             <label for="endereco">Endereço:</label>
-            <input
-              type="text" name="endereco" id="endereco" maxlength="200" required
-              value="<?= htmlspecialchars($cliente['endereco'], ENT_QUOTES) ?>"
-            />
+            <textarea name="endereco" id="endereco" required><?= htmlspecialchars($cliente['endereco']) ?></textarea>
           <?php endif; ?>
+        <label for="descricao">Descrição</label>
+        <textarea name="descricao" id="descricao" required><?= htmlspecialchars($cliente['descricao']) ?></textarea>  
 
         <label>Telefone:</label>
-        <input type="text" name="telefone" required value="<?= htmlspecialchars($cliente['telefone']) ?>" />
+        <input class="telefone" type="text" name="telefone" required value="<?= htmlspecialchars($cliente['telefone']) ?>" />
 
         <?php if ($mostrarVenda): ?>
           <label>Administradora:</label>
@@ -197,7 +204,7 @@ ob_start(); include('../../_php/_buscar/_buscaFun/buscaFun.php'); $optFun = ob_g
           <?php endfor; ?>
 
           <label>Contrato (nº):</label>
-          <input type="number" name="idVenda" required value="<?= htmlspecialchars($sale['idVenda']) ?>" />
+          <input class="contrato" type="number" name="idVenda" required value="<?= htmlspecialchars($sale['idVenda']) ?>" />
 
           <label>Tipo:</label>
           <select name="select_tipo">
@@ -206,10 +213,10 @@ ob_start(); include('../../_php/_buscar/_buscaFun/buscaFun.php'); $optFun = ob_g
           </select>
 
           <label>Valor:</label>
-          <input type="number" name="valor" step="0.01" required value="<?= htmlspecialchars($sale['valor']) ?>" />
+          <input class="valor" type="number" name="valor" step="0.01" required value="<?= htmlspecialchars($sale['valor']) ?>" />
 
           <label>Data:</label>
-          <input type="date" name="data" required value="<?= htmlspecialchars($sale['data']) ?>" />
+          <input class="data" type="date" name="data" required value="<?= htmlspecialchars($sale['data']) ?>" />
         <?php endif; ?>
       </fieldset>
 

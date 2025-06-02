@@ -26,13 +26,7 @@ if ($isAdmin) {
   <link rel="stylesheet" href="../../_css/_menu/menu.css">
   <link rel="stylesheet" href="../../_css/_dashboard/dashboard.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    .notificacoes { margin: 20px 0; padding: 10px; background: #f9f9f9; border: 1px solid #ccc; }
-    .notificacoes h3 { margin-bottom: 10px; }
-    .notificacao { margin-bottom: 8px; }
-    .notificacao a { color: #0077cc; text-decoration: none; }
-    .notificacao small { color: #888; font-size: 0.9em; }
-  </style>
+
 </head>
 <body>
   <div class="container">

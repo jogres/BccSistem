@@ -67,7 +67,7 @@ if (isset($_GET['idFun']) && is_numeric($_GET['idFun'])) {
 
           <?php if (!$editing): ?>
             <label for="matricula">Matrícula:</label>
-            <input
+            <input class="matricula"
               type="number"
               name="idFun"
               id="matricula"
@@ -77,76 +77,70 @@ if (isset($_GET['idFun']) && is_numeric($_GET['idFun'])) {
           <?php endif; ?>
 
           <label for="nome">Nome Completo:</label>
-          <input
+          <input class="nome"
             type="text" name="nome" id="nome" maxlength="100" required
             value="<?= htmlspecialchars($funcData['nome'], ENT_QUOTES) ?>"
           />
           <?php if (!$editing): ?>
              <label for="rua">Rua:</label>
-             <input 
+             <input class="endereco"
                type="text" name="rua" id="rua" maxlength="100" required
              />
              
              <label for="numero">Número:</label>
-             <input 
+             <input class="endereco"
                type="text" name="numero" id="numero" maxlength="10" required
-               
              />
-             
+
              <label for="bairro">Bairro:</label>
-             <input 
+             <input class="endereco"
                type="text" name="bairro" id="bairro" maxlength="50" required
-               
              />
-             
+
              <label for="cidade">Cidade:</label>
-             <input 
+             <input class="endereco"
                type="text" name="cidade" id="cidade" maxlength="50" required
-               
              />
-             
+
              <label for="estado">Estado:</label>
-             <input 
+             <input class="endereco"
                type="text" name="estado" id="estado" maxlength="2" required
                placeholder="UF"
-               
              />
-             
+
              <label for="cep">CEP:</label>
-             <input 
+             <input class="endereco"
                type="text" name="cep" id="cep" maxlength="9" required
                placeholder="00000-000"
                />
           <?php else: ?>
             <label for="endereco">Endereço:</label>
-            <input
-              type="text" name="endereco" id="endereco" maxlength="200" required
-              value="<?= htmlspecialchars($funcData['endereco'], ENT_QUOTES) ?>"
-            />
+            <textarea name="endereco" id="endereco" required><?= htmlspecialchars($cliente['endereco']) ?></textarea>
           <?php endif; ?>
+          
 
           <label for="telefone">Telefone:</label>
-          <input
+          <input class="telefone"
             type="text" name="telefone" id="telefone" maxlength="20" required
             pattern="\d+[\d\s\-()]*" title="Digite um telefone válido"
             value="<?= htmlspecialchars($funcData['numero'], ENT_QUOTES) ?>"
           />
 
           <label for="dataN">Data de Nascimento:</label>
-          <input
+          <input class="data"
             type="date" name="dataN" id="dataN" required
             value="<?= htmlspecialchars($funcData['dataN'], ENT_QUOTES) ?>"
           />
 
           <label for="cpf">CPF:</label>
-          <input
+          <input class="cpf"
             type="text" name="cpf" id="cpf" maxlength="14" required
             pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}" title="Digite um CPF válido"
             value="<?= htmlspecialchars($funcData['cpf'], ENT_QUOTES) ?>"
           />
 
           <label for="email">E-mail:</label>
-          <input
+          <input class="email"
             type="email" name="email" id="email" maxlength="150" required
             value="<?= htmlspecialchars($funcData['email'], ENT_QUOTES) ?>"
           />
@@ -154,7 +148,7 @@ if (isset($_GET['idFun']) && is_numeric($_GET['idFun'])) {
           <label for="senha">
             <?= $editing ? 'Nova Senha (deixe em branco para manter)' : 'Senha' ?>:
           </label>
-          <input
+          <input class="senha"
             type="password" name="senha" id="senha" <?= $editing ? '' : 'required' ?>
           />
 
