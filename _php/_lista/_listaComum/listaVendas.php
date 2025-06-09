@@ -10,6 +10,7 @@ if (!$userId) {
     header('Location: ../../_html/_login/index.php');
     exit;
 }
+
 echo "<table>";
 
 // 2) Determina filtro por funcionário
@@ -40,7 +41,7 @@ $stmtCount->execute($countParams);
 $totalRows = (int)$stmtCount->fetchColumn();
 $totalPages = (int)ceil($totalRows / $limit);
 
-// 5) Carrega vendas com limit e offset usando literais para evitar binding de strings
+// 5) Carrega vendas com limit e offset
 $sql = "
     SELECT
         v.id        AS venda_pk,
@@ -62,38 +63,37 @@ if ($useFilter) {
     $sql .= " WHERE vf.idFun = ?";
     $params[] = $filterFun;
 }
-// Adiciona paginação diretamente
 $sql .= " ORDER BY v.dataV DESC LIMIT {$limit} OFFSET {$offset}";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $vendas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// 6) Carrega comissões se necessário
-$commissions = [];
-if ($useFilter && $vendas) {
-    $saleIds = array_column($vendas, 'venda_pk');
-    $placeholders = implode(',', array_fill(0, count($saleIds), '?'));
-    $sqlComm = "
-        SELECT idVenda, primeira, segunda, terceira, quarta, totalC AS total_comissao
-        FROM comissao
-        WHERE idVenda IN ($placeholders) AND idFun = ?
-    ";
-    $stmtComm = $pdo->prepare($sqlComm);
-    $stmtComm->execute(array_merge($saleIds, [$filterFun]));
-    foreach ($stmtComm->fetchAll(PDO::FETCH_ASSOC) as $c) {
-        $commissions[$c['idVenda']] = $c;
-    }
-    echo "<thead> <tr> <th>Contrato</th><th>Cliente</th><th>Vendedor</th><th>Data</th><th>Adiministradora</th><th>Valor</th><th>1ª </th><th>2ª </th><th>3ª (%)</th><th>4ª (%)</th><th>Total Comissão</th> </tr> </thead>";
-}else {
-    echo "<thead> <tr> <th>Contrato</th><th>Cliente</th><th>Vendedor</th><th>Data</th><th>Adiministradora</th><th>Valor</th> </tr> </thead>";
+// 6) Renderiza cabeçalho da tabela
+if ($useFilter) {
+    echo "<thead><tr>"
+       ."<th>Contrato</th><th>Cliente</th><th>Vendedor</th><th>Data</th><th>Administradora</th><th>Valor</th>"
+       ."<th>1ª Comissão</th><th>2ª Comissão</th><th>3ª Comissão</th><th>4ª Comissão</th><th>Total Comissão</th>"
+       ."</tr></thead>";
+} else {
+    echo "<thead><tr>"
+       ."<th>Contrato</th><th>Cliente</th><th>Vendedor</th><th>Data</th><th>Administradora</th><th>Valor</th>"
+       ."</tr></thead>";
 }
 
-// 7) Renderiza a tabela
-$colspan = $useFilter ? 11 : 6;
+echo "<tbody>";
+
+// 7) Renderiza cada linha de venda
 if (empty($vendas)) {
+    $colspan = $useFilter ? 11 : 6;
     echo "<tr><td colspan='{$colspan}'>Nenhuma venda encontrada.</td></tr>";
 } else {
+    // Prepara queries para comissão por parcela
+    $stmtP1 = $pdo->prepare("SELECT valor FROM parcela1 WHERE idVenda = ? AND idFun = ?");
+    $stmtP2 = $pdo->prepare("SELECT valor FROM parcela2 WHERE idVenda = ? AND idFun = ?");
+    $stmtP3 = $pdo->prepare("SELECT valor FROM parcela3 WHERE idVenda = ? AND idFun = ?");
+    $stmtP4 = $pdo->prepare("SELECT valor FROM parcela4 WHERE idVenda = ? AND idFun = ?");
+
     foreach ($vendas as $row) {
         $vendaPk    = $row['venda_pk'];
         $contrato   = htmlspecialchars($row['contrato'], ENT_QUOTES);
@@ -101,49 +101,62 @@ if (empty($vendas)) {
         $vendedor   = htmlspecialchars($row['vendedor'], ENT_QUOTES);
         $data       = htmlspecialchars($row['data_venda'], ENT_QUOTES);
         $adm        = htmlspecialchars($row['administradora'], ENT_QUOTES);
-        $valorVenda = 'R$ ' . number_format($row['valor_venda'], 2, ',', '.');
-        echo "<tbody>";
+        
+        // Lógica de divisão do valor da venda por número de funcionários
+        $stmtCountFun = $pdo->prepare("SELECT COUNT(*) FROM venda_fun WHERE idVenda = ?");
+        $stmtCountFun->execute([$vendaPk]);
+        $countFun = (int)$stmtCountFun->fetchColumn() ?: 1;
+        $sharedValue = $row['valor_venda'] / $countFun;
+        $valorVenda  = 'R$ ' . number_format($sharedValue, 2, ',', '.');
+
         echo "<tr>";
-        echo "<td data-label='Contrato'>$contrato</td>";
-        echo "<td data-label='Cliente'>$cliente</td>";
-        echo "<td data-label='Vendedor'>$vendedor</td>";
-        echo "<td data-label='Data'>$data</td>";
-        echo "<td data-label='Administradora'>$adm</td>";
-        echo "<td data-label='Valor Venda'>$valorVenda</td>";
+        echo "<td data-label='Contrato'>{$contrato}</td>";
+        echo "<td data-label='Cliente'>{$cliente}</td>";
+        echo "<td data-label='Vendedor'>{$vendedor}</td>";
+        echo "<td data-label='Data'>{$data}</td>";
+        echo "<td data-label='Administradora'>{$adm}</td>";
+        echo "<td data-label='Valor Venda'>{$valorVenda}</td>";
 
         if ($useFilter) {
-            $c = $commissions[$vendaPk] ?? ['primeira'=>0,'segunda'=>0,'terceira'=>0,'quarta'=>0,'total_comissao'=>0];
-            $com1  = 'R$ ' . number_format($c['primeira'], 2, ',', '.');
-            $com2  = 'R$ ' . number_format($c['segunda'], 2, ',', '.');
-            $com3  = 'R$ ' . number_format($c['terceira'], 2, ',', '.');
-            $com4  = 'R$ ' . number_format($c['quarta'], 2, ',', '.');
-            $total = 'R$ ' . number_format($c['total_comissao'], 2, ',', '.');
-
-            echo "<td data-label='Comissão 1'>$com1</td>";
-            echo "<td data-label='Comissão 2'>$com2</td>";
-            echo "<td data-label='Comissão 3'>$com3</td>";
-            echo "<td data-label='Comissão 4'>$com4</td>";
-            echo "<td data-label='Total Comissão'>$total</td>";
+            // Parte de comissão por parcela
+            foreach ([1,2,3,4] as $p) {
+                $stmt = ${'stmtP'.$p};
+                $stmt->execute([$vendaPk, $filterFun]);
+                $val = $stmt->fetchColumn();
+                $valFmt = $val ? 'R$ '.number_format($val,2,',','.') : '-';
+                echo "<td data-label='{$p}ª Comissão'>{$valFmt}</td>";
+            }
+            // Total Comissão = soma das parcelas
+            $total = 0;
+            foreach ([1,2,3,4] as $p) {
+                $stmt = ${'stmtP'.$p};
+                $stmt->execute([$vendaPk, $filterFun]);
+                $v = $stmt->fetchColumn();
+                $total += $v ? floatval($v) : 0;
+            }
+            $totalFmt = 'R$ '.number_format($total,2,',','.');
+            echo "<td data-label='Total Comissão'>{$totalFmt}</td>";
         }
-        echo "</tr>";
 
+        echo "</tr>";
     }
 }
-echo "</tbody>";
-echo "</table>";
 
-// 8) Navegação de páginas
+echo "</tbody></table>";
+
+// 8) Paginação
 if (isset($totalPages) && $totalPages > 1) {
     echo "<nav aria-label='Paginação de vendas'><ul class='pagination'>";
     $prevPage = max(1, $page - 1);
-    echo "<li class='page-item". ($page==1? ' disabled':'') ."'>";
-    echo "<a class='page-link' href='?". ($useFilter? "idFun=$filterFun&": '') ."page=$prevPage' aria-label='Anterior'>Anterior</a></li>";
+    echo "<li class='page-item".($page==1?' disabled':'')."'>";
+    echo "<a class='page-link' href='?".($useFilter?"idFun=$filterFun&":'')."page=$prevPage'>Anterior</a></li>";
     for ($p=1; $p<=$totalPages; $p++) {
-        echo "<li class='page-item". ($p==$page? ' active':'') ."'>";
-        echo "<a class='page-link' href='?". ($useFilter? "idFun=$filterFun&": '') ."page=$p'>$p</a></li>";
+        echo "<li class='page-item".($p==$page?' active':'')."'>";
+        echo "<a class='page-link' href='?".($useFilter?"idFun=$filterFun&":'')."page=$p'>$p</a></li>";
     }
     $nextPage = min($totalPages, $page + 1);
-    echo "<li class='page-item". ($page==$totalPages? ' disabled':'') ."'>";
-    echo "<a class='page-link' href='?". ($useFilter? "idFun=$filterFun&": '') ."page=$nextPage' aria-label='Próximo'>Próximo</a></li>";
+    echo "<li class='page-item".($page==$totalPages?' disabled':'')."'>";
+    echo "<a class='page-link' href='?".($useFilter?"idFun=$filterFun&":'')."page=$nextPage'>Próximo</a></li>";
     echo "</ul></nav>";
 }
+?>

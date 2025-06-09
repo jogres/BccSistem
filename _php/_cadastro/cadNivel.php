@@ -93,13 +93,13 @@ try {
     $_SESSION['error'] = 'Erro ao salvar nível: ' . $e->getMessage();
     // mantém query params em caso de edição
     echo $e->getMessage();
-    /*
+    
     $qs = $nivelOriginal
         ? "?nivel={$nivelOriginal}&idPlano={$idPlano}"
         : '';
     header("Location: ../../_html/_cadastro/cadNivel.php{$qs}");
     exit;
-    */
+    
 }
 
 ?>

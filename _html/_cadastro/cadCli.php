@@ -128,7 +128,7 @@ ob_start(); include('../../_php/_buscar/_buscaFun/buscaFun.php'); $optFun = ob_g
     <?php endif; ?>
 
     <!-- Etapa 3: Formulário Cliente e Venda -->
-    <form action="../../_php/_cadastro/cadCli.php" method="post">
+    <form class="form-container" action="../../_php/_cadastro/cadCli.php" method="post">
       <?php if ($editing): ?><input type="hidden" name="idCli" value="<?= $idCli ?>" /><?php endif; ?>
       <input type="hidden" name="venda" value="<?= $vendaSelecionada ?>" />
       <input type="hidden" name="num_funcs" value="<?= $num_funcs ?>" />

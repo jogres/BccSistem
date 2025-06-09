@@ -3,10 +3,12 @@
 include('../../_php/_login/logado.php');
 require_once __DIR__ . '/../../config/db.php';
 
+// Permissões de acesso
 if (!in_array($acesso, ['admin', 'user'])) {
     exit('Acesso negado.');
 }
 
+// Valida parâmetros obrigatórios
 if (
     !isset($_POST['idVenda']) || !is_numeric($_POST['idVenda']) ||
     !isset($_POST['parcela']) || !is_numeric($_POST['parcela']) ||
@@ -15,26 +17,23 @@ if (
     exit('Parâmetros inválidos.');
 }
 
-$id      = (int) $_POST['idVenda'];  // PK da venda
-$parcela = (int) $_POST['parcela'];  // 1 a 4
-$idFun   = (int) $_POST['idFun'];
+$idVenda  = (int) $_POST['idVenda'];   // PK da venda
+$parcela  = (int) $_POST['parcela'];   // 1 a 4
+$idFun    = (int) $_POST['idFun'];     // ID do funcionário que confirma
 
+// Apenas admin pode confirmar parcela 1
 if ($parcela === 1 && $acesso !== 'admin') {
     exit('Somente administrador pode confirmar a parcela 1.');
 }
 
-
 try {
     $pdo->beginTransaction();
 
-    // 1) Busca venda pelo campo `id` (PK)
-    $stmt = $pdo->prepare("
-        SELECT valor, dataV, idAdm, confirmada, tipo 
-        FROM venda 
-        WHERE id = ? 
-        LIMIT 1
-    ");
-    $stmt->execute([$id]);
+    // 1) Recupera dados da venda
+    $stmt = $pdo->prepare(
+        "SELECT valor, dataV, idAdm, confirmada, tipo FROM venda WHERE id = ? LIMIT 1"
+    );
+    $stmt->execute([$idVenda]);
     $vendaDados = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$vendaDados) {
         throw new Exception('Venda não encontrada.');
@@ -46,156 +45,95 @@ try {
     $vendaConfirmada = (int) $vendaDados['confirmada'];
     $tipoVenda       = $vendaDados['tipo'];
 
-    // 2) Se for parcela 1 e ainda não estiver confirmada, atualiza
+    // 2) Confirmar venda global (parcela 1)
     if ($parcela === 1 && !$vendaConfirmada) {
-        $stmtUpd = $pdo->prepare("UPDATE venda SET confirmada = 1 WHERE id = ?");
-        $stmtUpd->execute([$id]);
-    }
-    // 3) Se for parcela >1, exige que venda global já esteja confirmada
-    if ($parcela > 1 && !$vendaConfirmada) {
-        throw new Exception('Venda global ainda não confirmada.');
+        $pdo->prepare("UPDATE venda SET confirmada = 1 WHERE id = ?")
+            ->execute([$idVenda]);
     }
 
-    // 4) Verifica se esta parcela já foi confirmada em qualquer estado
+    // 3) Para parcelas >1, exige venda global confirmada
+    if ($parcela > 1 && !$vendaConfirmada) {
+        throw new Exception('Venda global ainda não foi confirmada.');
+    }
+
+    // 4) Verifica se esta parcela já foi confirmada
     $tabelaParcela = 'parcela' . $parcela;
-    $stmt = $pdo->prepare("
-        SELECT confirmada 
-        FROM $tabelaParcela 
-        WHERE idVenda = ? AND idFun = ? 
-        LIMIT 1
-    ");
-    $stmt->execute([$id, $idFun]);
+    $stmt = $pdo->prepare(
+        "SELECT confirmada FROM {$tabelaParcela} WHERE idVenda = ? AND idFun = ? LIMIT 1"
+    );
+    $stmt->execute([$idVenda, $idFun]);
     $resPar = $stmt->fetch(PDO::FETCH_ASSOC);
     if ($resPar !== false && (int)$resPar['confirmada'] === 1) {
-        throw new Exception("Parcela $parcela já confirmada para este funcionário.");
+        throw new Exception("Parcela {$parcela} já confirmada para este funcionário.");
     }
 
-    // 5) Busca nível do funcionário
-    $stmt = $pdo->prepare("SELECT UPPER(TRIM(nivel)) AS nivel FROM cad_fun WHERE idFun = ?");
+    // 5) Obtém nível do funcionário
+    $stmt = $pdo->prepare("SELECT UPPER(TRIM(nivel)) FROM cad_fun WHERE idFun = ?");
     $stmt->execute([$idFun]);
-    $nivel = $stmt->fetchColumn();
-    // Se não houver nível, assumir “APRENDIZ”
-    if (!$nivel) {
-        $nivel = 'APRENDIZ';
-    } else {
-        $nivel = strtoupper($nivel);
-    }
+    $nivel = $stmt->fetchColumn() ?: 'APRENDIZ';
 
-    // 6) Obtém percentual na tabela de nível (master/classic/basic)
+    // 6) Busca percentual conforme nível e tipo de venda
     $percentual = 0.0;
-    if (in_array($nivel, ['MASTER', 'CLASSIC', 'BASIC'])) {
+    if (in_array($nivel, ['MASTER','CLASSIC','BASIC'])) {
+        $coluna = ['primeira','segunda','terceira','quarta'][$parcela-1] ?? null;
+        if (!$coluna) throw new Exception('Parcela inválida.');
         $tabelaNivel = strtolower($nivel);
-        switch ($parcela) {
-            case 1:
-                $coluna = 'primeira';
-                break;
-            case 2:
-                $coluna = 'segunda';
-                break;
-            case 3:
-                $coluna = 'terceira';
-                break;
-            case 4:
-                $coluna = 'quarta';
-                break;
-            default:
-                throw new Exception('Parcela inválida.');
-        }
-        $stmt2 = $pdo->prepare("
-            SELECT $coluna AS pc 
-            FROM $tabelaNivel 
-            WHERE idAdm = ? AND nome = ? 
-            LIMIT 1
-        ");
+        $stmt2 = $pdo->prepare(
+            "SELECT {$coluna} AS pc FROM {$tabelaNivel} WHERE idAdm = ? AND nome = ? LIMIT 1"
+        );
         $stmt2->execute([$idAdm, $tipoVenda]);
         $pc = $stmt2->fetch(PDO::FETCH_ASSOC);
-        if ($pc) {
-            $percentual = (float) $pc['pc'];
-        }
+        $percentual = $pc ? (float)$pc['pc'] : 0.0;
     }
-    // Se for “APRENDIZ”, $percentual permanece 0.0
 
-    // 7) Calcula o valor da comissão desta parcela
-    $valorComissaoParcela = ($percentual / 100.0) * $valorVenda;
+    // 7) Calcula valor da comissão da parcela
+    $valorComissao = ($percentual/100.0) * $valorVenda;
 
-    // 8) Insere ou atualiza registro na tabela de parcela correspondente
+    // 8) Insere ou atualiza na tabela da parcela
+    $agora = date('Y-m-d H:i:s');
     if ($resPar === false) {
-        // Ainda não existe → inserir
-        $stmtIns = $pdo->prepare("
-            INSERT INTO $tabelaParcela
-            (idVenda, idFun, valor, dataConfirmacao, confirmada)
-            VALUES (?, ?, ?, ?, 1)
-        ");
-        $stmtIns->execute([
-            $id,
-            $idFun,
-            $valorComissaoParcela,
-            date('Y-m-d H:i:s')
-        ]);
+        $stmtIns = $pdo->prepare(
+            "INSERT INTO {$tabelaParcela} (idVenda, idFun, valor, dataConfirmacao, confirmada) VALUES (?, ?, ?, ?, 1)"
+        );
+        $stmtIns->execute([$idVenda, $idFun, $valorComissao, $agora]);
     } else {
-        // Já existe linha (confirmada = 0) → atualizar
-        $stmtUpd2 = $pdo->prepare("
-            UPDATE $tabelaParcela
-            SET valor = ?, dataConfirmacao = ?, confirmada = 1
-            WHERE idVenda = ? AND idFun = ?
-        ");
-        $stmtUpd2->execute([
-            $valorComissaoParcela,
-            date('Y-m-d H:i:s'),
-            $id,
-            $idFun
-        ]);
+        $stmtUpd = $pdo->prepare(
+            "UPDATE {$tabelaParcela} SET valor = ?, dataConfirmacao = ?, confirmada = 1 WHERE idVenda = ? AND idFun = ?"
+        );
+        $stmtUpd->execute([$valorComissao, $agora, $idVenda, $idFun]);
     }
 
-    // 9) Atualiza ou insere na tabela comissao (apenas um registro por funcionário e mês)
-    $mesAtual = date('Y-m-01');
-    $stmt = $pdo->prepare("
-        SELECT idCom, totalV, totalC 
-        FROM comissao 
-        WHERE idFun = ? AND mesC = ? 
-        LIMIT 1
-    ");
-    $stmt->execute([$idFun, $mesAtual]);
-    $comRow = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($comRow) {
-        $idComExistente = (int) $comRow['idCom'];
-        $antigoV = (float) $comRow['totalV'];
-        $antigoC = (float) $comRow['totalC'];
-
-        $novoV = ($parcela === 1) ? $antigoV + $valorVenda : $antigoV;
-        $novoC = $antigoC + $valorComissaoParcela;
-
-        $stmtUpd3 = $pdo->prepare("
-            UPDATE comissao 
-            SET totalV = ?, totalC = ? 
-            WHERE idCom = ?
-        ");
-        $stmtUpd3->execute([$novoV, $novoC, $idComExistente]);
-        echo "Comissão atualizada: Venda Total = R$ " . number_format($novoV, 2, ',', '.') . ", Comissão Total = R$ " . number_format($novoC, 2, ',', '.');
-        echo "<br>Parcela $parcela confirmada com sucesso.";
-        echo "<br>Funcionário: $idFun, Nível: $nivel, Percentual: $percentual%";
-        echo "<br>Valor da Comissão desta Parcela: R$ " . number_format($valorComissaoParcela, 2, ',', '.');
-        echo "<br>" . $coluna;
-        echo "<br>". $tabelaNivel;
-        echo "<br>". $idAdm;
-        echo "<br>". $tipoVenda;
+    // 9) Atualiza ou insere na tabela `comissao`
+    $mesC = date('Y-m-01');
+    $stmt = $pdo->prepare("SELECT idCom, totalV, totalC FROM comissao WHERE idFun = ? AND mesC = ? LIMIT 1");
+    $stmt->execute([$idFun, $mesC]);
+    $cRow = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($cRow) {
+        $novoV = ($parcela===1 ? $cRow['totalV'] + $valorVenda : $cRow['totalV']);
+        $novoC = $cRow['totalC'] + $valorComissao;
+        $pdo->prepare("UPDATE comissao SET totalV = ?, totalC = ? WHERE idCom = ?")
+            ->execute([$novoV, $novoC, $cRow['idCom']]);
     } else {
-        $initV = ($parcela === 1) ? $valorVenda : 0.0;
-        $initC = $valorComissaoParcela;
-
-        $stmtIns2 = $pdo->prepare("
-            INSERT INTO comissao (totalV, mesC, idFun, totalC) 
-            VALUES (?, ?, ?, ?)
-        ");
-        $stmtIns2->execute([$initV, $mesAtual, $idFun, $initC]);
+        $initV = ($parcela===1 ? $valorVenda : 0.0);
+        $initC = $valorComissao;
+        $pdo->prepare("INSERT INTO comissao (totalV, mesC, idFun, totalC) VALUES (?, ?, ?, ?)")
+            ->execute([$initV, $mesC, $idFun, $initC]);
     }
+
+    // 10) Marca notificação desta parcela como lida
+    $stmtNotif = $pdo->prepare(
+        "UPDATE notificacoes SET lida = 1 WHERE idVenda = ? AND parcela = ?"
+    );
+    $stmtNotif->execute([$idVenda, $parcela]);
 
     $pdo->commit();
-    header('Location: ../../_html/_detalhes/detalhesVenda.php?idVenda=' . $id);
+
+    // Redireciona de volta aos detalhes da venda
+    header('Location: ../../_html/_detalhes/detalhesVenda.php?idVenda=' . $idVenda);
     exit;
+
 } catch (Exception $e) {
     $pdo->rollBack();
-    exit('Erro na confirmação: ' . $e->getMessage());
+    exit('Erro na confirmação: ' . htmlspecialchars($e->getMessage()));
 }
 ?>

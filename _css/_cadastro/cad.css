@@ -16,12 +16,15 @@ body {
   flex-direction: column;
   gap: 1.3rem;
 }
-
 form {
   display: flex;
   flex-direction: column;
   gap: 1.4rem;
   align-items: center;
+}
+.form-container,#formVendas,#formNumFuncs  {
+  margin-left: 260px;  
+
 }
 
 legend {
@@ -175,6 +178,8 @@ button[type="submit"], .btn.btn-secondary {
 }
 
 /* Responsivo */
+
+
 @media (max-width: 540px) {
   .form-container {
     padding: 1.2rem 0.4rem;

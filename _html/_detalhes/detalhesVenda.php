@@ -45,25 +45,61 @@
           }
         ?>
       </p>
-      <p><strong>Status:</strong>
+      <p><strong>Status Global:</strong>
         <?= $venda['confirmada']
             ? '<span class="status-confirmada">Venda Confirmada</span>'
             : '<span class="status-pendente">Pendente de Confirmação</span>' ?>
       </p>
 
-      <?php if (!$venda['confirmada']): ?>
-        <form action="../../_php/_confirmar/confirmaVenda.php" method="post">
-          <input type="hidden" name="idVenda" value="<?= (int) $venda['id'] ?>">
-          <input type="hidden" name="idFun"   value="<?= (int) $funcionarios[0]['idFun'] ?>">
-          <input type="hidden" name="parcela" value="<?= (int) $parcela ?>">
-          <button type="submit" class="btn-confirmar">Confirmar Venda</button>
-        </form>
-        
-        <form action="../../_php/_confirmar/recusarVenda.php" method="post">
-          <input type="hidden" name="idVenda" value="<?= (int) $venda['id'] ?>">
-          <button type="submit" class="btn-recusar">Recusar Venda</button>
-        </form>
+      <h3>Status das Parcelas</h3>
+      <?php if (!empty($notificacoes)): ?>
+      <table class="parcelas-table">
+        <thead>
+          <tr>
+            <th>Parcela</th>
+            <th>Data Prevista</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($notificacoes as $not): ?>
+          <tr>
+            <td><?= $not['parcela'] ?></td>
+            <td><?= date('d/m/Y', strtotime($not['data_criacao'])) ?></td>
+            <td>
+              <?= $not['lida']
+                  ? '<span class="status-confirmada">Confirmada</span>'
+                  : '<span class="status-pendente">Pendente</span>' ?>
+            </td>
+            <td>
+              <?php if (!$not['lida'] && canConfirm((int)$not['parcela'], $acesso)): ?>
+                <form action="../../_php/_confirmar/confirmaVenda.php" method="post" class="form-parcela">
+                  <input type="hidden" name="idVenda" value="<?= (int)$venda['id'] ?>">
+                  <input type="hidden" name="parcela"  value="<?= (int)$not['parcela'] ?>">
+                  <input type="hidden" name="idFun"    value="<?= (int)$_SESSION['user_id'] ?>">
+                  <button type="submit" class="btn-confirmar-parcela">Confirmar</button>
+                </form>
+              <?php else: ?>
+                &mdash;
+              <?php endif; ?>
+            </td>
+          </tr>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+      <?php else: ?>
+        <p>Não há notificações de parcelas para esta venda.</p>
       <?php endif; ?>
+
+      <?php if (!$venda['confirmada']): ?>
+      <form action="../../_php/_confirmar/recusarVenda.php" method="post">
+        <input type="hidden" name="idVenda" value="<?= (int)$venda['id'] ?>">
+        <button type="submit" class="btn-recusar-venda">Recusar Venda</button>
+      </form>
+      <?php endif; ?>
+
+      <a href="../../_html/_lista/listaVenda.php" class="btn-voltar">Voltar à Lista</a>
     </div>
   </div>
   <script src="../../_js/_menu/menu.js"></script>
