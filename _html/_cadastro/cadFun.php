@@ -82,37 +82,42 @@ if (isset($_GET['idFun']) && is_numeric($_GET['idFun'])) {
             value="<?= htmlspecialchars($funcData['nome'], ENT_QUOTES) ?>"
           />
           <?php if (!$editing): ?>
-             <label for="rua">Rua:</label>
-             <input class="endereco"
-               type="text" name="rua" id="rua" maxlength="100" required
-             />
-             
-             <label for="numero">Número:</label>
-             <input class="endereco"
-               type="text" name="numero" id="numero" maxlength="10" required
-             />
+            <div class="endereco-group">
+              <label for="rua">Rua:</label>
+              <input class="endereco"
+                type="text" name="rua" id="rua" maxlength="100" required
+              />
 
-             <label for="bairro">Bairro:</label>
-             <input class="endereco"
-               type="text" name="bairro" id="bairro" maxlength="50" required
-             />
+              <label for="numero">Número:</label>
+              <input class="endereco"
+                type="text" name="numero" id="numero" maxlength="10" required
 
-             <label for="cidade">Cidade:</label>
-             <input class="endereco"
-               type="text" name="cidade" id="cidade" maxlength="50" required
-             />
+              />
 
-             <label for="estado">Estado:</label>
-             <input class="endereco"
-               type="text" name="estado" id="estado" maxlength="2" required
-               placeholder="UF"
-             />
+              <label for="bairro">Bairro:</label>
+              <input class="endereco"
+                type="text" name="bairro" id="bairro" maxlength="50" required
+              />
 
-             <label for="cep">CEP:</label>
-             <input class="endereco"
-               type="text" name="cep" id="cep" maxlength="9" required
-               placeholder="00000-000"
-               />
+              <label for="cidade">Cidade:</label>
+              <input class="endereco"
+                type="text" name="cidade" id="cidade" maxlength="50" required
+
+              />
+
+              <label for="estado">Estado:</label>
+              <input class="endereco"
+                type="text" name="estado" id="estado" maxlength="2" required
+                placeholder="UF"
+
+              />
+
+              <label for="cep">CEP:</label>
+              <input class="endereco"
+                type="text" name="cep" id="cep" maxlength="9" required
+                placeholder="00000-000"
+                />
+            </div>
           <?php else: ?>
             <label for="endereco">Endereço:</label>
             <textarea name="endereco" id="endereco" required><?= htmlspecialchars($cliente['endereco']) ?></textarea>

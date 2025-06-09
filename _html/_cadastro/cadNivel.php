@@ -11,6 +11,7 @@ $nivelData = [
     'segunda'  => '',
     'terceira' => '',
     'quarta'   => '',
+    'segmento' => '',
     'idAdm'    => ''
 ];
 $idPlano = null;
@@ -21,9 +22,12 @@ if (!empty($_GET['nivel']) && isset($_GET['idPlano'])) {
     $allowed = ['basic','classic','master'];
     if (in_array($nivelEscolhido, $allowed, true)) {
         $editing = true;
-        $pk = $nivelEscolhido === 'basic' ? 'idBasic' : ($nivelEscolhido === 'classic' ? 'idClassic' : 'idMaster');
+        $pk = $nivelEscolhido === 'basic'
+            ? 'idBasic'
+            : ($nivelEscolhido === 'classic' ? 'idClassic' : 'idMaster');
+        // Seleciona também o campo 'segmento'
         $stmt = $pdo->prepare(
-            "SELECT nome, primeira, segunda, terceira, quarta, idAdm
+            "SELECT nome, primeira, segunda, terceira, quarta, segmento, idAdm
              FROM {$nivelEscolhido}
              WHERE {$pk} = ?"
         );
@@ -85,7 +89,7 @@ $options_adm = ob_get_clean();
           </select>
 
           <label for="nome">Nome do Plano:</label>
-          <input class="nome" type="text" id="nome" name="nome" maxlength="100" required
+          <input class="nome" id="nome" name="nome" maxlength="100" required
                  value="<?= htmlspecialchars($nivelData['nome'], ENT_QUOTES) ?>">
 
           <label for="primeira">1ª (%):</label>
@@ -103,6 +107,10 @@ $options_adm = ob_get_clean();
           <label for="quarta">4ª (%):</label>
           <input class="quarta" type="number" id="quarta" name="quarta" min="0" max="100" step="0.01" required
                  value="<?= htmlspecialchars($nivelData['quarta'], ENT_QUOTES) ?>">
+
+          <label for="segmento">Segmento:</label>
+          <input class="segmento" type="text" id="segmento" name="segmento" maxlength="50" required
+                 value="<?= htmlspecialchars($nivelData['segmento'], ENT_QUOTES) ?>">
 
           <label for="select-adm">Administradora:</label>
           <select name="select-adm" id="select-adm" required>
