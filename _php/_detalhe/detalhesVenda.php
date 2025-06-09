@@ -14,20 +14,21 @@ if (!$id) {
     exit('Venda não especificada.');
 }
 
-// 1) Consulta principal da venda
+// 1) Consulta principal da venda, incluindo o segmento
 $stmt = $pdo->prepare(
     "SELECT
         v.id,
-        v.idVenda AS num_contrato,
+        v.idVenda      AS num_contrato,
         v.tipo,
         v.valor,
         v.dataV,
+        v.segmento,              -- novo campo
         v.confirmada,
-        a.nome AS nome_adm
-    FROM venda v
-    LEFT JOIN cad_adm a ON v.idAdm = a.idAdm
-    WHERE v.id = ?
-    LIMIT 1"
+        a.nome         AS nome_adm
+     FROM venda v
+     LEFT JOIN cad_adm a ON v.idAdm = a.idAdm
+     WHERE v.id = ?
+     LIMIT 1"
 );
 $stmt->execute([$id]);
 $venda = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -37,16 +38,14 @@ if (!$venda) {
 
 // 2) Consulta do cliente vinculado
 $stmt = $pdo->prepare(
-    "SELECT c.nome FROM venda_cli vc
+    "SELECT c.nome
+     FROM venda_cli vc
      JOIN cad_cli c ON vc.idCli = c.idCli
      WHERE vc.idVenda = ?
      LIMIT 1"
 );
 $stmt->execute([$id]);
-$cliente = $stmt->fetchColumn();
-if ($cliente === false) {
-    $cliente = '';
-}
+$cliente = $stmt->fetchColumn() ?: '';
 
 // 3) Consulta dos funcionários envolvidos
 $stmt = $pdo->prepare(
@@ -74,8 +73,7 @@ $idFunSess = (int)$_SESSION['user_id'];
 // Função para verificar permissão de confirmação
 function canConfirm($parcela, $acesso) {
     if ($parcela === 1 && $acesso === 'admin') return true;
-    if ($parcela > 1 && in_array($acesso, ['admin'])) return true;
+    if ($parcela > 1 && in_array($acesso, ['admin'], true)) return true;
     return false;
 }
 ?>
-

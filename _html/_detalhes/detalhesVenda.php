@@ -36,6 +36,7 @@
       <p><strong>Data da Venda:</strong> <?= date('d/m/Y', strtotime($venda['dataV'])) ?></p>
       <p><strong>Administradora:</strong> <?= htmlspecialchars($venda['nome_adm']) ?></p>
       <p><strong>Cliente:</strong> <?= htmlspecialchars($cliente) ?></p>
+      <p><strong>Segmento:</strong> <?= htmlspecialchars($venda['segmento'] ?? '') ?></p>
       <p><strong>Funcionário(s):</strong>
         <?php
           if (count($funcionarios) === 0) {
@@ -77,7 +78,7 @@
                 <form action="../../_php/_confirmar/confirmaVenda.php" method="post" class="form-parcela">
                   <input type="hidden" name="idVenda" value="<?= (int)$venda['id'] ?>">
                   <input type="hidden" name="parcela"  value="<?= (int)$not['parcela'] ?>">
-                  <input type="hidden" name="idFun"    value="<?= (int)$_SESSION['user_id'] ?>">
+                  <input type="hidden" name="idFun" value="<?= (int)$not['idFun'] ?>">                  
                   <button type="submit" class="btn-confirmar-parcela">Confirmar</button>
                 </form>
               <?php else: ?>
