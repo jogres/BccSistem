@@ -13,6 +13,9 @@
 </head>
 <body>
   <div class="login-container">
+    <div class="logo-container">
+      <img src="../../_img/logo.png" alt="Logo" class="logo">
+    </div>
     <?php if ($error): ?>
       <!-- Mensagem de erro vinda da sessão, sanitizada para evitar XSS -->
       <div class="error-message"><?php echo htmlspecialchars($error); ?></div>

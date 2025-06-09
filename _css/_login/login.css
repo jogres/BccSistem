@@ -101,6 +101,28 @@ body {
   background: #ffb300;
   color: #fff;
 }
+/* Estilização do container da logo */
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem 0; /* espaço acima e abaixo da logo */
+}
+
+/* Estilização da imagem da logo */
+.logo {
+  max-width: 200px;   /* largura máxima em desktop */
+  width: 100%;        /* responsivo: ocupa toda a largura disponível até o max-width */
+  height: auto;       /* mantém proporção original */
+}
+
+/* Ajuste para telas pequenas */
+@media (max-width: 480px) {
+  .logo {
+    max-width: 140px;
+  }
+}
+
 
 @media (max-width: 520px) {
   .login-form {
