@@ -180,16 +180,19 @@ if ($isAdmin) {
           <?php endif; ?>
         </div>
       </div>
-
+      
       <div class="charts">
+      <?php if ($isAdmin): ?>  
         <div class="chart-container">
           <h4>Comparativo: Clientes cadastrados vs Vendas realizadas</h4>
           <canvas id="perfChart"></canvas>
         </div>
+      <?php endif; ?>    
         <div class="chart-container">
           <h4><?= $isAdmin ? 'Vendas Totais por Dia' : 'Minhas Vendas por Dia' ?></h4>
           <canvas id="salesChart"></canvas>
         </div>
+      
         <?php if (!$isAdmin): ?>
         <div class="chart-container">
           <h4>Meus Clientes por Dia</h4>

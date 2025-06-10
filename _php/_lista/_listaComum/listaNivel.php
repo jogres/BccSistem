@@ -30,6 +30,7 @@ foreach ($tiposNivel as $tabela => $info) {
                 n.segunda,
                 n.terceira,
                 n.quarta,
+                n.segmento,
                 a.nome AS adm_nome
          FROM {$tabela} n
          JOIN cad_adm a ON a.idAdm = n.idAdm
@@ -51,13 +52,14 @@ foreach ($tiposNivel as $tabela => $info) {
                 <th>3ª (%)</th>
                 <th>4ª (%)</th>
                 <th>Administradora</th>
+                <th>Segmento</th>
                 <th>Ações</th>
               </tr>
             </thead>
             <tbody>";
 
     if (empty($planos)) {
-        echo "<tr><td colspan='7'>Nenhum nível {$rotulo} cadastrado.</td></tr>";
+        echo "<tr><td colspan='8'>Nenhum nível {$rotulo} cadastrado.</td></tr>";
     } else {
         foreach ($planos as $row) {
             $idPlano   = (int) $row['idPlano'];
@@ -67,6 +69,7 @@ foreach ($tiposNivel as $tabela => $info) {
             $p3        = htmlspecialchars($row['terceira'], ENT_QUOTES);
             $p4        = htmlspecialchars($row['quarta'],  ENT_QUOTES);
             $admNome   = htmlspecialchars($row['adm_nome'],ENT_QUOTES);
+            $segmento  = htmlspecialchars($row['segmento'], ENT_QUOTES);
 
             echo "<tr>";
             echo "<td data-label='Plano'>{$nomePlano}</td>";
@@ -75,6 +78,7 @@ foreach ($tiposNivel as $tabela => $info) {
             echo "<td data-label='3ª (%)'>{$p3}</td>";
             echo "<td data-label='4ª (%)'>{$p4}</td>";
             echo "<td data-label='Administradora'>{$admNome}</td>";
+            echo "<td data-label='Segmento'>{$segmento}</td>";
             echo "<td data-label='Ações'>";
             echo "<a href='../../_html/_cadastro/cadNivel.php?nivel={$tabela}&idPlano={$idPlano}' class='btn btn-sm btn-warning'>Editar</a>";
             echo "</td>";

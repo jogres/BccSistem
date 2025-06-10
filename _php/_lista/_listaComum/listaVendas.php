@@ -50,7 +50,9 @@ $sql = "
         fun.nome    AS vendedor,
         DATE_FORMAT(v.dataV, '%d/%m/%Y') AS data_venda,
         adm.nome    AS administradora,
-        v.valor     AS valor_venda
+        v.valor     AS valor_venda,
+        v.segmento  AS segmento,
+        v.tipo      AS tipo_venda
     FROM venda v
     JOIN cad_adm    adm ON adm.idAdm   = v.idAdm
     JOIN venda_cli  vc  ON vc.idVenda  = v.id
@@ -72,12 +74,12 @@ $vendas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // 6) Renderiza cabeçalho da tabela
 if ($useFilter) {
     echo "<thead><tr>"
-       ."<th>Contrato</th><th>Cliente</th><th>Vendedor</th><th>Data</th><th>Administradora</th><th>Valor</th>"
+       ."<th>Contrato</th><th>Cliente</th><th>Vendedor</th><th>Data</th><th>Administradora</th><th>Segmento</th><th>Tipo</th><th>Valor</th>"
        ."<th>1ª Comissão</th><th>2ª Comissão</th><th>3ª Comissão</th><th>4ª Comissão</th><th>Total Comissão</th>"
        ."</tr></thead>";
 } else {
     echo "<thead><tr>"
-       ."<th>Contrato</th><th>Cliente</th><th>Vendedor</th><th>Data</th><th>Administradora</th><th>Valor</th>"
+       ."<th>Contrato</th><th>Cliente</th><th>Vendedor</th><th>Data</th><th>Administradora</th><th>Segmento</th><th>Tipo</th><th>Valor</th>"
        ."</tr></thead>";
 }
 
@@ -101,6 +103,8 @@ if (empty($vendas)) {
         $vendedor   = htmlspecialchars($row['vendedor'], ENT_QUOTES);
         $data       = htmlspecialchars($row['data_venda'], ENT_QUOTES);
         $adm        = htmlspecialchars($row['administradora'], ENT_QUOTES);
+        $segmento   = htmlspecialchars($row['segmento'], ENT_QUOTES);
+        $tipoVenda  = htmlspecialchars($row['tipo_venda'], ENT_QUOTES);
         
         // Lógica de divisão do valor da venda por número de funcionários
         $stmtCountFun = $pdo->prepare("SELECT COUNT(*) FROM venda_fun WHERE idVenda = ?");
@@ -115,6 +119,8 @@ if (empty($vendas)) {
         echo "<td data-label='Vendedor'>{$vendedor}</td>";
         echo "<td data-label='Data'>{$data}</td>";
         echo "<td data-label='Administradora'>{$adm}</td>";
+        echo "<td data-label='Segmento'>{$segmento}</td>";
+        echo "<td data-label='Tipo'>{$tipoVenda}</td>";
         echo "<td data-label='Valor Venda'>{$valorVenda}</td>";
 
         if ($useFilter) {
