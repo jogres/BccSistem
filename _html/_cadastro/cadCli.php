@@ -2,6 +2,16 @@
 include('../../_php/_login/logado.php');
 require_once __DIR__ . '/../../config/db.php';
 
+// Carrega TIPOS disponíveis para o <select> Tabela
+$stmtTipo = $pdo->query("
+    SELECT DISTINCT nome 
+      FROM basic
+     WHERE nome IS NOT NULL
+     ORDER BY nome
+");
+$optTipo = $stmtTipo->fetchAll(PDO::FETCH_COLUMN);   // array simples de strings
+
+
 // 1) Detecção de edição
 $editing      = false;
 $idCli        = null;
@@ -223,10 +233,14 @@ $optSeg = $stmtSeg->fetchAll(PDO::FETCH_COLUMN);
           <input class="contrato" type="number" name="idVenda" required
                  value="<?= htmlspecialchars($sale['idVenda']) ?>"/>
 
-          <label>Tipo:</label>
-          <select name="select_tipo">
-            <option <?= $sale['select_tipo']==='Normal'?'selected':'' ?>>Normal</option>
-            <option <?= $sale['select_tipo']==='2%'   ?'selected':'' ?>>2%</option>
+          <label>Tabela:</label>
+          <select name="select_tipo" required>
+            <?php foreach ($optTipo as $tipo): ?>
+              <option value="<?= htmlspecialchars($tipo, ENT_QUOTES) ?>"
+                <?= ($sale['select_tipo'] ?? '') === $tipo ? 'selected' : '' ?>>
+                <?= htmlspecialchars($tipo) ?>
+              </option>
+            <?php endforeach; ?>
           </select>
 
           <label for="select-segmento">Segmento:</label>
