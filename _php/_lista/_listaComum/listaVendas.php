@@ -87,7 +87,7 @@ echo "<tbody>";
 
 // 7) Renderiza cada linha de venda
 if (empty($vendas)) {
-    $colspan = $useFilter ? 11 : 6;
+    $colspan = $useFilter ? 13 : 8;
     echo "<tr><td colspan='{$colspan}'>Nenhuma venda encontrada.</td></tr>";
 } else {
     // Prepara queries para comissão por parcela
