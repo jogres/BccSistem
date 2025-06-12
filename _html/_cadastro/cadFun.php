@@ -120,7 +120,7 @@ if (isset($_GET['idFun']) && is_numeric($_GET['idFun'])) {
             </div>
           <?php else: ?>
             <label for="endereco">Endereço:</label>
-            <textarea name="endereco" id="endereco" required><?= htmlspecialchars($cliente['endereco']) ?></textarea>
+            <textarea name="endereco" id="endereco" required><?= htmlspecialchars($funcData['endereco']) ?></textarea>
           <?php endif; ?>
           
 
