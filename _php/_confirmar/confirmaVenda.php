@@ -121,7 +121,7 @@ try {
 
         // 5.4) Calcula valor-base para comissão
         $base = $valorVenda;
-        if (strcasecmp($tipoVenda, 'Meia Parcela') === 0) {
+        if (strcasecmp($tipoVenda, 'Meia') === 0) {
             $base /= 2;
         }
         if ($numFun > 1) {
