@@ -20,7 +20,7 @@ if (
 
 $idVenda = (int) $_POST['idVenda'];   // PK da venda
 $parcela = (int) $_POST['parcela'];   // 1 a 4
-$idFun   = (int) $_POST['idFun'];     // ID do funcionário que confirma
+$idFun   = (int) $_POST['idFun'];     // ID do administrador que confirma
 
 try {
     $pdo->beginTransaction();
@@ -158,25 +158,28 @@ try {
             $novoV = $cRow['totalV'] + ($parcela === 1 ? $valorVenda : 0.0);
             $novoC = $cRow['totalC'] + $valorComissao;
             $pdo->prepare(
-                "UPDATE comissao 
-                    SET totalV = ?, totalC = ? 
+                "UPDATE comissao
+                    SET totalV = ?, totalC = ?
                   WHERE idCom = ?"
             )->execute([$novoV, $novoC, $cRow['idCom']]);
         } else {
             $initV = ($parcela === 1 ? $valorVenda : 0.0);
             $initC = $valorComissao;
             $pdo->prepare(
-                "INSERT INTO comissao (totalV, mesC, idFun, totalC) 
+                "INSERT INTO comissao (totalV, mesC, idFun, totalC)
                  VALUES (?, ?, ?, ?)"
             )->execute([$initV, $mesC, $funIdItem, $initC]);
         }
 
         // 5.7) Marca notificações desta parcela como lidas
+        // agora usando $idFun (administrador) em vez de $funIdItem (vendedor)
         $pdo->prepare(
-            "UPDATE notificacoes 
-                SET lida = 1 
-              WHERE idVenda = ? AND idFun = ? AND parcela = ?"
-        )->execute([$idVenda, $funIdItem, $parcela]);
+            "UPDATE notificacoes
+                SET lida = 1
+              WHERE idVenda = ?
+                AND parcela = ?
+                AND idFun = ?"
+        )->execute([$idVenda, $parcela, $idFun]);
     }
 
     $pdo->commit();

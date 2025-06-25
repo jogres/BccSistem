@@ -166,14 +166,17 @@ try {
             $stmtFun->execute([(int)$f, $vendaPk]);
         }
 
-        // 4) Gera notificações para os admins (parcelas 1–4)
+        // 4) Gera notificações para as 4 parcelas (sem multiplicar por admins)
         $skipList = [/* ids que saltam 2 meses */];
         $interval = in_array($idAdm, $skipList, true) ? 2 : 1;
         $dtBase   = new DateTime($dataV);
         $link     = "../../_html/_detalhes/detalhesVenda.php?idVenda=$vendaPk";
 
-        $admins  = $pdo->query("SELECT idFun FROM cad_fun WHERE acesso = 'admin'")
-                       ->fetchAll(PDO::FETCH_COLUMN);
+        // Pega apenas UM administrador para receber as notificações
+        $admId = $pdo
+            ->query("SELECT idFun FROM cad_fun WHERE acesso = 'admin' LIMIT 1")
+            ->fetchColumn();
+
         // Nome do primeiro funcionário
         $stmtF0 = $pdo->prepare("SELECT nome FROM cad_fun WHERE idFun = ?");
         $stmtF0->execute([$fun_ids[0]]);
@@ -188,18 +191,17 @@ try {
             $dtNot = (clone $dtBase)->add(
                 new DateInterval('P' . (($p - 1) * $interval) . 'M')
             );
-            foreach ($admins as $admId) {
-                $stmtNotif->execute([
-                    $admId,
-                    "Pagamento — Contrato $numContrato (R$ " .
-                        number_format($valorTot, 2, ',', '.') .
-                        ") — $nomeFun",
-                    $link,
-                    $dtNot->format('Y-m-d H:i:s'),
-                    $vendaPk,
-                    $p
-                ]);
-            }
+            // Insere apenas UMA notificação por parcela
+            $stmtNotif->execute([
+                $admId,
+                "Pagamento — Contrato $numContrato (R$ " .
+                    number_format($valorTot, 2, ',', '.') .
+                    ") — $nomeFun",
+                $link,
+                $dtNot->format('Y-m-d H:i:s'),
+                $vendaPk,
+                $p
+            ]);
         }
     }
 
