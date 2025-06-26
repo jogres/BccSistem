@@ -721,6 +721,185 @@ END$$
 DELIMITER ;
 COMMIT;
 
+-- Ative o Event Scheduler se ainda não estiver ativo:
+SET GLOBAL event_scheduler = ON;
+
+DELIMITER $$
+CREATE EVENT IF NOT EXISTS `evt_recalcula_comissoes`
+  ON SCHEDULE
+    EVERY 1 MINUTE
+    STARTS CURRENT_TIMESTAMP
+  ON COMPLETION PRESERVE
+  ENABLE
+  COMMENT 'Recalcula comissoes das parcelas confirmadas conforme nivel atual'
+DO
+BEGIN
+  -- 1) Recalcula parcela1
+  UPDATE parcela1 p
+    JOIN venda v 
+      ON v.id = p.idVenda
+    JOIN cad_fun f 
+      ON f.idFun = p.idFun
+    LEFT JOIN basic   b ON f.nivel = 'basic'   AND b.idAdm = v.idAdm AND b.nome = v.tipo AND b.segmento = v.segmento
+    LEFT JOIN classic c ON f.nivel = 'classic' AND c.idAdm = v.idAdm AND c.nome = v.tipo AND c.segmento = v.segmento
+    LEFT JOIN master  m ON f.nivel = 'master'  AND m.idAdm = v.idAdm AND m.nome = v.tipo AND m.segmento = v.segmento
+    JOIN (
+      SELECT idVenda, COUNT(*) AS numFun
+        FROM venda_fun
+       GROUP BY idVenda
+    ) cnt ON cnt.idVenda = v.id
+  SET
+    p.valor = (
+      CASE f.nivel
+        WHEN 'basic'   THEN b.primeira
+        WHEN 'classic' THEN c.primeira
+        WHEN 'master'  THEN m.primeira
+        ELSE 0
+      END / 100.0
+    ) * (
+      (CASE WHEN v.tipo = 'Meia Gazin' THEN v.valor/2 ELSE v.valor END)
+      / cnt.numFun
+    ),
+    p.dataConfirmacao = NOW()
+  WHERE p.confirmada = 1
+    AND MONTH(p.dataConfirmacao) = MONTH(CURDATE())
+    AND YEAR(p.dataConfirmacao) = YEAR(CURDATE());
+
+  -- 2) Recalcula parcela2
+  UPDATE parcela2 p
+    JOIN venda v 
+      ON v.id = p.idVenda
+    JOIN cad_fun f 
+      ON f.idFun = p.idFun
+    LEFT JOIN basic   b ON f.nivel = 'basic'   AND b.idAdm = v.idAdm AND b.nome = v.tipo AND b.segmento = v.segmento
+    LEFT JOIN classic c ON f.nivel = 'classic' AND c.idAdm = v.idAdm AND c.nome = v.tipo AND c.segmento = v.segmento
+    LEFT JOIN master  m ON f.nivel = 'master'  AND m.idAdm = v.idAdm AND m.nome = v.tipo AND m.segmento = v.segmento
+    JOIN (
+      SELECT idVenda, COUNT(*) AS numFun
+        FROM venda_fun
+       GROUP BY idVenda
+    ) cnt ON cnt.idVenda = v.id
+  SET
+    p.valor = (
+      CASE f.nivel
+        WHEN 'basic'   THEN b.segunda
+        WHEN 'classic' THEN c.segunda
+        WHEN 'master'  THEN m.segunda
+        ELSE 0
+      END / 100.0
+    ) * (
+      (CASE WHEN v.tipo = 'Meia Gazin' THEN v.valor/2 ELSE v.valor END)
+      / cnt.numFun
+    ),
+    p.dataConfirmacao = NOW()
+  WHERE p.confirmada = 1
+    AND MONTH(p.dataConfirmacao) = MONTH(CURDATE())
+    AND YEAR(p.dataConfirmacao) = YEAR(CURDATE());
+
+  -- 3) Recalcula parcela3
+  UPDATE parcela3 p
+    JOIN venda v 
+      ON v.id = p.idVenda
+    JOIN cad_fun f 
+      ON f.idFun = p.idFun
+    LEFT JOIN basic   b ON f.nivel = 'basic'   AND b.idAdm = v.idAdm AND b.nome = v.tipo AND b.segmento = v.segmento
+    LEFT JOIN classic c ON f.nivel = 'classic' AND c.idAdm = v.idAdm AND c.nome = v.tipo AND c.segmento = v.segmento
+    LEFT JOIN master  m ON f.nivel = 'master'  AND m.idAdm = v.idAdm AND m.nome = v.tipo AND m.segmento = v.segmento
+    JOIN (
+      SELECT idVenda, COUNT(*) AS numFun
+        FROM venda_fun
+       GROUP BY idVenda
+    ) cnt ON cnt.idVenda = v.id
+  SET
+    p.valor = (
+      CASE f.nivel
+        WHEN 'basic'   THEN b.terceira
+        WHEN 'classic' THEN c.terceira
+        WHEN 'master'  THEN m.terceira
+        ELSE 0
+      END / 100.0
+    ) * (
+      (CASE WHEN v.tipo = 'Meia Gazin' THEN v.valor/2 ELSE v.valor END)
+      / cnt.numFun
+    ),
+    p.dataConfirmacao = NOW()
+  WHERE p.confirmada = 1
+    AND MONTH(p.dataConfirmacao) = MONTH(CURDATE())
+    AND YEAR(p.dataConfirmacao) = YEAR(CURDATE());
+
+  -- 4) Recalcula parcela4
+  UPDATE parcela4 p
+    JOIN venda v 
+      ON v.id = p.idVenda
+    JOIN cad_fun f 
+      ON f.idFun = p.idFun
+    LEFT JOIN basic   b ON f.nivel = 'basic'   AND b.idAdm = v.idAdm AND b.nome = v.tipo AND b.segmento = v.segmento
+    LEFT JOIN classic c ON f.nivel = 'classic' AND c.idAdm = v.idAdm AND c.nome = v.tipo AND c.segmento = v.segmento
+    LEFT JOIN master  m ON f.nivel = 'master'  AND m.idAdm = v.idAdm AND m.nome = v.tipo AND m.segmento = v.segmento
+    JOIN (
+      SELECT idVenda, COUNT(*) AS numFun
+        FROM venda_fun
+       GROUP BY idVenda
+    ) cnt ON cnt.idVenda = v.id
+  SET
+    p.valor = (
+      CASE f.nivel
+        WHEN 'basic'   THEN b.quarta
+        WHEN 'classic' THEN c.quarta
+        WHEN 'master'  THEN m.quarta
+        ELSE 0
+      END / 100.0
+    ) * (
+      (CASE WHEN v.tipo = 'Meia Gazin' THEN v.valor/2 ELSE v.valor END)
+      / cnt.numFun
+    ),
+    p.dataConfirmacao = NOW()
+  WHERE p.confirmada = 1
+    AND MONTH(p.dataConfirmacao) = MONTH(CURDATE())
+    AND YEAR(p.dataConfirmacao) = YEAR(CURDATE());
+
+  -- 5) Atualiza totais na tabela comissao
+  UPDATE comissao c
+    JOIN (
+      SELECT vf.idFun,
+             DATE_FORMAT(v.dataV, '%Y-%m-01') AS mesC,
+             SUM(v.valor) AS totalV
+        FROM venda_fun vf
+        JOIN venda v 
+          ON v.id = vf.idVenda
+        JOIN parcela1 p1
+          ON p1.idVenda = v.id
+         AND p1.idFun   = vf.idFun
+         AND p1.confirmada = 1
+       WHERE MONTH(v.dataV) = MONTH(CURDATE())
+         AND YEAR(v.dataV)  = YEAR(CURDATE())
+       GROUP BY vf.idFun, mesC
+    ) tv ON c.idFun = tv.idFun AND c.mesC = tv.mesC
+    JOIN (
+      SELECT t.idFun,
+             DATE_FORMAT(t.dataConfirmacao, '%Y-%m-01') AS mesC,
+             SUM(t.valor) AS totalC
+        FROM (
+          SELECT idFun, dataConfirmacao, valor FROM parcela1 WHERE confirmada = 1
+          UNION ALL
+          SELECT idFun, dataConfirmacao, valor FROM parcela2 WHERE confirmada = 1
+          UNION ALL
+          SELECT idFun, dataConfirmacao, valor FROM parcela3 WHERE confirmada = 1
+          UNION ALL
+          SELECT idFun, dataConfirmacao, valor FROM parcela4 WHERE confirmada = 1
+        ) AS t
+       WHERE MONTH(t.dataConfirmacao) = MONTH(CURDATE())
+         AND YEAR(t.dataConfirmacao)  = YEAR(CURDATE())
+       GROUP BY t.idFun, mesC
+    ) tc ON c.idFun = tc.idFun AND c.mesC = tc.mesC
+  SET
+    c.totalV = tv.totalV,
+    c.totalC = tc.totalC;
+
+END$$
+DELIMITER ;
+
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
