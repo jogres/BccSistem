@@ -9,7 +9,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // 2) Só permite acesso de usuário logado
 if (empty($_SESSION['user_id'])) {
-    header('Location: /_consorcioBcc/_html/_login/index.php');
+    header('Location: /BccSistem/_html/_login/index.php');
     exit;
 }
 

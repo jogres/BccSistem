@@ -4,7 +4,7 @@
 include __DIR__ . '/../../_php/_menu/menu.php'; 
 
 if (empty($_SESSION['user_id'])) {
-    header('Location: /_consorcioBcc/_html/_login/index.php');
+    header('Location: /BccSistem/_html/_login/index.php');
     exit;
 }
 ?>
@@ -14,8 +14,8 @@ if (empty($_SESSION['user_id'])) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Percentuais de Comissão — consórcioBCC</title>
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_menu/style.css">
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_listas/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_menu/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_listas/style.css">
 </head>
 <body>
   <main class="list-wrapper">
@@ -68,9 +68,9 @@ if (empty($_SESSION['user_id'])) {
             <td><?= $r['numero_parcela'] ?></td>
             <td><?= number_format($r['percentual'], 2, ',', '.') ?>%</td>
             <td class="actions">
-              <a href="/_consorcioBcc/_html/_percentuais_comissao/form.php?id=<?= $r['id_percentual'] ?>"
+              <a href="/BccSistem/_html/_percentuais_comissao/form.php?id=<?= $r['id_percentual'] ?>"
                  class="btn btn-primary btn-sm">Editar</a>
-              <a href="/_consorcioBcc/_php/_percentuais_comissao/delete.php?id=<?= $r['id_percentual'] ?>"
+              <a href="/BccSistem/_php/_percentuais_comissao/delete.php?id=<?= $r['id_percentual'] ?>"
                  onclick="return confirm('Confirma exclusão?')"
                  class="btn btn-secondary btn-sm">Excluir</a>
             </td>

@@ -9,7 +9,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 if (empty($_SESSION['user_id'])) {
-    header('Location: /_consorcioBcc/_html/_login/index.php');
+    header('Location: /BccSistem/_html/_login/index.php');
     exit;
 }
 

@@ -5,7 +5,7 @@ include __DIR__ . '/../../_php/_menu/menu.php';
 include __DIR__ . '/../../_php/_clientes/form.php'; // popula $isEdit, $id_cliente, $nome, $cpf, etc.
 
 if (empty($_SESSION['user_id'])) {
-    header('Location: /_consorcioBcc/_html/_login/index.php');
+    header('Location: /BccSistem/_html/_login/index.php');
     exit;
 }
 ?>

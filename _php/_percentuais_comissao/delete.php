@@ -3,7 +3,7 @@
 require __DIR__ . '/../../config/database.php';
 session_start();
 if (empty($_SESSION['user_id']) || empty($_GET['id'])) {
-    header('Location: /_consorcioBcc/_php/_percentuais_comissao/list.php');
+    header('Location: /BccSistem/_php/_percentuais_comissao/list.php');
     exit;
 }
 
@@ -14,5 +14,5 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([':id' => (int) $_GET['id']]);
 
-header('Location: /_consorcioBcc/_php/_percentuais_comissao/list.php');
+header('Location: /BccSistem/_php/_percentuais_comissao/list.php');
 exit;

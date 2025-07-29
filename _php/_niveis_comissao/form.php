@@ -2,7 +2,7 @@
 require __DIR__ . '/../../config/database.php';
 
 if (empty($_SESSION['user_id'])) {
-  header('Location: /_consorcioBcc/_html/_login/index.php');
+  header('Location: /BccSistem/_html/_login/index.php');
   exit;
 }
 
@@ -30,7 +30,7 @@ if (!empty($_GET['id'])) {
   $stmt->execute([':id'=>$id_adm_nivel]);
   $row = $stmt->fetch(PDO::FETCH_ASSOC);
   if (!$row) {
-    header('Location: /_consorcioBcc/_php/_niveis_comissao/list.php');
+    header('Location: /BccSistem/_php/_niveis_comissao/list.php');
     exit;
   }
   $id_administradora = $row['id_administradora'];

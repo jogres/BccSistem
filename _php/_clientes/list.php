@@ -4,7 +4,7 @@ require __DIR__ . '/../../config/database.php';
 require __DIR__ . '/../../_php/shared/verify_session.php';
 
 if (empty($_SESSION['user_id'])) {
-    header('Location: /_consorcioBcc/_html/_login/index.php');
+    header('Location: /BccSistem/_html/_login/index.php');
     exit;
 }
 

@@ -18,8 +18,8 @@ if (!empty($_GET['id'])) {
         ? 'Editar Funcionário — consórcioBCC'
         : 'Cadastrar Funcionário — consórcioBCC' ?>
   </title>
-  <link id="emp-create-css" rel="stylesheet" href="/_consorcioBcc/_css/_cadastro/style.css">
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_menu/style.css">
+  <link id="emp-create-css" rel="stylesheet" href="/BccSistem/_css/_cadastro/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_menu/style.css">
 </head>
 <body id="emp-create-body">
   <main id="emp-create-wrapper">
@@ -212,6 +212,6 @@ if (!empty($_GET['id'])) {
       </div>
     </form>
   </main>
-  <script src="/_consorcioBcc/_js/_cadastro/form.js"></script>
+  <script src="/BccSistem/_js/_cadastro/form.js"></script>
 </body>
 </html>

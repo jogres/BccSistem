@@ -5,7 +5,7 @@ require __DIR__ . '/../../config/database.php';
 
 // 1) Verifica autenticação
 if (empty($_SESSION['user_id'])) {
-    header('Location: /_consorcioBcc/_html/_login/index.php');
+    header('Location: /BccSistem/_html/_login/index.php');
     exit;
 }
 
@@ -15,7 +15,7 @@ $numero_parcela  = isset($_GET['parcela'])  ? (int) $_GET['parcela'] : 0;
 
 if ($id_venda <= 0 || $numero_parcela <= 0) {
     // Parâmetros inválidos
-    header("Location: /_consorcioBcc/_php/_parcelas_comissao/list.php?venda={$id_venda}&error=Parâmetros inválidos");
+    header("Location: /BccSistem/_php/_parcelas_comissao/list.php?venda={$id_venda}&error=Parâmetros inválidos");
     exit;
 }
 
@@ -37,12 +37,12 @@ try {
     ]);
 
     // 4) Redireciona de volta para a listagem
-    header("Location: /_consorcioBcc/_php/_parcelas_comissao/list.php?venda={$id_venda}");
+    header("Location: /BccSistem/_php/_parcelas_comissao/list.php?venda={$id_venda}");
     exit;
 
 } catch (Exception $e) {
     // Em caso de erro, redireciona com mensagem
     $msg = urlencode($e->getMessage());
-    header("Location: /_consorcioBcc/_php/_parcelas_comissao/list.php?venda={$id_venda}&error={$msg}");
+    header("Location: /BccSistem/_php/_parcelas_comissao/list.php?venda={$id_venda}&error={$msg}");
     exit;
 }

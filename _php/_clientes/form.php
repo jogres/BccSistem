@@ -5,7 +5,7 @@ require __DIR__ . '/../../config/database.php';
 
 // 1) Garante que só usuários autenticados acessem
 if (empty($_SESSION['user_id'])) {
-    header('Location: /_consorcioBcc/_html/_login/index.php');
+    header('Location: /BccSistem/_html/_login/index.php');
     exit;
 }
 
@@ -53,7 +53,7 @@ if (!empty($_GET['id'])) {
 
     if (!$row) {
         // ID inválido, volta à lista
-        header('Location: /_consorcioBcc/_php/_clientes/list.php');
+        header('Location: /BccSistem/_php/_clientes/list.php');
         exit;
     }
 

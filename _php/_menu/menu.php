@@ -3,7 +3,7 @@
 
 
 if (empty($_SESSION['user_id'])) {
-    header('Location: /_consorcioBcc/_html/_login/index.php');
+    header('Location: /BccSistem/_html/_login/index.php');
     exit;
 }
 
@@ -29,15 +29,15 @@ function canView($module) {
 <nav id="main-menu" class="open">
   <ul class="menu-list">
     <?php if (canView('dashboard')): ?>
-      <li><a href="/_consorcioBcc/_html/_dashboard/index.php">Dashboard</a></li>
+      <li><a href="/BccSistem/_html/_dashboard/index.php">Dashboard</a></li>
     <?php endif; ?>
 
     <?php if (canView('clientes')): ?>
       <li class="has-submenu">
         <a href="#">Clientes</a>
         <ul class="submenu">
-          <li><a href="/_consorcioBcc/_html/_clientes/form.php">Cadastrar Cliente</a></li>
-          <li><a href="/_consorcioBcc/_php/_clientes/list.php">Listar Clientes</a></li>
+          <li><a href="/BccSistem/_html/_clientes/form.php">Cadastrar Cliente</a></li>
+          <li><a href="/BccSistem/_php/_clientes/list.php">Listar Clientes</a></li>
         </ul>
       </li>
     <?php endif; ?>
@@ -46,8 +46,8 @@ function canView($module) {
       <li class="has-submenu">
         <a href="#">Funcionários</a>
         <ul class="submenu">
-          <li><a href="/_consorcioBcc/_html/_funcionarios/form.php">Cadastrar Funcionário</a></li>
-          <li><a href="/_consorcioBcc/_php/_funcionarios/list.php">Listar Funcionários</a></li>
+          <li><a href="/BccSistem/_html/_funcionarios/form.php">Cadastrar Funcionário</a></li>
+          <li><a href="/BccSistem/_php/_funcionarios/list.php">Listar Funcionários</a></li>
         </ul>
       </li>
     <?php endif; ?>
@@ -56,8 +56,8 @@ function canView($module) {
       <li class="has-submenu">
         <a href="#">Administradoras</a>
         <ul class="submenu">
-          <li><a href="/_consorcioBcc/_html/_administradoras/form.php">Cadastrar Administradora</a></li>
-          <li><a href="/_consorcioBcc/_php/_administradoras/list.php">Listar Administradoras</a></li>
+          <li><a href="/BccSistem/_html/_administradoras/form.php">Cadastrar Administradora</a></li>
+          <li><a href="/BccSistem/_php/_administradoras/list.php">Listar Administradoras</a></li>
         </ul>
       </li>
     <?php endif; ?>
@@ -66,8 +66,8 @@ function canView($module) {
       <li class="has-submenu">
         <a href="#">Planos de Comissão</a>
         <ul class="submenu">
-          <li><a href="/_consorcioBcc/_html/_planos_comissao/form.php">Cadastrar Plano</a></li>
-          <li><a href="/_consorcioBcc/_php/_planos_comissao/list.php">Listar Planos</a></li>
+          <li><a href="/BccSistem/_html/_planos_comissao/form.php">Cadastrar Plano</a></li>
+          <li><a href="/BccSistem/_php/_planos_comissao/list.php">Listar Planos</a></li>
         </ul>
       </li>
     <?php endif; ?>
@@ -76,8 +76,8 @@ function canView($module) {
       <li class="has-submenu">
         <a href="#">Percentuais de Comissão</a>
         <ul class="submenu">
-          <li><a href="/_consorcioBcc/_html/_percentuais_comissao/form.php">Cadastrar Percentual</a></li>
-          <li><a href="/_consorcioBcc/_php/_percentuais_comissao/list.php">Listar Percentuais</a></li>
+          <li><a href="/BccSistem/_html/_percentuais_comissao/form.php">Cadastrar Percentual</a></li>
+          <li><a href="/BccSistem/_php/_percentuais_comissao/list.php">Listar Percentuais</a></li>
         </ul>
       </li>
     <?php endif; ?>
@@ -86,8 +86,8 @@ function canView($module) {
       <li class="has-submenu">
         <a href="#">Níveis de Comissão</a>
         <ul class="submenu">
-          <li><a href="/_consorcioBcc/_html/_niveis_comissao/form.php">Cadastrar Nível</a></li>
-          <li><a href="/_consorcioBcc/_php/_niveis_comissao/list.php">Listar Níveis</a></li>
+          <li><a href="/BccSistem/_html/_niveis_comissao/form.php">Cadastrar Nível</a></li>
+          <li><a href="/BccSistem/_php/_niveis_comissao/list.php">Listar Níveis</a></li>
         </ul>
       </li>
     <?php endif; ?>
@@ -96,8 +96,8 @@ function canView($module) {
       <li class="has-submenu">
         <a href="#">Vendas</a>
         <ul class="submenu">
-          <li><a href="/_consorcioBcc/_html/_vendas/form.php">Cadastrar Venda</a></li>
-          <li><a href="/_consorcioBcc/_php/_vendas/list.php">Listar Vendas</a></li>
+          <li><a href="/BccSistem/_html/_vendas/form.php">Cadastrar Venda</a></li>
+          <li><a href="/BccSistem/_php/_vendas/list.php">Listar Vendas</a></li>
         </ul>
       </li>
     <?php endif; ?>
@@ -108,8 +108,8 @@ function canView($module) {
          alt="Foto de <?php echo htmlspecialchars($userName); ?>"
          class="menu-avatar">
     <span class="menu-username"><?php echo htmlspecialchars($userName); ?></span>
-    <a href="/_consorcioBcc/_php/_login/logout.php" class="menu-logout">Sair</a>
+    <a href="/BccSistem/_php/_login/logout.php" class="menu-logout">Sair</a>
   </div>
 </nav>
 
-<script src="/_consorcioBcc/_js/_menu/menu.js"></script>
+<script src="/BccSistem/_js/_menu/menu.js"></script>

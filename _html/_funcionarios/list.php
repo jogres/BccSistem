@@ -10,14 +10,14 @@ include __DIR__ . '/../../_php/_menu/menu.php';
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Listar Funcionários — consórcioBCC</title>
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_listas/style.css">
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_menu/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_listas/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_menu/style.css">
 </head>
 <body>
   <main class="list-wrapper">
     <header class="list-header">
       <h1>Funcionários</h1>
-      <form method="get" action="/_consorcioBcc/_php/_funcionarios/list.php" class="search-form">
+      <form method="get" action="/BccSistem/_php/_funcionarios/list.php" class="search-form">
         <input
           type="text"
           name="search"
@@ -76,12 +76,12 @@ include __DIR__ . '/../../_php/_menu/menu.php';
             <td><?= htmlspecialchars($f['papel']) ?></td>
             <td class="actions">
               <a
-                href="/_consorcioBcc/_html/_funcionarios/form.php?id=<?= $f['id_funcionario'] ?>"
+                href="/BccSistem/_html/_funcionarios/form.php?id=<?= $f['id_funcionario'] ?>"
                 class="btn btn-primary btn-sm">
                 Editar
               </a>
               <a
-                href="/_consorcioBcc/_html/_funcionarios/commissions.php?id=<?= $f['id_funcionario'] ?>"
+                href="/BccSistem/_html/_funcionarios/commissions.php?id=<?= $f['id_funcionario'] ?>"
                 class="btn btn-secondary btn-sm">
                 Comissões
               </a>
@@ -104,6 +104,6 @@ include __DIR__ . '/../../_php/_menu/menu.php';
     <?php endif; ?>
   </main>
 
-  <script src="/_consorcioBcc/_js/_listas/list.js"></script>
+  <script src="/BccSistem/_js/_listas/list.js"></script>
 </body>
 </html>

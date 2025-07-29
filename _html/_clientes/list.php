@@ -2,7 +2,7 @@
 
   include __DIR__ . '/../../_php/_menu/menu.php'; 
   if (empty($_SESSION['user_id'])) {
-    header('Location: /_consorcioBcc/_html/_login/index.php');
+    header('Location: /BccSistem/_html/_login/index.php');
     exit;
   }
 ?>
@@ -11,8 +11,8 @@
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Clientes — consórcioBCC</title>
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_menu/style.css">
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_listas/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_menu/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_listas/style.css">
 </head>
 <body>
   
@@ -60,9 +60,9 @@
             <td><?= htmlspecialchars($r['telefone']) ?></td>
             <td><?= nl2br(htmlspecialchars($r['motivo'])) ?></td>
             <td class="actions">
-              <a href="/_consorcioBcc/_html/_clientes/form.php?id=<?= $r['id_cliente'] ?>"
+              <a href="/BccSistem/_html/_clientes/form.php?id=<?= $r['id_cliente'] ?>"
                  class="btn btn-primary btn-sm">Editar</a>
-              <a href="/_consorcioBcc/_php/_clientes/delete.php?id=<?= $r['id_cliente'] ?>"
+              <a href="/BccSistem/_php/_clientes/delete.php?id=<?= $r['id_cliente'] ?>"
                  onclick="return confirm('Confirma exclusão?')"
                  class="btn btn-secondary btn-sm">Excluir</a>
             </td>

@@ -6,7 +6,7 @@ if (!empty($_GET['id'])) {
   include __DIR__ . '/../../_php/_administradoras/form.php';
 }
 if (empty($_SESSION['user_id'])) {
-    header('Location: /_consorcioBcc/_html/_login/index.php');
+    header('Location: /BccSistem/_html/_login/index.php');
     exit;
 }
 ?>
@@ -21,8 +21,8 @@ if (empty($_SESSION['user_id'])) {
          ? "Editar Administradora — " . htmlspecialchars($nome)
          : "Cadastrar Nova Administradora" ?>
   </title>
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_menu/style.css">
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_cadastro/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_menu/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_cadastro/style.css">
 </head>
 <body id="emp-create-body">
   <main id="emp-create-wrapper">
@@ -42,7 +42,7 @@ if (empty($_SESSION['user_id'])) {
 
     <form id="emp-create-form"
           class="form"
-          action="/_consorcioBcc/_php/_administradoras/process.php"
+          action="/BccSistem/_php/_administradoras/process.php"
           method="post"
           novalidate>
       <?php if (!empty($_GET['id'])): ?>
@@ -80,6 +80,6 @@ if (empty($_SESSION['user_id'])) {
     </form>
   </main>
 
-  <script src="/_consorcioBcc/_js/_cadastro/administradoras-form.js"></script>
+  <script src="/BccSistem/_js/_cadastro/administradoras-form.js"></script>
 </body>
 </html>

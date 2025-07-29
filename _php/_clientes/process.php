@@ -5,7 +5,7 @@ session_start();
 
 // 1) Autenticação
 if (empty($_SESSION['user_id'])) {
-    header('Location: /_consorcioBcc/_html/_login/index.php');
+    header('Location: /BccSistem/_html/_login/index.php');
     exit;
 }
 
@@ -42,8 +42,8 @@ if ($motivo === '') {
 if ($errors) {
     $err = urlencode($errors[0]);
     $loc = $id_cliente
-         ? "/_consorcioBcc/_html/_clientes/form.php?id={$id_cliente}&error={$err}"
-         : "/_consorcioBcc/_html/_clientes/form.php?error={$err}";
+         ? "/BccSistem/_html/_clientes/form.php?id={$id_cliente}&error={$err}"
+         : "/BccSistem/_html/_clientes/form.php?error={$err}";
     header("Location: {$loc}");
     exit;
 }
@@ -115,15 +115,15 @@ try {
     }
 
     // 5) Redireciona para a listagem
-    header('Location: /_consorcioBcc/_php/_clientes/list.php');
+    header('Location: /BccSistem/_php/_clientes/list.php');
     exit;
 
 } catch (Exception $e) {
     // Em caso de erro, retorna ao formulário com a mensagem
     $msg = urlencode($e->getMessage());
     $loc = $id_cliente
-         ? "/_consorcioBcc/_html/_clientes/form.php?id={$id_cliente}&error={$msg}"
-         : "/_consorcioBcc/_html/_clientes/form.php?error={$msg}";
+         ? "/BccSistem/_html/_clientes/form.php?id={$id_cliente}&error={$msg}"
+         : "/BccSistem/_html/_clientes/form.php?error={$msg}";
     header("Location: {$loc}");
     exit;
 }

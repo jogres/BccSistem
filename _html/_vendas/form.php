@@ -5,7 +5,7 @@ include __DIR__ . '/../../_php/_menu/menu.php';
 include __DIR__ . '/../../_php/_vendas/form.php';
 
 if (empty($_SESSION['user_id'])) {
-    header('Location: /_consorcioBcc/_html/_login/index.php');
+    header('Location: /BccSistem/_html/_login/index.php');
     exit;
 }
 
@@ -18,8 +18,8 @@ $clientes_json = json_encode(array_column($clientes, null, 'id_cliente'));
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title><?= $isEdit ? "Editar Venda #{$id_venda}" : "Cadastrar Venda" ?></title>
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_menu/style.css">
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_cadastro/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_menu/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_cadastro/style.css">
 </head>
 <body id="emp-create-body">
   <main id="emp-create-wrapper">
@@ -28,7 +28,7 @@ $clientes_json = json_encode(array_column($clientes, null, 'id_cliente'));
       <div class="alert-error"><?= htmlspecialchars($_GET['error']) ?></div>
     <?php endif; ?>
 
-    <form action="/_consorcioBcc/_php/_vendas/process.php" method="post" class="form" id="sale-form">
+    <form action="/BccSistem/_php/_vendas/process.php" method="post" class="form" id="sale-form">
       <?php if ($isEdit): ?>
         <input type="hidden" name="id_venda" value="<?= $id_venda ?>">
       <?php endif; ?>

@@ -18,8 +18,8 @@ $isManager = in_array($role, ['admin','gerente'], true);
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dashboard — consórcioBCC</title>
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_dashboard/style.css">
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_menu/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_dashboard/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_menu/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -101,7 +101,7 @@ $isManager = in_array($role, ['admin','gerente'], true);
                   <td><?= date('d/m/Y', strtotime($p['data_prevista'])) ?></td>
                   <td>
                     <?php if ($isManager): ?>
-                      <a href="/_consorcioBcc/_php/_parcelas_comissao/list.php?venda=<?= $p['id_venda'] ?>"
+                      <a href="/BccSistem/_php/_parcelas_comissao/list.php?venda=<?= $p['id_venda'] ?>"
                          class="btn-link">Ver</a>
                     <?php else: ?>
                       — <!-- ou deixe em branco, ou exiba “Não permitido” -->
@@ -159,6 +159,6 @@ $isManager = in_array($role, ['admin','gerente'], true);
           data-sales-data='<?= json_encode(array_column($stats["salesWeekByUser"], "vendas")) ?>'
           data-parcels-count='<?= count($stats["pendingParcels"]) ?>'>
   </script>
-  <script src="/_consorcioBcc/_js/_dashboard/dashboard.js"></script>
+  <script src="/BccSistem/_js/_dashboard/dashboard.js"></script>
 </body>
 </html>

@@ -7,7 +7,7 @@ require __DIR__ . '/../../_php/shared/verify_session.php';
 
 // 1. Verifica sessão
 if (empty($_SESSION['user_id'])) {
-    header('Location: /_consorcioBcc/_html/_login/index.php');
+    header('Location: /BccSistem/_html/_login/index.php');
     exit;
 }
 

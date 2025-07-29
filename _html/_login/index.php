@@ -4,7 +4,7 @@
 session_start();
 // Redireciona usuário já autenticado
 if (!empty($_SESSION['user_id'])) {
-    header('Location: /_consorcioBcc/_html/_dashboard/index.php');
+    header('Location: /BccSistem/_html/_dashboard/index.php');
     exit;
 }
 ?><!DOCTYPE html>
@@ -13,7 +13,7 @@ if (!empty($_SESSION['user_id'])) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title id="page-title">Login — consórcioBCC</title>
-  <link id="login-css" rel="stylesheet" href="/_consorcioBcc/_css/_login/style.css">
+  <link id="login-css" rel="stylesheet" href="/BccSistem/_css/_login/style.css">
 </head>
 <body id="login-body">
   <!-- Wrapper flex para centralizar vertical e horizontalmente -->
@@ -29,7 +29,7 @@ if (!empty($_SESSION['user_id'])) {
         </div>
       <?php endif; ?>
 
-      <form id="login-form" action="/_consorcioBcc/_php/_login/login.php" method="post" novalidate>
+      <form id="login-form" action="/BccSistem/_php/_login/login.php" method="post" novalidate>
         <div class="form-group" id="login-group-email">
           <label for="email" class="form-label">E-mail</label>
           <input
@@ -66,6 +66,6 @@ if (!empty($_SESSION['user_id'])) {
     </div>
   </div>
 
-  <script id="login-js" src="/_consorcioBcc/_js/_login/app.js"></script>
+  <script id="login-js" src="/BccSistem/_js/_login/app.js"></script>
 </body>
 </html>

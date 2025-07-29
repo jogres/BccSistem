@@ -3,7 +3,7 @@
 require __DIR__ . '/../../config/database.php';
 session_start();
 if (empty($_SESSION['user_id'])) {
-    header('Location: /_consorcioBcc/_html/_login/index.php');
+    header('Location: /BccSistem/_html/_login/index.php');
     exit;
 }
 
@@ -35,8 +35,8 @@ if (!in_array($modalidade,
 if ($errors) {
     $err = urlencode($errors[0]);
     $loc = $id_plano_comissao
-         ? "/_consorcioBcc/_html/_planos_comissao/form.php?id={$id_plano_comissao}&error={$err}"
-         : "/_consorcioBcc/_html/_planos_comissao/form.php?error={$err}";
+         ? "/BccSistem/_html/_planos_comissao/form.php?id={$id_plano_comissao}&error={$err}"
+         : "/BccSistem/_html/_planos_comissao/form.php?error={$err}";
     header("Location: {$loc}");
     exit;
 }
@@ -101,13 +101,13 @@ try {
         ]);
     }
 
-    header('Location: /_consorcioBcc/_php/_planos_comissao/list.php');
+    header('Location: /BccSistem/_php/_planos_comissao/list.php');
     exit;
 } catch (Exception $e) {
     $msg = urlencode($e->getMessage());
     $loc = $id_plano_comissao
-         ? "/_consorcioBcc/_html/_planos_comissao/form.php?id={$id_plano_comissao}&error={$msg}"
-         : "/_consorcioBcc/_html/_planos_comissao/form.php?error={$msg}";
+         ? "/BccSistem/_html/_planos_comissao/form.php?id={$id_plano_comissao}&error={$msg}"
+         : "/BccSistem/_html/_planos_comissao/form.php?error={$msg}";
     header("Location: {$loc}");
     exit;
 }

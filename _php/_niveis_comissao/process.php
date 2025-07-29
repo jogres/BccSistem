@@ -2,7 +2,7 @@
 require __DIR__ . '/../../config/database.php';
 session_start();
 if (empty($_SESSION['user_id'])) {
-  header('Location: /_consorcioBcc/_html/_login/index.php');
+  header('Location: /BccSistem/_html/_login/index.php');
   exit;
 }
 
@@ -25,8 +25,8 @@ if (!is_numeric($percentual) || $percentual < 0) {
 if ($errors) {
   $err = urlencode($errors[0]);
   $loc = $id_adm_nivel
-       ? "/_consorcioBcc/_html/_niveis_comissao/form.php?id={$id_adm_nivel}&error={$err}"
-       : "/_consorcioBcc/_html/_niveis_comissao/form.php?error={$err}";
+       ? "/BccSistem/_html/_niveis_comissao/form.php?id={$id_adm_nivel}&error={$err}"
+       : "/BccSistem/_html/_niveis_comissao/form.php?error={$err}";
   header("Location: {$loc}");
   exit;
 }
@@ -87,14 +87,14 @@ try {
     ]);
   }
 
-  header('Location: /_consorcioBcc/_php/_niveis_comissao/list.php');
+  header('Location: /BccSistem/_php/_niveis_comissao/list.php');
   exit;
 
 } catch (Exception $e) {
   $msg = urlencode($e->getMessage());
   $loc = $id_adm_nivel
-       ? "/_consorcioBcc/_html/_niveis_comissao/form.php?id={$id_adm_nivel}&error={$msg}"
-       : "/_consorcioBcc/_html/_niveis_comissao/form.php?error={$msg}";
+       ? "/BccSistem/_html/_niveis_comissao/form.php?id={$id_adm_nivel}&error={$msg}"
+       : "/BccSistem/_html/_niveis_comissao/form.php?error={$msg}";
   header("Location: {$loc}");
   exit;
 }

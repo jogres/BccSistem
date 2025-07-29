@@ -3,7 +3,7 @@
 require __DIR__ . '/../../config/database.php';
 session_start();
 if (empty($_SESSION['user_id'])) {
-    header('Location: /_consorcioBcc/_html/_login/index.php');
+    header('Location: /BccSistem/_html/_login/index.php');
     exit;
 }
 
@@ -23,8 +23,8 @@ if (!preg_match('/^\d{2}\.\d{3}\.\d{3}\/\d{4}\-\d{2}$/', $cnpj)) {
 if ($errors) {
     $err = urlencode($errors[0]);
     $loc = $id
-      ? "/_consorcioBcc/_html/_administradoras/form.php?id={$id}&error={$err}"
-      : "/_consorcioBcc/_html/_administradoras/form.php?error={$err}";
+      ? "/BccSistem/_html/_administradoras/form.php?id={$id}&error={$err}"
+      : "/BccSistem/_html/_administradoras/form.php?error={$err}";
     header("Location: {$loc}");
     exit;
 }
@@ -76,14 +76,14 @@ try {
         ]);
     }
 
-    header('Location: /_consorcioBcc/_php/_administradoras/list.php');
+    header('Location: /BccSistem/_php/_administradoras/list.php');
     exit;
 
 } catch (Exception $e) {
     $err = urlencode($e->getMessage());
     $loc = $id
-      ? "/_consorcioBcc/_html/_administradoras/form.php?id={$id}&error={$err}"
-      : "/_consorcioBcc/_html/_administradoras/form.php?error={$err}";
+      ? "/BccSistem/_html/_administradoras/form.php?id={$id}&error={$err}"
+      : "/BccSistem/_html/_administradoras/form.php?error={$err}";
     header("Location: {$loc}");
     exit;
 }

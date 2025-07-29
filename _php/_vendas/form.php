@@ -4,7 +4,7 @@ require __DIR__ . '/../../config/database.php';
 
 
 if (empty($_SESSION['user_id'])) {
-    header('Location: /_consorcioBcc/_html/_login/index.php');
+    header('Location: /BccSistem/_html/_login/index.php');
     exit;
 }
 
@@ -93,7 +93,7 @@ if (!empty($_GET['id'])) {
     $stmt->execute([':id' => $id_venda]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$row) {
-        header('Location: /_consorcioBcc/_php/_vendas/list.php');
+        header('Location: /BccSistem/_php/_vendas/list.php');
         exit;
     }
 

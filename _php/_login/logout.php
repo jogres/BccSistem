@@ -8,6 +8,6 @@ if (ini_get("session.use_cookies")) {
 }
 session_destroy();
 // Redireciona ao login
-header('Location: /_consorcioBcc/_html/_login/index.php');
+header('Location: /BccSistem/_html/_login/index.php');
 exit;
 ?>

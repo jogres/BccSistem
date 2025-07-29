@@ -3,7 +3,7 @@
 require __DIR__ . '/../../config/database.php';
 session_start();
 if (empty($_SESSION['user_id'])) {
-    header('Location: /_consorcioBcc/_html/_login/index.php');
+    header('Location: /BccSistem/_html/_login/index.php');
     exit;
 }
 
@@ -13,7 +13,7 @@ $percentuaisArr      = $_POST['percentual']        ?? [];
 $id_nivel_comissao   = (int) ($_POST['id_nivel_comissao'] ?? 0);
 
 if (!$id_plano_comissao || !$id_nivel_comissao || !count($parcelas)) {
-    header('Location: /_consorcioBcc/_html/_percentuais_comissao/form.php?'
+    header('Location: /BccSistem/_html/_percentuais_comissao/form.php?'
          . 'plano=' . $id_plano_comissao
          . '&error=' . urlencode('Selecione plano, nível e preencha ao menos uma parcela.'));
     exit;
@@ -77,14 +77,14 @@ try {
     }
 
     $pdo->commit();
-    header('Location: /_consorcioBcc/_php/_percentuais_comissao/list.php');
+    header('Location: /BccSistem/_php/_percentuais_comissao/list.php');
     exit;
 
 } catch (Exception $e) {
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
     }
-    header('Location: /_consorcioBcc/_html/_percentuais_comissao/form.php?'
+    header('Location: /BccSistem/_html/_percentuais_comissao/form.php?'
          . 'plano='  . $id_plano_comissao
          . '&error=' . urlencode($e->getMessage()));
     exit;

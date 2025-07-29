@@ -4,14 +4,14 @@
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Administradoras — consórcioBCC</title>
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_menu/style.css">
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_listas/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_menu/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_listas/style.css">
 </head>
 <body>
   <main class="list-wrapper">
     <header class="list-header">
       <h1>Administradoras</h1>
-      <form method="get" action="/_consorcioBcc/_php/_administradoras/list.php" class="search-form">
+      <form method="get" action="/BccSistem/_php/_administradoras/list.php" class="search-form">
         <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="Buscar por nome…" class="search-input">
         <button type="submit" class="btn btn-secondary">Buscar</button>
       </form>
@@ -38,7 +38,7 @@
           <td><?= htmlspecialchars($a['nome']) ?></td>
           <td><?= htmlspecialchars($a['cnpj']) ?></td>
           <td class="actions">
-            <a href="/_consorcioBcc/_html/_administradoras/form.php?id=<?= $a['id_administradora'] ?>"
+            <a href="/BccSistem/_html/_administradoras/form.php?id=<?= $a['id_administradora'] ?>"
                class="btn btn-primary btn-sm">Editar</a>
           </td>
         </tr>
@@ -55,6 +55,6 @@
     </nav>
     <?php endif; ?>
   </main>
-  <script src="/_consorcioBcc/_js/_listas/list.js"></script>
+  <script src="/BccSistem/_js/_listas/list.js"></script>
 </body>
 </html>

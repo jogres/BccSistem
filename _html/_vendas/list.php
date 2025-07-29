@@ -3,7 +3,7 @@
 include __DIR__ . '/../../_php/_menu/menu.php'; 
 
 if (empty($_SESSION['user_id'])) {
-    header('Location: /_consorcioBcc/_html/_login/index.php');
+    header('Location: /BccSistem/_html/_login/index.php');
     exit;
 }
 
@@ -15,8 +15,8 @@ if (empty($_SESSION['user_id'])) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Vendas — consórcioBCC</title>
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_menu/style.css">
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_listas/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_menu/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_listas/style.css">
 </head>
 <body>
   <main class="list-wrapper">
@@ -85,7 +85,7 @@ if (empty($_SESSION['user_id'])) {
           <td><?= htmlspecialchars($r['status']) ?></td>
           <td class="actions">
             <a 
-              href="/_consorcioBcc/_php/_vendas/delete.php?id=<?= $r['id_venda'] ?>" 
+              href="/BccSistem/_php/_vendas/delete.php?id=<?= $r['id_venda'] ?>" 
               class="btn-sm btn-secondary"
               onclick="return confirm('Excluir?')"
             >

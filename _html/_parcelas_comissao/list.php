@@ -5,9 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Parcelas da Venda #<?= htmlspecialchars($contrato) ?></title>
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_menu/style.css">
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_dashboard/style.css">
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_parcelas_comissao/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_menu/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_dashboard/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_parcelas_comissao/style.css">
 
 </head>
 <body>
@@ -57,7 +57,7 @@
                     </td>
                     <td>
                       <?php if ($p['status'] !== 'paga'): ?>
-                        <a href="/_consorcioBcc/_php/_parcelas_comissao/process_confirm.php?venda=<?= $id_venda ?>&parcela=<?= $p['numero_parcela'] ?>"
+                        <a href="/BccSistem/_php/_parcelas_comissao/process_confirm.php?venda=<?= $id_venda ?>&parcela=<?= $p['numero_parcela'] ?>"
                            class="btn-link">Confirmar</a>
                       <?php else: ?>
                         —

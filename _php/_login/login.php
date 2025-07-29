@@ -8,7 +8,7 @@ $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
 $senha = $_POST['senha'] ?? '';
 
 if (!$email || !$senha) {
-    header('Location: /_consorcioBcc/_html/_login/index.php?error=1');
+    header('Location: /BccSistem/_html/_login/index.php?error=1');
     exit;
 }
 
@@ -33,11 +33,11 @@ try {
         $_SESSION['user_photo']  = $user['foto_url'];
         $_SESSION['user_name']  = $user['nome'];
         // Redireciona para dashboard
-        header('Location: /_consorcioBcc/_html/_dashboard/index.php');
+        header('Location: /BccSistem/_html/_dashboard/index.php');
         exit;
     } else {
         // Credenciais inválidas
-        header('Location: /_consorcioBcc/_html/_login/index.php?error=1');
+        header('Location: /BccSistem/_html/_login/index.php?error=1');
         exit;
     }
 } catch (PDOException $e) {

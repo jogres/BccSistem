@@ -4,7 +4,7 @@ require __DIR__ . '/../../_php/shared/verify_session.php';
 include_once __DIR__ . '/../../_php/_menu/menu.php';
 include    __DIR__ . '/../../_php/_planos_comissao/form.php';
 if (empty($_SESSION['user_id'])) {
-    header('Location: /_consorcioBcc/_html/_login/index.php');
+    header('Location: /BccSistem/_html/_login/index.php');
     exit;
 }
 ?>
@@ -18,8 +18,8 @@ if (empty($_SESSION['user_id'])) {
          ? "Editar Plano — " . htmlspecialchars($nome_plano)
          : "Cadastrar Novo Plano de Comissão" ?>
   </title>
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_menu/style.css">
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_cadastro/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_menu/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_cadastro/style.css">
 </head>
 <body id="emp-create-body">
   <main id="emp-create-wrapper">
@@ -36,7 +36,7 @@ if (empty($_SESSION['user_id'])) {
     <?php endif; ?>
 
     <form id="emp-create-form" class="form"
-          action="/_consorcioBcc/_php/_planos_comissao/process.php"
+          action="/BccSistem/_php/_planos_comissao/process.php"
           method="post" novalidate>
       <?php if ($isEdit): ?>
         <input type="hidden"

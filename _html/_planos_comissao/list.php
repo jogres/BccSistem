@@ -1,7 +1,7 @@
 <?php 
 include __DIR__ . '/../../_php/_menu/menu.php'; 
 if (empty($_SESSION['user_id'])) {
-    header('Location: /_consorcioBcc/_html/_login/index.php');
+    header('Location: /BccSistem/_html/_login/index.php');
     exit;
 }
 ?>
@@ -10,8 +10,8 @@ if (empty($_SESSION['user_id'])) {
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Planos de Comissão — consórcioBCC</title>
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_menu/style.css">
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_listas/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_menu/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_listas/style.css">
 </head>
 <body>
 
@@ -63,9 +63,9 @@ if (empty($_SESSION['user_id'])) {
             <td><?= $r['num_parcelas_comiss'] ?></td>
             <td><?= htmlspecialchars($r['modalidade']) ?></td>
             <td class="actions">
-              <a href="/_consorcioBcc/_html/_planos_comissao/form.php?id=<?= $r['id_plano_comissao'] ?>"
+              <a href="/BccSistem/_html/_planos_comissao/form.php?id=<?= $r['id_plano_comissao'] ?>"
                  class="btn btn-primary btn-sm">Editar</a>
-              <a href="/_consorcioBcc/_php/_planos_comissao/delete.php?id=<?= $r['id_plano_comissao'] ?>"
+              <a href="/BccSistem/_php/_planos_comissao/delete.php?id=<?= $r['id_plano_comissao'] ?>"
                  onclick="return confirm('Confirma exclusão?')"
                  class="btn btn-secondary btn-sm">Excluir</a>
             </td>

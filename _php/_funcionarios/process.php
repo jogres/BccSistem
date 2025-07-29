@@ -6,7 +6,7 @@ session_start();
 
 // 1) Proteção de rota
 if (empty($_SESSION['user_id'])) {
-    header('Location: /_consorcioBcc/_html/_login/index.php');
+    header('Location: /BccSistem/_html/_login/index.php');
     exit;
 }
 
@@ -56,8 +56,8 @@ if (!in_array($papel, ['admin','gerente','vendedor'], true)) {
 if ($errors) {
     $err = urlencode($errors[0]);
     $redir = $id
-      ? "/_consorcioBcc/_html/_funcionarios/form.php?id={$id}&error={$err}"
-      : "/_consorcioBcc/_html/_funcionarios/form.php?error={$err}";
+      ? "/BccSistem/_html/_funcionarios/form.php?id={$id}&error={$err}"
+      : "/BccSistem/_html/_funcionarios/form.php?error={$err}";
     header("Location: {$redir}");
     exit;
 }
@@ -181,14 +181,14 @@ try {
     }
 
     // 6) Redireciona para lista
-    header('Location: /_consorcioBcc/_php/_funcionarios/list.php');
+    header('Location: /BccSistem/_php/_funcionarios/list.php');
     exit;
 
 } catch (Exception $e) {
     $err = urlencode($e->getMessage());
     $redir = $id
-      ? "/_consorcioBcc/_html/_funcionarios/form.php?id={$id}&error={$err}"
-      : "/_consorcioBcc/_html/_funcionarios/form.php?error={$err}";
+      ? "/BccSistem/_html/_funcionarios/form.php?id={$id}&error={$err}"
+      : "/BccSistem/_html/_funcionarios/form.php?error={$err}";
     header("Location: {$redir}");
     exit;
 }

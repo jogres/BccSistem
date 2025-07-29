@@ -6,7 +6,7 @@ require __DIR__ . '/../../config/database.php';
 
 // Verifica sessão
 if (empty($_SESSION['user_id'])) {
-    header('Location: /_consorcioBcc/_html/_login/index.php');
+    header('Location: /BccSistem/_html/_login/index.php');
     exit;
 }
 
@@ -42,7 +42,7 @@ if (!empty($_GET['id'])) {
     $f = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$f) {
         // id inválido — volta para a lista
-        header('Location: /_consorcioBcc/_php/_funcionarios/list.php');
+        header('Location: /BccSistem/_php/_funcionarios/list.php');
         exit;
     }
     // Popula variáveis com dados do funcionário

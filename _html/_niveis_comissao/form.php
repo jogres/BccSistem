@@ -13,8 +13,8 @@ include    __DIR__ . '/../../_php/_niveis_comissao/form.php';
          ? "Editar Comissão: {$administradoras[array_search($id_administradora,array_column($administradoras,'id_administradora'))]['nome']} / Nível {$nivel}"
          : "Cadastrar Comissão por Administradora e Nível" ?>
   </title>
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_menu/style.css">
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_cadastro/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_menu/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_cadastro/style.css">
 </head>
 <body id="emp-create-body">
   <main id="emp-create-wrapper">
@@ -30,7 +30,7 @@ include    __DIR__ . '/../../_php/_niveis_comissao/form.php';
 
     <form id="emp-create-form"
           class="form"
-          action="/_consorcioBcc/_php/_niveis_comissao/process.php"
+          action="/BccSistem/_php/_niveis_comissao/process.php"
           method="post" novalidate>
       <?php if ($isEdit): ?>
         <input type="hidden" name="id_adm_nivel" value="<?= $id_adm_nivel ?>">

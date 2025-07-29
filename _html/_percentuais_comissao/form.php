@@ -5,7 +5,7 @@ include __DIR__ . '/../../_php/_menu/menu.php';
 include __DIR__ . '/../../_php/_percentuais_comissao/form.php';
 
 if (empty($_SESSION['user_id'])) {
-    header('Location: /_consorcioBcc/_html/_login/index.php');
+    header('Location: /BccSistem/_html/_login/index.php');
     exit;
 }
 ?>
@@ -15,8 +15,8 @@ if (empty($_SESSION['user_id'])) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= $isEdit ? 'Editar Percentuais' : 'Novos Percentuais' ?></title>
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_menu/style.css">
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_cadastro/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_menu/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_cadastro/style.css">
 </head>
 <body id="emp-create-body">
   <main id="emp-create-wrapper">
@@ -51,7 +51,7 @@ if (empty($_SESSION['user_id'])) {
     <?php if ($id_plano_comissao && $numParcelas>0): ?>
       <!-- 2) Formulário de Percentuais (POST) -->
       <form id="emp-create-form" class="form"
-            action="/_consorcioBcc/_php/_percentuais_comissao/process.php"
+            action="/BccSistem/_php/_percentuais_comissao/process.php"
             method="post" novalidate>
         <input type="hidden" name="id_plano_comissao" value="<?= $id_plano_comissao ?>">
 

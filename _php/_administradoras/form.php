@@ -3,7 +3,7 @@
 require __DIR__ . '/../../config/database.php';
 
 if (empty($_SESSION['user_id'])) {
-    header('Location: /_consorcioBcc/_html/_login/index.php');
+    header('Location: /BccSistem/_html/_login/index.php');
     exit;
 }
 
@@ -22,7 +22,7 @@ if (!empty($_GET['id'])) {
     $stmt->execute([':id' => $id]);
     $a = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$a) {
-        header('Location: /_consorcioBcc/_php/_administradoras/list.php');
+        header('Location: /BccSistem/_php/_administradoras/list.php');
         exit;
     }
     $nome = $a['nome'];
