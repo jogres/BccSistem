@@ -10,7 +10,7 @@ if (empty($_SESSION['user_id'])) {
 // Dados do usuário
 $role      = $_SESSION['user_papel'];    // 'admin', 'gerente' ou 'vendedor'
 $userName  = $_SESSION['user_name']  ?? '';
-$userPhoto = $_SESSION['user_photo'] ?? '/_consorcioBcc/_img/avatar-placeholder.jpg';
+$userPhoto = $_SESSION['user_photo'] ?? '/BccSistem/_img/avatar-placeholder.jpg';
 
 // Permissões de acesso por módulo
 $permissions = [
