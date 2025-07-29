@@ -6,7 +6,7 @@ if (
     empty($_SESSION['user_papel'])
 ) {
     // Não autenticado: volta ao login
-    header('Location: /_html/_login/index.php');
+    header('Location: /BccSistem/_html/_login/index.php');
     exit;
 }
 
