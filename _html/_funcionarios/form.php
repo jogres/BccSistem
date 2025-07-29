@@ -36,7 +36,7 @@ if (!empty($_GET['id'])) {
     <?php endif; ?>
 
     <form id="emp-create-form" class="form"
-          action="/_consorcioBcc/_php/_funcionarios/process.php"
+          action="/BccSistem/_php/_funcionarios/process.php"
           method="post" novalidate>
       
       <?php if (!empty($_GET['id'])): ?>

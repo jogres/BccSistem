@@ -19,8 +19,8 @@ if (empty($_SESSION['user_id'])) {
         ? "Editar Cliente — " . htmlspecialchars($nome) 
         : "Cadastrar Cliente" ?>
   </title>
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_menu/style.css">
-  <link rel="stylesheet" href="/_consorcioBcc/_css/_cadastro/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_menu/style.css">
+  <link rel="stylesheet" href="/BccSistem/_css/_cadastro/style.css">
 </head>
 <body id="emp-create-body">
   <main id="emp-create-wrapper">
@@ -37,7 +37,7 @@ if (empty($_SESSION['user_id'])) {
     <?php endif; ?>
 
     <form id="emp-create-form" class="form"
-          action="/_consorcioBcc/_php/_clientes/process.php"
+          action="/BccSistem/_php/_clientes/process.php"
           method="post" novalidate>
       <?php if ($isEdit): ?>
         <input type="hidden" name="id_cliente" value="<?= $id_cliente ?>">
