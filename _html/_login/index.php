@@ -1,34 +1,71 @@
 <?php
-  session_start();
-  $error = $_SESSION['error'] ?? '';
-  unset($_SESSION['error']); // limpa mensagem após exibir
-?>
-<!DOCTYPE html>
+// /_consorcioBcc/_html/_login/index.php
+
+session_start();
+// Redireciona usuário já autenticado
+if (!empty($_SESSION['user_id'])) {
+    header('Location: /_consorcioBcc/_html/_dashboard/index.php');
+    exit;
+}
+?><!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="../../_css/_login/login.css">
-  <title>Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title id="page-title">Login — consórcioBCC</title>
+  <link id="login-css" rel="stylesheet" href="/_consorcioBcc/_css/_login/style.css">
 </head>
-<body>
-  <div class="login-container">
-    <div class="logo-container">
-      <img src="../../_img/logo.png" alt="Logo" class="logo">
-    </div>
-    <?php if ($error): ?>
-      <!-- Mensagem de erro vinda da sessão, sanitizada para evitar XSS -->
-      <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
-    <?php endif; ?>
-    <div class="login-form">
-      <form action="../../_php/_login/checklogin.php" method="POST">
-        <fieldset>
-          <input type="email" name="email" id="email" placeholder="E-mail" required>
-          <input type="password" name="senha" id="senha" placeholder="Senha" required>
-        </fieldset>
-        <button type="submit" id="enviar" name="enviar" class="login-button">Enviar</button>
+<body id="login-body">
+  <!-- Wrapper flex para centralizar vertical e horizontalmente -->
+  <div id="login-wrapper">
+    <div id="login-container" class="login-container">
+      <header id="login-header">
+        <h1 id="login-title">Área de Login</h1>
+      </header>
+
+      <?php if (isset($_GET['error'])): ?>
+        <div id="login-error" class="alert alert-error">
+          E-mail ou senha inválidos.
+        </div>
+      <?php endif; ?>
+
+      <form id="login-form" action="/_consorcioBcc/_php/_login/login.php" method="post" novalidate>
+        <div class="form-group" id="login-group-email">
+          <label for="email" class="form-label">E-mail</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            class="form-input"
+            placeholder="seu@email.com"
+            required
+            autofocus>
+        </div>
+
+        <div class="form-group" id="login-group-senha">
+          <label for="senha" class="form-label">Senha</label>
+          <input
+            type="password"
+            id="senha"
+            name="senha"
+            class="form-input"
+            placeholder="••••••••"
+            required>
+        </div>
+
+        <div class="form-group form-group-submit" id="login-group-submit">
+          <button type="submit" id="login-button" class="btn btn-primary">
+            Entrar
+          </button>
+        </div>
       </form>
+
+      <footer id="login-footer">
+        <p class="footer-text">© Brasil Center Credit – Todos os direitos reservados.</p>
+      </footer>
     </div>
   </div>
+
+  <script id="login-js" src="/_consorcioBcc/_js/_login/app.js"></script>
 </body>
 </html>
