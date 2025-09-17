@@ -1,0 +1,231 @@
+/* ===============================
+   BCC Design System (profissional)
+   ===============================
+   - Tokens (cores/tipografia/spacing/sombras)
+   - Tipografia fluida (clamp)
+   - Mobile-first + breakpoints por conteúdo
+   - Container queries para cards/tabelas
+   - Foco visível e contraste (WCAG 2.1 AA)
+   - Componentes: topbar/nav/cards/tabelas/form/botões/alerts/footer
+   Referências: MDN custom properties & var(), clamp(), flexbox, container queries; web.dev RWD; WCAG contraste.
+*/
+
+/* ---------- Reset & base --------- */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+
+
+/* ---------- TOKENS (LIGHT) ---------- */
+:root {
+  /* === Marca (ajuste estes quatro se tiver o manual) === */
+  --brand-blue:   #0b3f91; /* azul principal do fundo do logo */
+  --brand-orange: #d88c00; /* dourado/laranja do “B” */
+  --brand-green:  #0aae8a; /* turquesa do “C/O” e tagline */
+  --brand-ink-on-primary: #ffffff;
+
+  /* Derivados automáticos */
+  --brand-blue-600: color-mix(in srgb, var(--brand-blue) 90%, #fff);
+  --brand-blue-700: color-mix(in srgb, var(--brand-blue) 100%, #000 10%);
+  --brand-orange-600: color-mix(in srgb, var(--brand-orange) 88%, #000 8%);
+  --brand-green-700:  color-mix(in srgb, var(--brand-green) 95%, #000 12%);
+
+  /* Neutros */
+  --neutral-50:#f8fafc; --neutral-100:#f1f5f9; --neutral-200:#e2e8f0;
+  --neutral-300:#cbd5e1; --neutral-400:#94a3b8; --neutral-500:#64748b;
+  --neutral-600:#475569; --neutral-700:#334155; --neutral-800:#1f2937; --neutral-900:#0f172a;
+
+  /* Superfícies e texto */
+  --bg-body:#ffffff;         /* fundo geral claro */
+  --bg-elev:#ffffff;         /* cartões/barras */
+  --bg-muted:var(--neutral-50);
+  --text-strong:var(--neutral-900);
+  --text-body:var(--neutral-800);
+  --text-muted:var(--neutral-600);
+
+  /* Bordas & sombras */
+  --border:var(--neutral-200);
+  --shadow-sm:0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 6px 16px rgba(0,0,0,.12);
+
+  /* Ritmo/escala (8pt grid) */
+  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:20px;
+  --space-6:24px; --space-8:32px; --space-10:40px; --space-12:48px;
+
+  /* Raio */
+  --radius-sm:6px; --radius-md:10px; --radius-lg:16px;
+
+  /* Tipografia (fluida) */
+  --font-sans: system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  --font-mono: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+
+  /* escala fluida com clamp() */
+  --fs-12: clamp(.72rem,.68rem + .20vw,.78rem);
+  --fs-14: clamp(.82rem,.78rem + .20vw,.90rem);
+  --fs-16: clamp(.96rem,.90rem + .30vw,1.00rem);
+  --fs-18: clamp(1.02rem,.96rem + .40vw,1.12rem);
+  --fs-20: clamp(1.10rem,1.00rem + .60vw,1.25rem);
+  --fs-24: clamp(1.25rem,1.10rem + .80vw,1.50rem);
+  --fs-28: clamp(1.40rem,1.20rem + 1.2vw,1.75rem);
+  --fs-32: clamp(1.60rem,1.30rem + 1.6vw,2.00rem);
+
+  /* Container & foco */
+  --container-max: 1200px;
+  --focus-ring: 0 0 0 3px color-mix(in srgb, var(--brand-green) 40%, transparent);
+}
+
+/* ---------- TOKENS (DARK) ---------- */
+[data-theme="dark"]{
+  --bg-body:#0b1220; --bg-elev:#121a2c; --bg-muted:#0f172a;
+  --text-strong:#e6edf3; --text-body:#cbd5e1; --text-muted:#94a3b8;
+  --border:#1e293b;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+  --shadow-md:0 8px 20px rgba(0,0,0,.5);
+}
+
+/* ---------- Base tipográfica ---------- */
+body{
+  background:var(--bg-body);
+  color:var(--text-body);
+  font-family:var(--font-sans);
+  font-size:var(--fs-16);
+  line-height:1.55;
+}
+h1,h2,h3{ color:var(--text-strong); margin:var(--space-4) 0; }
+h1{font-size:var(--fs-28)} h2{font-size:var(--fs-24)} h3{font-size:var(--fs-20)}
+small{font-size:var(--fs-12); color:var(--text-muted)}
+a{ color:var(--brand-green); text-decoration:none }
+a:hover{ text-decoration:underline }
+
+/* ---------- Layout simétrico ---------- */
+.container{ max-width:var(--container-max); margin:0 auto; padding:var(--space-4) }
+.section{ padding-block:var(--space-6) } /* blocos com mesma “altura visual” */
+
+/* Topbar / Nav (simetria horizontal/vertical) */
+.topbar{
+  background:var(--brand-blue);
+  color:var(--brand-ink-on-primary);
+  box-shadow:var(--shadow-sm);
+}
+.topbar .container{
+  display:flex; align-items:center; justify-content:space-between; gap:var(--space-4); flex-wrap:wrap;
+  padding-block: var(--space-3);
+}
+.topbar .brand{ font-weight:800; font-size:var(--fs-18); letter-spacing:.3px }
+.topbar .nav{ display:flex; align-items:center; gap:var(--space-3); flex-wrap:wrap }
+.topbar .nav a{
+  color:var(--brand-ink-on-primary); padding:8px 12px; border-radius:var(--radius-sm);
+}
+.topbar .nav a:hover{ background:var(--brand-blue-600); text-decoration:none }
+.topbar .nav .logout{ background:var(--brand-orange); color:#00122b }
+.topbar .user{ opacity:.95 }
+
+/* ---------- Cards ---------- */
+.card{
+  background:var(--bg-elev);
+  border:1px solid var(--border);
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-sm);
+  padding:var(--space-4);
+  margin-bottom:var(--space-4);
+  text-align: center;
+}
+
+
+/* ---------- Tabelas (responsivas e legíveis) ---------- */
+.table{ width:100%; border-collapse:collapse; font-size:var(--fs-14); }
+.table th,.table td{ border:1px solid var(--border); padding:12px 14px; text-align:left; }
+.table th{
+  background:var(--bg-muted); color:var(--text-strong); position:sticky; top:0; z-index:1;
+}
+/* zebra + hover leve */
+.table tbody tr:nth-child(odd) td{ background: color-mix(in srgb, var(--bg-elev) 96%, #000 4%) }
+.table tr:hover td{ background: color-mix(in srgb, var(--bg-elev) 92%, #000 8%) }
+
+/* Wrap horizontal quando necessário */
+.table-wrap{ overflow:auto }
+
+/* ---------- Formulários ---------- */
+label{ display:block; font-size:var(--fs-12); color:var(--text-muted); margin-bottom:6px }
+.form-control{
+  width:100%; padding:10px 12px; border-radius:var(--radius-sm);
+  border:1px solid var(--border); background:var(--bg-body); color:var(--text-body);
+}
+.form-control:focus{ outline:none; box-shadow:var(--focus-ring); border-color:var(--brand-green) }
+.form-row {
+    display: flex;
+    gap: var(--space-3);
+    flex-direction: column;
+    align-items: center;
+}
+.form-row .col{ flex: 1 0 100%; }
+@media (min-width: 720px){
+  .form-row .col{ flex: 1 0 50%; }
+  .form-row .col.w-3{ flex: 1 0 25%; }
+  .form-row .col.w-4{ flex: 1 0 33.33%; }
+}
+
+/* ---------- Botões ---------- */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:10px 14px; border-radius:var(--radius-sm);
+  background:var(--brand-blue); color:var(--brand-ink-on-primary);
+  border:1px solid transparent; cursor:pointer; font-weight:700;
+}
+.btn:hover{ background:var(--brand-blue-700); text-decoration:none }
+.btn.secondary{ background:var(--brand-green); color:#072a29; padding: 5px 10px 8px 10px }
+.btn.danger{ background:#c62828; color:#fff }
+.btn:focus-visible{ outline:none; box-shadow:var(--focus-ring) }
+
+/* ---------- Alerts / Notices ---------- */
+.notice{
+  padding:10px 12px; border-radius:var(--radius-sm); border:1px solid var(--border);
+  background:var(--bg-muted); color:var(--text-body);
+}
+.notice.error{ border-color:#ffb4b4; background:#ffecec; color:#8b0000 }
+
+/* ---------- Footer ---------- */
+.footer{ color:var(--text-muted); padding:var(--space-6) 0; margin-top: 24%;  text-align: center;}
+
+/* ---------- Utilitários de simetria ---------- */
+.stack > * + *{ margin-top: var(--space-3) } /* espaçamento consistente vertical */
+.cluster{ display:flex; flex-wrap:wrap; gap:var(--space-3); align-items:center } /* linha flex com gap */
+.mt-2{margin-top:var(--space-2)} .mt-3{margin-top:var(--space-3)} .mt-4{margin-top:var(--space-4)}
+.mb-2{margin-bottom:var(--space-2)} .mb-3{margin-bottom:var(--space-3)} .mb-4{margin-bottom:var(--space-4)}
+.text-right{text-align:right} .text-center{text-align:center}
+.hidden{display:none !important}
+
+#kpi-chart { width: 100%; display: block; }
+.dashboard-card { container-type: inline-size; }
+.chart-caption {
+  margin-top: 8px;
+  color: var(--text-muted);
+  font-size: var(--fs-12);
+}
+
+
+/* ---------- Responsividade por conteúdo ---------- */
+/* breakpoint pequeno: formularios lado a lado e topbar mais espaçado */
+@media (min-width: 768px){
+  .topbar .container{ padding-block: var(--space-4); }
+}
+
+/* breakpoint médio: container maior e tabela mais “compacta” */
+@media (min-width: 1024px){
+  .container{ padding-inline: var(--space-6); }
+  .table th,.table td{ padding: 10px 12px; }
+}
+
+/* ---------- Container Queries p/ módulos do dashboard ---------- */
+.dashboard-card{ container-type: inline-size; }
+@container (min-width: 720px){
+  .filters{ gap: var(--space-4); }
+}
+
+/* ---------- Impressão ---------- */
+@media print{
+  .topbar, .footer{ display:none !important }
+  .card{ box-shadow:none; border-color:#ccc }
+}
