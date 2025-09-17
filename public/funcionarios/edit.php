@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 include __DIR__ . '/../../app/views/partials/header.php';
 ?>
-<div class="card" style="max-width:760px">
+<div class="card" >
   <h1>Editar <?= $func['nome'] ?></h1>
   <?php if ($message): ?><div class="notice error"><?= e($message) ?></div><?php endif; ?>
   <form method="post">

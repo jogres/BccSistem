@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 include __DIR__ . '/../../app/views/partials/header.php';
 ?>
-<div class="card" style="max-width:720px">
+<div class="card" >
   <h1>Novo funcionário</h1>
   <?php if ($message): ?><div class="notice" style="background:#ffebee;border-color:#ffcdd2;color:#b71c1c"><?= e($message) ?></div><?php endif; ?>
   <form method="post">
