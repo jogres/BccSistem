@@ -5,6 +5,7 @@ require __DIR__ . '/../../app/lib/Helpers.php';
 require __DIR__ . '/../../app/lib/CSRF.php';
 require __DIR__ . '/../../app/middleware/require_login.php';
 require __DIR__ . '/../../app/models/Cliente.php';
+$opcoesInteresse = require __DIR__.'/../../app/config/interesses.php';
 
 $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -12,9 +13,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nome = trim($_POST['nome'] ?? '');
     $telefone = trim($_POST['telefone'] ?? '');
     $cidade = trim($_POST['cidade'] ?? '');
+    $interesse = trim($_POST['interesse'] ?? '');
     $estado = strtoupper(trim($_POST['estado'] ?? ''));
     if ($nome && $telefone && $cidade && $estado) {
-        Cliente::create($nome, $telefone, $cidade, $estado, Auth::user()['id']);
+        Cliente::create($nome, $telefone, $interesse, $cidade, $estado, Auth::user()['id']);
         redirect(base_url('clientes/index.php'));
     } else {
         $message = 'Preencha todos os campos.';
@@ -38,6 +40,15 @@ include __DIR__ . '/../../app/views/partials/header.php';
       <div class="col">
         <label>Telefone</label>
         <input class="form-control" name="telefone" required>
+      </div>
+      <div class="col">
+        <label>Interesse</label>
+        <select class="form-control" name="interesse" required>
+          <option value="" disabled selected>Selecione</option>
+          <?php foreach($opcoesInteresse as $opcao): ?>
+            <option value="<?= e($opcao) ?>"><?= e($opcao) ?></option>
+          <?php endforeach; ?>
+        </select>
       </div>
       <div class="col">
         <label>Cidade</label>

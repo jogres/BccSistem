@@ -5,6 +5,7 @@ require __DIR__ . '/../../app/lib/Helpers.php';
 require __DIR__ . '/../../app/lib/CSRF.php';
 require __DIR__ . '/../../app/middleware/require_login.php';
 require __DIR__ . '/../../app/models/Cliente.php';
+$opcoesInteresse = require __DIR__.'/../../app/config/interesses.php';
 
 $id = (int)($_GET['id'] ?? 0);
 $cliente = Cliente::find($id);
@@ -24,10 +25,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     CSRF::validate();
     $nome = trim($_POST['nome'] ?? '');
     $telefone = trim($_POST['telefone'] ?? '');
+    $valorAtual = $cliente['interesse'] ?? '';
     $cidade = trim($_POST['cidade'] ?? '');
     $estado = strtoupper(trim($_POST['estado'] ?? ''));
     if ($nome && $telefone && $cidade && $estado) {
-        Cliente::update($id, $nome, $telefone, $cidade, $estado);
+        Cliente::update($id, $nome, $valorAtual, $telefone, $cidade, $estado);
         redirect(base_url('clientes/index.php'));
     } else {
         $message = 'Preencha todos os campos.';
@@ -51,6 +53,15 @@ include __DIR__ . '/../../app/views/partials/header.php';
       <div class="col">
         <label>Telefone</label>
         <input class="form-control" name="telefone" value="<?= e($cliente['telefone']) ?>" required>
+      </div>
+      <div class="col">
+        <label>Interesse</label>
+        <select class="form-control" name="interesse" required>
+          <option value="" disabled>Selecione</option>
+          <?php foreach($opcoesInteresse as $opcao): ?>
+            <option value="<?= e($opcao) ?>" <?= ($cliente['interesse'] === $opcao) ? 'selected' : '' ?>><?= e($opcao) ?></option>
+          <?php endforeach; ?>
+        </select>
       </div>
       <div class="col">
         <label>Cidade</label>

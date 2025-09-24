@@ -1,12 +1,13 @@
 <?php
 class Cliente {
-    public static function create(string $nome, string $telefone, string $cidade, string $estado, int $criado_por): int {
+    public static function create(string $nome, string $telefone, string $interesse, string $cidade, string $estado, int $criado_por): int {
         $pdo = Database::getConnection();
-        $stmt = $pdo->prepare("INSERT INTO clientes (nome, telefone, cidade, estado, criado_por) 
-                               VALUES (:nome, :telefone, :cidade, :estado, :criado_por)");
+        $stmt = $pdo->prepare("INSERT INTO clientes (nome, telefone, interesse, cidade, estado, criado_por) 
+                               VALUES (:nome, :telefone, :interesse, :cidade, :estado, :criado_por)");
         $stmt->execute([
             ':nome' => $nome,
             ':telefone' => $telefone,
+            ':interesse' => $interesse,
             ':cidade' => $cidade,
             ':estado' => $estado,
             ':criado_por' => $criado_por,
@@ -22,13 +23,14 @@ class Cliente {
         return $r ?: null;
     }
 
-    public static function update(int $id, string $nome, string $telefone, string $cidade, string $estado): void {
+    public static function update(int $id, string $nome, string $telefone, string $interesse, string $cidade, string $estado): void {
         $pdo = Database::getConnection();
-        $stmt = $pdo->prepare("UPDATE clientes SET nome = :nome, telefone = :telefone, cidade = :cidade, estado = :estado WHERE id = :id");
+        $stmt = $pdo->prepare("UPDATE clientes SET nome = :nome, telefone = :telefone, interesse = :interesse, cidade = :cidade, estado = :estado WHERE id = :id");
         $stmt->execute([
             ':id' => $id,
             ':nome' => $nome,
             ':telefone' => $telefone,
+            ':interesse' => $interesse,
             ':cidade' => $cidade,
             ':estado' => $estado,
         ]);
