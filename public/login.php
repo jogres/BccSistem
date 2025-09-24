@@ -43,7 +43,6 @@ include __DIR__ . '/../app/views/partials/header.php';
       <button class="btn" type="submit">Entrar</button>
     </div>
   </form>
-  <p style="font-size:12px;color:#666;margin-top:12px">Dica: rode o script <code>scripts/seed_admin.php</code> para criar o primeiro administrador.</p>
 </div>
 <?php
 include __DIR__ . '/../app/views/partials/footer.php';
