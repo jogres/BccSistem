@@ -1,13 +1,10 @@
 <?php
-function e(string $v): string {
-    return htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
+function e(?string $s): string {
+    return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
-function redirect(string $path): void {
-    header('Location: ' . $path);
-    exit;
-}
-function base_url(string $path = ''): string {
-    $config = require __DIR__ . '/../config/config.php';
-    $base = rtrim($config['app']['base_url'] ?? '', '/');
-    return $base . '/' . ltrim($path, '/');
+function base_url(string $path=''): string {
+    $cfg = require __DIR__ . '/../config/config.php';
+    $base = rtrim($cfg['app']['base_url'] ?? '', '/');
+    $path = ltrim($path, '/');
+    return $base . ($path ? "/$path" : '');
 }

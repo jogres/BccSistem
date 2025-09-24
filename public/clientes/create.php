@@ -1,68 +1,93 @@
 <?php
-require __DIR__ . '/../../app/lib/Database.php';
-require __DIR__ . '/../../app/lib/Auth.php';
-require __DIR__ . '/../../app/lib/Helpers.php';
-require __DIR__ . '/../../app/lib/CSRF.php';
-require __DIR__ . '/../../app/middleware/require_login.php';
-require __DIR__ . '/../../app/models/Cliente.php';
-$opcoesInteresse = require __DIR__.'/../../app/config/interesses.php';
+require __DIR__.'/../../app/lib/Database.php';
+require __DIR__.'/../../app/lib/Auth.php';
+require __DIR__.'/../../app/lib/Helpers.php';
+require __DIR__.'/../../app/lib/Request.php';
+require __DIR__.'/../../app/lib/CSRF.php';
+require __DIR__.'/../../app/middleware/require_login.php';
+require __DIR__.'/../../app/models/Cliente.php';
 
-$message = '';
+$opcoesInteresse = require __DIR__.'/../../app/config/interesses.php';
+$user = Auth::user();
+$errors = [];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     CSRF::validate();
-    $nome = trim($_POST['nome'] ?? '');
-    $telefone = trim($_POST['telefone'] ?? '');
-    $cidade = trim($_POST['cidade'] ?? '');
-    $interesse = trim($_POST['interesse'] ?? '');
-    $estado = strtoupper(trim($_POST['estado'] ?? ''));
-    if ($nome && $telefone && $cidade && $estado) {
-        Cliente::create($nome, $telefone, $interesse, $cidade, $estado, Auth::user()['id']);
-        redirect(base_url('clientes/index.php'));
-    } else {
-        $message = 'Preencha todos os campos.';
+
+    $nome      = Request::postString('nome');
+    $telefone  = Request::postString('telefone');
+    $cidade    = Request::postString('cidade');
+    $estado    = strtoupper(substr(Request::postString('estado'), 0, 2));
+    $interesse = Request::postString('interesse');
+
+    if ($nome === '')      $errors[] = 'Nome é obrigatório.';
+    if ($telefone === '')  $errors[] = 'Telefone é obrigatório.';
+    if ($cidade === '')    $errors[] = 'Cidade é obrigatória.';
+    if (strlen($estado) !== 2) $errors[] = 'Estado deve ter 2 letras.';
+    if (!in_array($interesse, $opcoesInteresse, true)) $errors[] = 'Interesse inválido.';
+
+    if (!$errors) {
+        $id = Cliente::create([
+            'nome'       => $nome,
+            'telefone'   => $telefone,
+            'cidade'     => $cidade,
+            'estado'     => $estado,
+            'interesse'  => $interesse,
+            'criado_por' => $user['id'],
+        ]);
+        header('Location: '.base_url('clientes/index.php'), true, 303); // 303 opcional e recomendado
+        exit;
     }
 }
 
-include __DIR__ . '/../../app/views/partials/header.php';
+include __DIR__.'/../../app/views/partials/header.php';
 ?>
 <div class="card" >
-  <h1>Novo cliente</h1>
-  <?php if ($message): ?><div class="notice" style="background:#fff3e0;border-color:#ffe0b2;color:#e65100"><?= e($message) ?></div><?php endif; ?>
-  <form method="post">
-    <?= CSRF::field() ?>
+  <?php if ($errors): ?>
+    <div class="notice" style="background:#ffebee;border-color:#ffcdd2;color:#b71c1c">
+      <ul>
+        <?php foreach ($errors as $err): ?>
+          <li><?= e($err) ?></li>
+        <?php endforeach; ?>
+      </ul>
+    </div>
+  <?php endif; ?>
+
+<h1>Novo cliente</h1>
+<form method="post">
+  <input type="hidden" name="csrf_token" value="<?= e(CSRF::token()) ?>">
     <div class="form-row">
       <div class="col">
-        <label>Nome</label>
-        <input class="form-control" name="nome" required>
+        <label>Nome <input class="form-control" name="nome" required></label>
       </div>
     </div>
     <div class="form-row">
       <div class="col">
-        <label>Telefone</label>
-        <input class="form-control" name="telefone" required>
+        <label>Telefone <input class="form-control" name="telefone" required></label>
       </div>
+    </div>
+    <div class="form-row">
+      <div class="col">
+        <label>Cidade <input class="form-control" name="cidade" required></label>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="col">
+        <label>Estado <input class="form-control" name="estado" maxlength="2" required></label>
+      </div>
+    </div>
+    <div class="form-row">
       <div class="col">
         <label>Interesse</label>
-        <select class="form-control" name="interesse" required>
-          <option value="" disabled selected>Selecione</option>
-          <?php foreach($opcoesInteresse as $opcao): ?>
-            <option value="<?= e($opcao) ?>"><?= e($opcao) ?></option>
-          <?php endforeach; ?>
-        </select>
-      </div>
-      <div class="col">
-        <label>Cidade</label>
-        <input class="form-control" name="cidade" required>
-      </div>
-      <div class="col" style="max-width:120px">
-        <label>UF</label>
-        <input class="form-control" name="estado" maxlength="2" required>
-      </div>
+          <select class="form-control" name="interesse" required>
+              <option value="">Selecione...</option>
+        <?php foreach ($opcoesInteresse as $opt): ?>
+          <option value="<?= e($opt) ?>"><?= e($opt) ?></option>
+        <?php endforeach; ?>
+      </select>
     </div>
-    <div style="margin-top:12px">
-      <button class="btn" type="submit">Salvar</button>
-      <a class="btn secondary" href="<?= e(base_url('clientes/index.php')) ?>">Cancelar</a>
-    </div>
-  </form>
+  </div>
+  <button class="btn" type="submit">Salvar</button>
+</form>
 </div>
-<?php include __DIR__ . '/../../app/views/partials/footer.php'; ?>
+<?php include __DIR__.'/../../app/views/partials/footer.php'; ?>

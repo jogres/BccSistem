@@ -6,4 +6,5 @@ return[
   'Motos',
   'Serviços',
   'Eletrodomésticos',
+  'Maquinarios',
 ];

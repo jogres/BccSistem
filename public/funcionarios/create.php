@@ -22,7 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($nome && $login && $senha && $role_id) {
         try {
             Funcionario::create($nome, $login, $senha, $role_id, $is_ativo);
-            redirect(base_url('funcionarios/index.php'));
+            header('Location: ' . base_url('funcionarios/index.php'));
+            exit;
         } catch (PDOException $e) {
             $message = 'Erro ao criar: ' . $e->getMessage();
         }

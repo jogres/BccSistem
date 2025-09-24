@@ -1,60 +1,61 @@
 <?php
-class Cliente {
-    public static function create(string $nome, string $telefone, string $cidade, string $estado,  string $interesse,int $criado_por): int {
+final class Cliente {
+    public static function create(array $d): int {
         $pdo = Database::getConnection();
-        $stmt = $pdo->prepare("INSERT INTO clientes (nome, telefone, cidade, estado, interesse, criado_por) 
-                               VALUES (:nome, :telefone, :cidade, :estado, :interesse, :criado_por)");
+        $sql = "INSERT INTO clientes
+                  (nome, telefone, cidade, estado, interesse, criado_por)
+                VALUES
+                  (:nome, :telefone, :cidade, :estado, :interesse, :criado_por)";
+        $stmt = $pdo->prepare($sql);
         $stmt->execute([
-            ':nome' => $nome,
-            ':telefone' => $telefone,            
-            ':cidade' => $cidade,
-            ':estado' => $estado,
-            ':interesse' => $interesse,
-            ':criado_por' => $criado_por,
+            ':nome'       => $d['nome'],
+            ':telefone'   => $d['telefone'],
+            ':cidade'     => $d['cidade'],
+            ':estado'     => $d['estado'],
+            ':interesse'  => $d['interesse'],
+            ':criado_por' => (int)$d['criado_por'],
         ]);
         return (int)$pdo->lastInsertId();
     }
 
-    public static function find(int $id): ?array {
+    public static function update(int $id, array $d): void {
         $pdo = Database::getConnection();
-        $stmt = $pdo->prepare("SELECT * FROM clientes WHERE id = :id");
-        $stmt->execute([':id' => $id]);
-        $r = $stmt->fetch();
-        return $r ?: null;
-    }
-
-    public static function update(int $id, string $nome, string $telefone, string $cidade, string $estado, string $interesse): void {
-        $pdo = Database::getConnection();
-        $stmt = $pdo->prepare("UPDATE clientes SET nome = :nome, telefone = :telefone, cidade = :cidade, estado = :estado, interesse = :interesse WHERE id = :id");
+        $sql = "UPDATE clientes
+                   SET nome = :nome,
+                       telefone = :telefone,
+                       cidade = :cidade,
+                       estado = :estado,
+                       interesse = :interesse
+                 WHERE id = :id";
+        $stmt = $pdo->prepare($sql);
         $stmt->execute([
-            ':id' => $id,
-            ':nome' => $nome,
-            ':telefone' => $telefone,
-            ':cidade' => $cidade,
-            ':estado' => $estado,
-            ':interesse' => $interesse,
+            ':nome'      => $d['nome'],
+            ':telefone'  => $d['telefone'],
+            ':cidade'    => $d['cidade'],
+            ':estado'    => $d['estado'],
+            ':interesse' => $d['interesse'],
+            ':id'        => $id,
         ]);
     }
 
-    public static function softDelete(int $id): void {
+    public static function find(int $id): ?array {
         $pdo = Database::getConnection();
-        $stmt = $pdo->prepare("UPDATE clientes SET deleted_at = NOW() WHERE id = :id");
-        $stmt->execute([':id' => $id]);
+        $st  = $pdo->prepare("SELECT * FROM clientes WHERE id=:id LIMIT 1");
+        $st->execute([':id'=>$id]);
+        return $st->fetch() ?: null;
     }
 
-    public static function listForUser(?int $userId, bool $admin): array {
+    public static function allForUser(?int $userId, ?string $interesse=''): array {
         $pdo = Database::getConnection();
-        if ($admin) {
-            $sql = "SELECT c.*, f.nome AS criado_por_nome 
-                    FROM clientes c 
-                    JOIN funcionarios f ON f.id = c.criado_por
-                    WHERE c.deleted_at IS NULL
-                    ORDER BY c.created_at DESC";
-            return $pdo->query($sql)->fetchAll();
-        } else {
-            $stmt = $pdo->prepare("SELECT * FROM clientes WHERE criado_por = :u AND deleted_at IS NULL ORDER BY created_at DESC");
-            $stmt->execute([':u' => $userId]);
-            return $stmt->fetchAll();
-        }
+        $where  = "c.deleted_at IS NULL";
+        $params = [];
+        if ($userId) { $where .= " AND c.criado_por = :u"; $params[':u'] = $userId; }
+        if ($interesse !== '') { $where .= " AND c.interesse = :i"; $params[':i'] = $interesse; }
+        $sql = "SELECT c.*, f.nome AS criado_por_nome
+                FROM clientes c JOIN funcionarios f ON f.id=c.criado_por
+                WHERE $where ORDER BY c.created_at DESC";
+        $st = $pdo->prepare($sql);
+        $st->execute($params);
+        return $st->fetchAll();
     }
 }

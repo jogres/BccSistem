@@ -29,7 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($nome && $login && $role_id) {
         try {
             Funcionario::update($id, $nome, $login, $senha, $role_id, $is_ativo);
-            redirect(base_url('funcionarios/index.php'));
+            header('Location: ' . base_url('funcionarios/index.php'));
+            exit;
         } catch (PDOException $e) {
             // 23000 = violação de integridade (UNIQUE/PK). 1062 = Duplicate entry. :contentReference[oaicite:4]{index=4}
             $sqlstate = $e->getCode();
