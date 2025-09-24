@@ -23,13 +23,13 @@ if (!$isAdmin && (int)$cliente['criado_por'] !== (int)$user['id']) {
 $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     CSRF::validate();
-    $nome = trim($_POST['nome'] ?? '');
-    $telefone = trim($_POST['telefone'] ?? '');
-    $valorAtual = $cliente['interesse'] ?? '';
-    $cidade = trim($_POST['cidade'] ?? '');
-    $estado = strtoupper(trim($_POST['estado'] ?? ''));
-    if ($nome && $telefone && $cidade && $estado) {
-        Cliente::update($id, $nome, $valorAtual, $telefone, $cidade, $estado);
+    $nome      = trim($_POST['nome']      ?? '');
+    $telefone  = trim($_POST['telefone']  ?? '');
+    $cidade    = trim($_POST['cidade']    ?? '');
+    $estado    = trim($_POST['estado']    ?? '');
+    $interesse = trim($_POST['interesse'] ?? '');
+    if ($nome && $telefone && $cidade && $estado && $interesse) {
+        Cliente::update($id, $nome, $telefone, $cidade, $estado, $interesse);
         redirect(base_url('clientes/index.php'));
     } else {
         $message = 'Preencha todos os campos.';
