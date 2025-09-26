@@ -238,9 +238,9 @@ document.addEventListener('DOMContentLoaded', function () {
           },
           y: { 
             beginAtZero: true,
-            suggestedMax: 10,
+            suggestedMax: 150,
             ticks: { 
-              stepSize: 1,
+              stepSize: 10,
               precision: 0 
             }
           }
