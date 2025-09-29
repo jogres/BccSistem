@@ -19,8 +19,8 @@ include __DIR__ . '/../app/views/partials/header.php';
     <div>
       <label>Modo</label>
       <select class="form-control" name="mode" id="mode">
-        <option value="week" selected>Semanal (padrão)</option>
-        <option value="month">Mensal</option>
+        <option value="week">Semanal</option>
+        <option value="month" selected >Mensal (padrão)</option>
         <option value="day">Diário</option>
       </select>
     </div>
@@ -60,7 +60,7 @@ include __DIR__ . '/../app/views/partials/header.php';
 
     <?php if ($isAdmin): ?>
       <div>
-        <label><input id="toggle-compare" type="checkbox"> Comparar usuários</label>
+        <label><input id="toggle-compare" type="checkbox" checked> Comparar usuários</label>
       </div>
       <div id="multi-users" style="display:none">
         <label>Usuários</label>
