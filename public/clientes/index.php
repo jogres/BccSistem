@@ -117,7 +117,6 @@ include __DIR__ . '/../../app/views/partials/header.php';
           <?php endforeach; ?>
         </select>
       </label>
-      <label>Busca geral <input type="text" name="q" value="<?= e($q) ?>" placeholder="nome, telefone, cidade, ..."></label>
       <label>Itens por página
         <select name="pp">
           <?php foreach ([10,25,50,100] as $n): ?>
