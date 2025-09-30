@@ -191,7 +191,7 @@ label{ display:block; font-size:var(--fs-12); color:var(--text-muted); margin-bo
 
 /* ---------- Utilitários de simetria ---------- */
 .stack > * + *{ margin-top: var(--space-3) } /* espaçamento consistente vertical */
-.cluster{ display:flex; flex-wrap:wrap; gap:var(--space-3); align-items:center } /* linha flex com gap */
+.cluster{ display:flex; flex-direction: row-reverse; gap:var(--space-3); align-items:center } /* linha flex com gap */
 .mt-2{margin-top:var(--space-2)} .mt-3{margin-top:var(--space-3)} .mt-4{margin-top:var(--space-4)}
 .mb-2{margin-bottom:var(--space-2)} .mb-3{margin-bottom:var(--space-3)} .mb-4{margin-bottom:var(--space-4)}
 .text-right{text-align:right} .text-center{text-align:center}
@@ -229,3 +229,120 @@ label{ display:block; font-size:var(--fs-12); color:var(--text-muted); margin-bo
   .topbar, .footer{ display:none !important }
   .card{ box-shadow:none; border-color:#ccc }
 }
+
+.filters fieldset { border: 1px solid var(--border); padding: .75rem; margin: .5rem 0; }
+.filters label { margin-right: .75rem; display: inline-flex; gap: .35rem; align-items: center; }
+.when-month { margin-left: 1rem; }
+
+.month-divider { background: var(--bg-elev); font-weight: 600; }
+.month-divider td { padding-top: .6rem; padding-bottom: .4rem; }
+
+.pagination { margin-top: 1rem; display: flex; justify-content: space-between; align-items: center; }
+.pagination a { margin: 0 .25rem; text-decoration: none; }
+/* ==== Clientes / Listagem — filtros, tabela, paginação (PATCH) ==== */
+
+/* Layout dos filtros */
+.filters {
+  display: grid;
+  gap: var(--space-3);
+  align-items: end;
+}
+
+/* Fieldsets mais legíveis e consistentes */
+.filters fieldset {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  display: grid;
+  gap: var(--space-3);
+}
+
+/* Legend destacado */
+.filters fieldset > legend {
+  font-weight: 700;
+  color: var(--text-strong);
+  padding: 0 .4rem;
+}
+
+/* Quando o modo = mês estiver ativo */
+.when-month { margin-left: 0; }
+
+/* Controles com largura mínima confortável (cabem AAAA-MM, DDD etc.) */
+.filters input[type="text"],
+.filters input[type="date"],
+.filters input[type="month"],
+.filters select {
+  border-radius: 0.25rem;
+  border: 1px solid var(--border);
+  min-width: 14ch;
+}
+
+.filters input[type="month"] { width: 16ch; }
+.filters select[name="pp"]   { width: auto; }
+
+/* Tabela: header fixo e coluna de ações sem quebra */
+.table th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-muted);
+  z-index: 2;
+}
+.table td:last-child { white-space: nowrap; }
+
+/* Divisor por mês (quando period=month) */
+.month-divider {
+  background: var(--bg-muted);
+  color: var(--text-strong);
+}
+.month-divider td {
+  padding-top: .6rem;
+  padding-bottom: .4rem;
+  border-top: 2px solid var(--border);
+}
+
+/* Paginação */
+.pagination {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+}
+.pagination a {
+  margin: 0 .25rem;
+  text-decoration: none;
+  border: 1px solid var(--border);
+  padding: .35rem .55rem;
+  border-radius: var(--radius-sm);
+}
+.pagination a:hover {
+  background: var(--bg-muted);
+  text-decoration: none;
+}
+
+/* Dark mode (ajustes de contraste) */
+[data-theme="dark"] .table th {
+  background: color-mix(in srgb, var(--bg-elev) 96%, #000 8%);
+}
+[data-theme="dark"] .pagination a:hover {
+  background: color-mix(in srgb, var(--bg-elev) 92%, #000 12%);
+}
+
+/* Responsividade dos filtros: em telas médias, distribui melhor */
+@media (min-width: 960px) {
+  .filters fieldset {
+    grid-template-columns: repeat(4, minmax(220px, 1fr));
+  }
+  .filters fieldset legend {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Acessibilidade: foco bem visível nos filtros (reforço) */
+.filters input:focus-visible,
+.filters select:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-color: var(--brand-green);
+}
+

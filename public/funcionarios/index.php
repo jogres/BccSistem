@@ -15,9 +15,10 @@ $funcs = Funcionario::all($status);
 include __DIR__ . '/../../app/views/partials/header.php';
 ?>
 <div class="card">
+  <h1>Funcionários</h1>
   <div class="cluster" style="justify-content:space-between">
-    <h1>Funcionários</h1>
-    <a class="btn" href="<?= e(base_url('funcionarios/create.php')) ?>">Novo funcionário</a>
+    
+    <a class="btn secondary" href="<?= e(base_url('funcionarios/create.php')) ?>">Novo funcionário</a>
   </div>
 
   <form method="get" class="filters mt-3" aria-label="Filtros de funcionários">

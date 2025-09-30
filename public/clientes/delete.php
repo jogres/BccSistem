@@ -21,4 +21,5 @@ if (!$isAdmin && (int)$cliente['criado_por'] !== (int)$user['id']) {
 }
 
 Cliente::softDelete($id);
-redirect(base_url('clientes/index.php'));
+header('Location: ' . base_url('clientes/index.php'));
+exit;

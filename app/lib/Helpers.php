@@ -8,3 +8,4 @@ function base_url(string $path=''): string {
     $path = ltrim($path, '/');
     return $base . ($path ? "/$path" : '');
 }
+

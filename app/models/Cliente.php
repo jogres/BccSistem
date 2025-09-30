@@ -1,5 +1,10 @@
 <?php
 final class Cliente {
+    public static function softDelete($id) {
+        $pdo = Database::getConnection();
+        $stmt = $pdo->prepare("UPDATE clientes SET deleted_at = NOW() WHERE id = ?");
+        $stmt->execute([$id]);
+    }
     public static function create(array $d): int {
         $pdo = Database::getConnection();
         $sql = "INSERT INTO clientes

@@ -6,12 +6,39 @@ class Funcionario
      * $status: 'active' | 'inactive' | 'all'
      * (compat: se boolean, true=active, false=all)
      */
-    public static function all($status = 'active'): array {
+    public static function withActivityBetween(string $start, string $end): array
+    {
+        $pdo = Database::getConnection();
+        $sql = "SELECT f.id, f.nome
+            FROM funcionarios f
+            JOIN (
+              SELECT DISTINCT criado_por AS uid
+              FROM clientes
+              WHERE deleted_at IS NULL
+                AND created_at BETWEEN :start AND :end
+            ) a ON a.uid = f.id
+            WHERE f.is_ativo = 1
+            ORDER BY f.nome";
+        $st = $pdo->prepare($sql);
+        $st->execute([':start' => $start, ':end' => $end]);
+        return $st->fetchAll();
+    }
+
+    public static function allActiveIds(): array
+    {
+        $pdo = Database::getConnection();
+        $rows = $pdo->query("SELECT id FROM funcionarios WHERE is_ativo = 1")->fetchAll();
+        return array_map('intval', array_column($rows, 'id'));
+    }
+    // Removed duplicate allActive method here to avoid duplicate symbol error.
+
+    public static function all($status = 'active'): array
+    {
         // compat com chamadas antigas: all(true) => 'active'; all(false) => 'all'
         if (is_bool($status)) {
             $status = $status ? 'active' : 'all';
         }
-        $allowed = ['active','inactive','all'];
+        $allowed = ['active', 'inactive', 'all'];
         if (!in_array($status, $allowed, true)) {
             $status = 'active';
         }
@@ -33,13 +60,15 @@ class Funcionario
     }
 
     /** Para selects do dashboard (somente ativos). */
-    public static function allActive(): array {
+    public static function allActive(): array
+    {
         $pdo = Database::getConnection();
         $sql = "SELECT f.id, f.nome FROM funcionarios f WHERE f.is_ativo = 1 ORDER BY f.nome";
         return $pdo->query($sql)->fetchAll();
     }
 
-    public static function find(int $id): ?array {
+    public static function find(int $id): ?array
+    {
         $pdo = Database::getConnection();
         $stmt = $pdo->prepare("SELECT * FROM funcionarios WHERE id = :id");
         $stmt->execute([':id' => $id]);
@@ -47,7 +76,8 @@ class Funcionario
         return $r ?: null;
     }
 
-    public static function create(string $nome, string $login, string $password, int $role_id, int $is_ativo = 1): int {
+    public static function create(string $nome, string $login, string $password, int $role_id, int $is_ativo = 1): int
+    {
         $pdo = Database::getConnection();
         $hash = password_hash($password, PASSWORD_DEFAULT);
         $stmt = $pdo->prepare(
@@ -65,7 +95,8 @@ class Funcionario
     }
 
     /** Atualiza dados; se $newPassword vazio/null, mantém a senha atual. */
-    public static function update(int $id, string $nome, string $login, ?string $newPassword, int $role_id, int $is_ativo): void {
+    public static function update(int $id, string $nome, string $login, ?string $newPassword, int $role_id, int $is_ativo): void
+    {
         $pdo = Database::getConnection();
         if ($newPassword !== null && $newPassword !== '') {
             $hash = password_hash($newPassword, PASSWORD_DEFAULT);

@@ -5,10 +5,14 @@ require __DIR__ . '/../app/lib/Helpers.php';
 require __DIR__ . '/../app/lib/CSRF.php';
 require __DIR__ . '/../app/middleware/require_login.php';
 require __DIR__ . '/../app/models/Funcionario.php';
-
 $user = Auth::user();
 $isAdmin = Auth::isAdmin();
-$allUsers = Funcionario::allActive();
+$monthDefault = date('Y-m');
+$start = $monthDefault . '-01';
+$end   = date('Y-m-d', strtotime('last day of ' . $start));
+// Busca somente quem tem pelo menos 1 cliente no mês atual
+$allUsers = Funcionario::withActivityBetween($start . ' 00:00:00', $end . ' 23:59:59');
+
 
 include __DIR__ . '/../app/views/partials/header.php';
 ?>
@@ -20,7 +24,7 @@ include __DIR__ . '/../app/views/partials/header.php';
       <label>Modo</label>
       <select class="form-control" name="mode" id="mode">
         <option value="week">Semanal</option>
-        <option value="month" selected >Mensal (padrão)</option>
+        <option value="month" selected>Mensal (padrão)</option>
         <option value="day">Diário</option>
       </select>
     </div>
@@ -62,7 +66,7 @@ include __DIR__ . '/../app/views/partials/header.php';
       <div>
         <label><input id="toggle-compare" type="checkbox" checked> Comparar usuários</label>
       </div>
-      <div id="multi-users" style="display:none">
+      <div id="multi-users" style="display:block">
         <label>Usuários</label>
         <select class="form-control" name="users[]" multiple size="5">
           <?php foreach ($allUsers as $u): ?>

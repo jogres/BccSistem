@@ -88,6 +88,7 @@ include __DIR__.'/../../app/views/partials/header.php';
       </select>
     </div>
   </div>
-  <button class="btn" type="submit">Salvar</button>
+  <button class="btn danger" type="submit">Salvar</button>
+  <a class="btn secondary" href="<?= e(base_url('clientes/index.php')) ?>">Cancelar</a>
 </form>
 </div><?php include __DIR__.'/../../app/views/partials/footer.php'; ?>

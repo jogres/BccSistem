@@ -90,8 +90,8 @@ include __DIR__ . '/../../app/views/partials/header.php';
     </div>
 
     <div class="mt-3">
-      <button class="btn" type="submit">Salvar</button>
-      <a class="btn secondary" href="<?= e(base_url('funcionarios/index.php')) ?>">Cancelar</a>
+      <button class="btn secondary" type="submit">Salvar</button>
+      <a class="btn danger" href="<?= e(base_url('funcionarios/index.php')) ?>">Cancelar</a>
     </div>
   </form>
 </div>
