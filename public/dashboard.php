@@ -62,15 +62,13 @@ include __DIR__ . '/../app/views/partials/header.php';
       <div class="filter-section">
         <h4>📆 Seleção de Data</h4>
         <div id="range-week" class="date-range" style="display: none;">
-          <div class="date-controls">
-            <div class="form-group">
-              <label class="form-label" for="start">Data Inicial</label>
-              <input class="form-control" type="date" name="start" id="start">
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="end">Data Final</label>
-              <input class="form-control" type="date" name="end" id="end">
-            </div>
+          <div class="form-group">
+            <label class="form-label" for="start">Data Inicial</label>
+            <input class="form-control" type="date" name="start" id="start">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="end">Data Final</label>
+            <input class="form-control" type="date" name="end" id="end">
           </div>
           <div class="date-presets">
             <button type="button" class="preset-btn" onclick="setDateRange('thisWeek')">Esta Semana</button>

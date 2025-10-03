@@ -86,9 +86,30 @@ document.addEventListener('DOMContentLoaded', function () {
   // Alternância de campos por modo
   function syncModeFields() {
     const m = modeSel.value;
-    week?.classList.toggle('hidden',  m !== 'week');
-    month?.classList.toggle('hidden', m !== 'month');
-    day?.classList.toggle('hidden',   m !== 'day');
+    console.log('🔄 Alternando modo para:', m);
+    
+    // Usar display style em vez de classe hidden para garantir funcionamento
+    if (week) {
+      week.style.display = (m === 'week') ? 'block' : 'none';
+      console.log('📅 Campo semana display:', week.style.display);
+      
+      // Se mudou para modo semanal, inicializar com dados da semana atual
+      if (m === 'week') {
+        const startInput = document.getElementById('start');
+        const endInput = document.getElementById('end');
+        if (startInput && !startInput.value) {
+          setDateRange('thisWeek');
+        }
+      }
+    }
+    if (month) {
+      month.style.display = (m === 'month') ? 'block' : 'none';
+      console.log('📆 Campo mês display:', month.style.display);
+    }
+    if (day) {
+      day.style.display = (m === 'day') ? 'block' : 'none';
+      console.log('📅 Campo dia display:', day.style.display);
+    }
   }
   syncModeFields();
   modeSel?.addEventListener('change', syncModeFields);
@@ -650,6 +671,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const today = new Date();
     let start, end;
     
+    console.log('📅 Configurando período:', preset);
+    
     switch (preset) {
       case 'thisWeek':
         start = new Date(today);
@@ -673,6 +696,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const endInput = document.getElementById('end');
     if (startInput) startInput.value = start.toISOString().split('T')[0];
     if (endInput) endInput.value = end.toISOString().split('T')[0];
+    
+    console.log('📅 Datas configuradas:', {
+      start: start.toISOString().split('T')[0],
+      end: end.toISOString().split('T')[0],
+      startInputValue: startInput?.value,
+      endInputValue: endInput?.value
+    });
   };
 
   // Presets de data para mês
