@@ -97,11 +97,6 @@ include __DIR__ . '/../../app/views/partials/header.php';
 
 // Calcular estatísticas
 $totalClients = $total;
-$currentMonthClients = 0;
-if ($period === 'month') {
-  $currentMonthClients = count($rows);
-}
-$allTimeClients = $period === 'all' ? $total : $total;
 ?>
 <div class="main-container">
   <div class="clients-container">
@@ -140,13 +135,6 @@ $allTimeClients = $period === 'all' ? $total : $total;
         <div class="stat-number"><?= $totalClients ?></div>
         <div class="stat-label">Total</div>
       </div>
-      <?php if ($period === 'month'): ?>
-      <div class="stat-card current-month">
-        <div class="stat-icon">📅</div>
-        <div class="stat-number"><?= $currentMonthClients ?></div>
-        <div class="stat-label">Este Mês</div>
-      </div>
-      <?php endif; ?>
       <div class="stat-card this-period">
         <div class="stat-icon">📊</div>
         <div class="stat-number"><?= count($rows) ?></div>
