@@ -42,53 +42,125 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 include __DIR__.'/../../app/views/partials/header.php';
 ?>
-<div class="card" >
-  <?php if ($errors): ?>
-    <div class="notice" style="background:#ffebee;border-color:#ffcdd2;color:#b71c1c">
-      <ul>
-        <?php foreach ($errors as $err): ?>
-          <li><?= e($err) ?></li>
-        <?php endforeach; ?>
-      </ul>
+<div class="main-container">
+  <div class="form-container">
+    <!-- Cabeçalho do formulário -->
+    <div class="form-header">
+      <h1 class="form-title">👤 Novo Cliente</h1>
+      <p class="form-subtitle">Cadastre um novo cliente no sistema</p>
     </div>
-  <?php endif; ?>
 
-<h1>Novo cliente</h1>
-<form method="post">
-  <input type="hidden" name="csrf_token" value="<?= e(CSRF::token()) ?>">
-    <div class="form-row">
-      <div class="col">
-        <label>Nome <input class="form-control" name="nome" required></label>
+    <!-- Erros de validação -->
+    <?php if ($errors): ?>
+      <div class="form-errors">
+        <h4>Erros encontrados:</h4>
+        <ul>
+          <?php foreach ($errors as $err): ?>
+            <li><?= e($err) ?></li>
+          <?php endforeach; ?>
+        </ul>
       </div>
-    </div>
-    <div class="form-row">
-      <div class="col">
-        <label>Telefone <input class="form-control" name="telefone" required></label>
+    <?php endif; ?>
+
+    <!-- Formulário -->
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="<?= e(CSRF::token()) ?>">
+      
+      <!-- Seção de Dados Pessoais -->
+      <div class="form-section">
+        <h3 class="form-section-title">📋 Dados Pessoais</h3>
+        
+        <div class="form-row single">
+          <div class="form-group">
+            <label class="form-label required" for="nome">👤 Nome Completo</label>
+            <input 
+              class="form-control" 
+              id="nome"
+              name="nome" 
+              type="text"
+              placeholder="Digite o nome completo do cliente"
+              value="<?= e($_POST['nome'] ?? '') ?>"
+              required
+            >
+          </div>
+        </div>
+        
+        <div class="form-row single">
+          <div class="form-group">
+            <label class="form-label required" for="telefone">📞 Telefone</label>
+            <input 
+              class="form-control" 
+              id="telefone"
+              name="telefone" 
+              type="tel"
+              placeholder="(11) 99999-9999"
+              value="<?= e($_POST['telefone'] ?? '') ?>"
+              required
+            >
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="form-row">
-      <div class="col">
-        <label>Cidade <input class="form-control" name="cidade" required></label>
+
+      <!-- Seção de Localização -->
+      <div class="form-section">
+        <h3 class="form-section-title">📍 Localização</h3>
+        
+        <div class="form-row double">
+          <div class="form-group">
+            <label class="form-label required" for="cidade">🏙️ Cidade</label>
+            <input 
+              class="form-control" 
+              id="cidade"
+              name="cidade" 
+              type="text"
+              placeholder="Nome da cidade"
+              value="<?= e($_POST['cidade'] ?? '') ?>"
+              required
+            >
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label required" for="estado">🗺️ Estado (UF)</label>
+            <input 
+              class="form-control" 
+              id="estado"
+              name="estado" 
+              type="text"
+              maxlength="2"
+              placeholder="SP"
+              value="<?= e($_POST['estado'] ?? '') ?>"
+              style="text-transform: uppercase;"
+              required
+            >
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="form-row">
-      <div class="col">
-        <label>Estado <input class="form-control" name="estado" maxlength="2" required></label>
+
+      <!-- Seção de Interesse -->
+      <div class="form-section">
+        <h3 class="form-section-title">🎯 Interesse</h3>
+        
+        <div class="form-row single">
+          <div class="form-group">
+            <label class="form-label required" for="interesse">💼 Tipo de Interesse</label>
+            <select class="form-control" id="interesse" name="interesse" required>
+              <option value="">Selecione o tipo de interesse...</option>
+              <?php foreach ($opcoesInteresse as $opt): ?>
+                <option value="<?= e($opt) ?>" <?= (($_POST['interesse'] ?? '') === $opt) ? 'selected' : '' ?>>
+                  <?= e($opt) ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="form-row">
-      <div class="col">
-        <label>Interesse</label>
-          <select class="form-control" name="interesse" required>
-              <option value="">Selecione...</option>
-        <?php foreach ($opcoesInteresse as $opt): ?>
-          <option value="<?= e($opt) ?>"><?= e($opt) ?></option>
-        <?php endforeach; ?>
-      </select>
-    </div>
+
+      <!-- Botões de ação -->
+      <div class="form-actions">
+        <button class="btn-save" type="submit">Salvar Cliente</button>
+        <a class="btn-cancel" href="<?= e(base_url('clientes/index.php')) ?>">Cancelar</a>
+      </div>
+    </form>
   </div>
-  <button class="btn secondary" type="submit">Salvar</button>
-  <a class="btn danger" href="<?= e(base_url('clientes/index.php')) ?>">Cancelar</a>
-</form>
 </div>
 <?php include __DIR__.'/../../app/views/partials/footer.php'; ?>

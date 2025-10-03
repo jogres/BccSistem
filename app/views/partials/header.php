@@ -9,7 +9,8 @@ $user = Auth::user();
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>BCC - Gestão</title>
-  <link rel="stylesheet" href="<?= e(base_url('assets/css/style.css')) ?>">
+  <link rel="stylesheet" href="<?= e(base_url('assets/css/main.css')) ?>">
+ 
   <script>
     window.APP = {
       isAdmin: <?= Auth::isAdmin() ? 'true' : 'false' ?>,
@@ -20,20 +21,46 @@ $user = Auth::user();
 </head>
 
 <body>
-  <header class="topbar">
-    <div class="container">
-      <div class="brand">Brasil Center Cred — Gestão</div>
+  <header class="header">
+    <div class="navbar">
+      <a href="<?= e(base_url('dashboard.php')) ?>" class="navbar-brand">
+        🏢 Brasil Center Cred
+      </a>
+      
       <?php if ($user): ?>
-        <nav class="nav">
-          <a href="<?= e(base_url('dashboard.php')) ?>">Dashboard</a>
-          <a href="<?= e(base_url('clientes/index.php')) ?>">Clientes</a>
+        <nav class="navbar-nav">
+          <a href="<?= e(base_url('dashboard.php')) ?>" class="nav-link">
+            📊 Dashboard
+          </a>
+          <a href="<?= e(base_url('clientes/index.php')) ?>" class="nav-link">
+            👥 Clientes
+          </a>
           <?php if (Auth::isAdmin()): ?>
-            <a href="<?= e(base_url('funcionarios/index.php')) ?>">Funcionários</a>
+            <a href="<?= e(base_url('funcionarios/index.php')) ?>" class="nav-link">
+              🧑‍💼 Funcionários
+            </a>
           <?php endif; ?>
-          <span class="user">Olá, <?= e($user['nome']) ?> (<?= e($user['role_name']) ?>)</span>
-          <a class="logout" href="<?= e(base_url('logout.php')) ?>">Sair</a>
+          
+          <?php
+          // Buscar contador de notificações não lidas
+          require_once __DIR__ . '/../../lib/Notification.php';
+          $unreadCount = Notification::getUnreadCount($user['id']);
+          ?>
+          
+          <a href="<?= e(base_url('notifications.php')) ?>" class="nav-link notification-badge">
+            🔔 Notificações
+            <?php if ($unreadCount > 0): ?>
+              <span class="badge"><?= $unreadCount ?></span>
+            <?php endif; ?>
+          </a>
+          
+          <span class="nav-link">👋 Olá, <?= e($user['nome']) ?></span>
+          <a href="<?= e(base_url('logout.php')) ?>" class="nav-link">
+            🚪 Sair
+          </a>
         </nav>
       <?php endif; ?>
     </div>
   </header>
-  <main class="container">
+  
+  <main class="main-container">

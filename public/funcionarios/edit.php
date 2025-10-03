@@ -48,51 +48,116 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 include __DIR__ . '/../../app/views/partials/header.php';
 ?>
-<div class="card" >
-  <h1>Editar <?= $func['nome'] ?></h1>
-  <?php if ($message): ?><div class="notice error"><?= e($message) ?></div><?php endif; ?>
-  <form method="post">
-    <?= CSRF::field() ?>
-    <div class="form-row">
-      <div class="col">
-        <label>Nome</label>
-        <input class="form-control" name="nome" value="<?= e($func['nome']) ?>" required>
-      </div>
-      <div class="col">
-        <label>Login</label>
-        <input class="form-control" name="login" value="<?= e($func['login']) ?>" required>
-      </div>
+<div class="main-container">
+  <div class="form-container">
+    <!-- Cabeçalho do formulário -->
+    <div class="form-header">
+      <h1 class="form-title">✏️ Editar Funcionário</h1>
+      <p class="form-subtitle">Editando dados de: <strong><?= e($func['nome']) ?></strong></p>
     </div>
 
-    <div class="form-row">
-      <div class="col">
-        <label>Senha (deixe em branco para não alterar)</label>
-        <input class="form-control" type="password" name="senha" autocomplete="new-password">
+    <!-- Erros de validação -->
+    <?php if ($message): ?>
+      <div class="form-errors">
+        <h4>Erro encontrado:</h4>
+        <ul>
+          <li><?= e($message) ?></li>
+        </ul>
       </div>
-      <div class="col w-4">
-        <label>Perfil (cargo)</label>
-        <select class="form-control" name="role_id" required>
-          <option value="">Selecione</option>
-          <?php foreach ($roles as $r): ?>
-            <option value="<?= (int)$r['id'] ?>" <?= ((int)$func['role_id']===(int)$r['id']?'selected':'') ?>>
-              <?= e($r['nome']) ?>
-            </option>
-          <?php endforeach; ?>
-        </select>
-      </div>
-      <div class="col w-4">
-        <label>Ativo</label>
-        <select class="form-control" name="is_ativo">
-          <option value="1" <?= ((int)$func['is_ativo']===1?'selected':'') ?>>Sim</option>
-          <option value="0" <?= ((int)$func['is_ativo']===0?'selected':'') ?>>Não</option>
-        </select>
-      </div>
-    </div>
+    <?php endif; ?>
 
-    <div class="mt-3">
-      <button class="btn secondary" type="submit">Salvar</button>
-      <a class="btn danger" href="<?= e(base_url('funcionarios/index.php')) ?>">Cancelar</a>
-    </div>
-  </form>
+    <!-- Formulário -->
+    <form method="post">
+      <?= CSRF::field() ?>
+      
+      <!-- Seção de Dados Pessoais -->
+      <div class="form-section">
+        <h3 class="form-section-title">👤 Dados Pessoais</h3>
+        
+        <div class="form-row double">
+          <div class="form-group">
+            <label class="form-label required" for="nome">📝 Nome Completo</label>
+            <input 
+              class="form-control" 
+              id="nome"
+              name="nome" 
+              type="text"
+              placeholder="Digite o nome completo do funcionário"
+              value="<?= e($func['nome']) ?>"
+              required
+            >
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label required" for="login">🔑 Login de Acesso</label>
+            <input 
+              class="form-control" 
+              id="login"
+              name="login" 
+              type="text"
+              placeholder="usuario123"
+              value="<?= e($func['login']) ?>"
+              required
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Seção de Segurança -->
+      <div class="form-section">
+        <h3 class="form-section-title">🔒 Segurança e Acesso</h3>
+        
+        <div class="form-row single">
+          <div class="form-group">
+            <label class="form-label" for="senha">🔐 Nova Senha</label>
+            <input 
+              class="form-control" 
+              id="senha"
+              name="senha" 
+              type="password"
+              placeholder="Deixe em branco para manter a senha atual"
+              autocomplete="new-password"
+            >
+            <small style="color: var(--bcc-gray-600); font-size: 0.8rem; margin-top: 0.25rem; display: block;">
+              💡 Deixe em branco se não quiser alterar a senha
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seção de Permissões -->
+      <div class="form-section">
+        <h3 class="form-section-title">⚙️ Permissões e Status</h3>
+        
+        <div class="form-row double">
+          <div class="form-group">
+            <label class="form-label required" for="role_id">👔 Perfil de Acesso</label>
+            <select class="form-control" id="role_id" name="role_id" required>
+              <option value="">Selecione o perfil...</option>
+              <?php foreach ($roles as $r): ?>
+                <option value="<?= (int)$r['id'] ?>" <?= ((int)$func['role_id']===(int)$r['id']?'selected':'') ?>>
+                  <?= e($r['nome']) ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label required" for="is_ativo">✅ Status da Conta</label>
+            <select class="form-control" id="is_ativo" name="is_ativo">
+              <option value="1" <?= ((int)$func['is_ativo']===1?'selected':'') ?>>🟢 Ativo</option>
+              <option value="0" <?= ((int)$func['is_ativo']===0?'selected':'') ?>>🔴 Inativo</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botões de ação -->
+      <div class="form-actions">
+        <button class="btn-save" type="submit">Salvar Alterações</button>
+        <a class="btn-cancel" href="<?= e(base_url('funcionarios/index.php')) ?>">Cancelar</a>
+      </div>
+    </form>
+  </div>
 </div>
 <?php include __DIR__ . '/../../app/views/partials/footer.php'; ?>

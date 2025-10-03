@@ -1,0 +1,326 @@
+/* ========================================
+   CORREÇÕES DE COMPATIBILIDADE
+   ======================================== */
+
+/* Garantir que todas as classes antigas funcionem */
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  animation: colFadeIn 0.4s ease-out;
+}
+
+@keyframes colFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-md);
+  min-height: 48px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn.primary {
+  background: linear-gradient(135deg, var(--bcc-blue), var(--bcc-blue-light));
+  color: var(--bcc-white);
+  border: 2px solid var(--bcc-blue);
+}
+
+.btn.secondary {
+  background: var(--bcc-white);
+  color: var(--bcc-gray-700);
+  border: 2px solid var(--bcc-gray-300);
+}
+
+.btn.success {
+  background: linear-gradient(135deg, var(--bcc-green), var(--bcc-green-light));
+  color: var(--bcc-white);
+  border: 2px solid var(--bcc-green);
+}
+
+.btn.danger {
+  background: linear-gradient(135deg, #ef4444, #f87171);
+  color: var(--bcc-white);
+  border: 2px solid #ef4444;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+  text-decoration: none;
+}
+
+/* Tabelas responsivas */
+.table-responsive {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  background: var(--bcc-white);
+}
+
+/* Notices antigas */
+.notice.success {
+  background: var(--bcc-green-bg);
+  color: var(--bcc-green-dark);
+  border-color: var(--bcc-green);
+}
+
+.notice.error {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #ef4444;
+}
+
+.notice.warning {
+  background: var(--bcc-orange-bg);
+  color: var(--bcc-orange-dark);
+  border-color: var(--bcc-orange);
+}
+
+.notice.info {
+  background: var(--bcc-blue-bg);
+  color: var(--bcc-blue-dark);
+  border-color: var(--bcc-blue);
+}
+
+/* Campos de formulário antigos */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="month"],
+input[type="date"],
+select,
+textarea {
+  border: 2px solid var(--bcc-gray-300);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all var(--transition-normal);
+  background: var(--bcc-white);
+  box-shadow: var(--shadow-sm);
+  min-height: 48px;
+  width: 100%;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="tel"]:focus,
+input[type="month"]:focus,
+input[type="date"]:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--bcc-blue);
+  box-shadow: 0 0 0 3px rgba(1, 41, 128, 0.1);
+  background: var(--bcc-blue-bg);
+}
+
+input[type="text"]:hover,
+input[type="email"]:hover,
+input[type="password"]:hover,
+input[type="number"]:hover,
+input[type="tel"]:hover,
+input[type="month"]:hover,
+input[type="date"]:hover,
+select:hover,
+textarea:hover {
+  border-color: var(--bcc-orange);
+  background: var(--bcc-orange-bg);
+}
+
+/* Labels antigas */
+label {
+  font-weight: 600;
+  color: var(--bcc-gray-700);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--space-2);
+}
+
+/* Fieldset e legend */
+fieldset {
+  border: 1px solid var(--bcc-gray-200);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+legend {
+  font-weight: 700;
+  color: var(--bcc-blue);
+  padding: 0 var(--space-2);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Radio buttons e checkboxes */
+input[type="radio"],
+input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-right: var(--space-2);
+  cursor: pointer;
+}
+
+/* Links como botões */
+a.btn {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Espaçamentos utilitários */
+.mt-3 { margin-top: var(--space-4); }
+.mb-3 { margin-bottom: var(--space-4); }
+.mt-4 { margin-top: var(--space-6); }
+.mb-4 { margin-bottom: var(--space-6); }
+.mt-5 { margin-top: var(--space-8); }
+.mb-5 { margin-bottom: var(--space-8); }
+
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+
+/* H1, H2, H3 padrões */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--bcc-blue);
+  font-weight: 700;
+  margin-bottom: var(--space-4);
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: var(--space-6);
+}
+
+h2 {
+  font-size: 1.5rem;
+  margin-bottom: var(--space-5);
+}
+
+h3 {
+  font-size: 1.25rem;
+  margin-bottom: var(--space-4);
+}
+
+/* Parágrafos */
+p {
+  margin-bottom: var(--space-4);
+  line-height: 1.6;
+  color: var(--bcc-gray-700);
+}
+
+/* Links */
+a {
+  color: var(--bcc-blue);
+  text-decoration: none;
+  transition: color var(--transition-normal);
+}
+
+a:hover {
+  color: var(--bcc-orange);
+  text-decoration: underline;
+}
+
+/* Status badges antigos */
+.status-active {
+  background: var(--bcc-green-bg);
+  color: var(--bcc-green-dark);
+  border: 1px solid var(--bcc-green);
+}
+
+.status-inactive {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #ef4444;
+}
+
+/* Paginação antiga */
+.pagination a,
+.pagination span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-3);
+  margin: 0 var(--space-1);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all var(--transition-normal);
+  min-width: 40px;
+  height: 40px;
+}
+
+.pagination a {
+  background: var(--bcc-white);
+  color: var(--bcc-gray-700);
+  border: 1px solid var(--bcc-gray-300);
+}
+
+.pagination a:hover {
+  background: var(--bcc-blue);
+  color: var(--bcc-white);
+  border-color: var(--bcc-blue);
+}
+
+.pagination .current {
+  background: var(--bcc-orange);
+  color: var(--bcc-white);
+  border: 1px solid var(--bcc-orange);
+}
+
+/* Responsividade para elementos antigos */
+@media (max-width: 768px) {
+  .table-responsive {
+    font-size: 0.75rem;
+  }
+  
+  .btn {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: var(--space-2);
+  }
+  
+  fieldset {
+    padding: var(--space-3);
+  }
+  
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  select,
+  textarea {
+    font-size: 0.875rem;
+    padding: var(--space-2) var(--space-3);
+  }
+}

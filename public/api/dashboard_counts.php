@@ -21,6 +21,11 @@ try {
     // -------- Params --------
     $mode = $_GET['mode'] ?? 'month'; // 'week' | 'month' | 'day'
     $mode = in_array($mode, ['week','month','day'], true) ? $mode : 'month';
+    
+    // Filtros avançados
+    $minClients = (int)($_GET['minClients'] ?? 0);
+    $sortBy = $_GET['sortBy'] ?? 'name';
+    $sortBy = in_array($sortBy, ['name', 'total', 'average'], true) ? $sortBy : 'name';
 
     // Intervalo de datas (start/end inclusivo)
     if ($mode === 'month') {
@@ -37,17 +42,21 @@ try {
     }
 
     // -------- Usuários (segurança/escopo) --------
-    $userIds = array_map('intval', (array)($_GET['users'] ?? [])); // quando “Comparar” estiver ligado
+    $userIds = array_map('intval', (array)($_GET['users'] ?? [])); // quando "Comparar" estiver ligado
 
-    if ($isAdmin && empty($userIds)) {
-        require_once __DIR__ . '/../../app/models/Funcionario.php';
-        $userIds = Funcionario::allActiveIds(); // todos ativos
-    }
-    if (!$isAdmin) {
-        $userIds = [$user['id']]; // só ele mesmo
+    // Se não houver usuários selecionados, aplicar lógica padrão
+    if (empty($userIds)) {
+        if ($isAdmin) {
+            // Admin sem seleção específica: buscar todos os usuários ativos
+            require_once __DIR__ . '/../../app/models/Funcionario.php';
+            $userIds = Funcionario::allActiveIds();
+        } else {
+            // Usuário normal: apenas ele mesmo
+            $userIds = [$user['id']];
+        }
     }
 
-    // Se não houver nenhum usuário de entrada, devolve vazio coerente
+    // Se ainda não houver nenhum usuário, devolve vazio coerente
     if (empty($userIds)) {
         echo json_encode([
             'ok' => true,
@@ -56,6 +65,18 @@ try {
             'end' => $end,
             'labels' => [],
             'series' => new stdClass(),
+            'stats' => [
+                'total_clients' => 0,
+                'total_users' => 0,
+                'average_per_user' => 0,
+                'top_performer' => null,
+                'period_label' => $mode === 'week' ? 'semana' : ($mode === 'month' ? 'mês' : 'dia'),
+                'date_range' => [
+                    'start_formatted' => date('d/m/Y', strtotime($start)),
+                    'end_formatted' => date('d/m/Y', strtotime($end)),
+                    'duration_days' => (strtotime($end) - strtotime($start)) / (60 * 60 * 24) + 1
+                ]
+            ]
         ]);
         exit;
     }
@@ -147,19 +168,73 @@ try {
 
     // -------- Séries (somente usuários com atividade) --------
     $series = [];
+    $userTotals = []; // Para ordenação
+    
     foreach ($activeUserIds as $uid) {
         $uid  = (int)$uid;
         $data = [];
         foreach ($labels as $lab) {
             $data[] = (int)($byUserByLabel[$uid][$lab] ?? 0);
         }
+        
+        $total = array_sum($data);
+        
+        // Aplicar filtro de mínimo de clientes
+        if ($minClients > 0 && $total < $minClients) continue;
+        
         // (Segurança extra: se por algum motivo ficar tudo 0, pula)
-        if (array_sum($data) === 0) continue;
+        if ($total === 0) continue;
 
+        $userTotals[$uid] = $total;
         $series[(string)$uid] = [
             'name' => $names[$uid] ?? ('ID '.$uid),
             'data' => $data,
+            'total' => $total,
+            'average' => count($labels) > 0 ? round($total / count($labels), 2) : 0,
         ];
+    }
+
+    // -------- Ordenação das séries --------
+    if (!empty($series) && $sortBy !== 'name') {
+        $sortedSeries = [];
+        
+        // Criar array para ordenação
+        $sortData = [];
+        foreach ($series as $uid => $seriesData) {
+            $sortValue = match($sortBy) {
+                'total' => $seriesData['total'],
+                'average' => $seriesData['average'],
+                default => $seriesData['total']
+            };
+            $sortData[$uid] = $sortValue;
+        }
+        
+        // Ordenar por valor (decrescente)
+        arsort($sortData);
+        
+        // Reconstruir séries na ordem correta
+        foreach (array_keys($sortData) as $uid) {
+            $sortedSeries[$uid] = $series[$uid];
+        }
+        
+        $series = $sortedSeries;
+    }
+
+    // -------- Estatísticas adicionais --------
+    $totalClients = array_sum(array_column($series, 'total'));
+    $totalUsers = count($series);
+    $averagePerUser = $totalUsers > 0 ? round($totalClients / $totalUsers, 2) : 0;
+    
+    // Top performer
+    $topPerformer = null;
+    if (!empty($series)) {
+        $maxTotal = max(array_column($series, 'total'));
+        foreach ($series as $uid => $data) {
+            if ($data['total'] === $maxTotal) {
+                $topPerformer = ['id' => $uid, 'name' => $data['name'], 'total' => $data['total']];
+                break;
+            }
+        }
     }
 
     echo json_encode([
@@ -169,6 +244,18 @@ try {
         'end'    => $end,
         'labels' => $labels,
         'series' => !empty($series) ? $series : new stdClass(),
+        'stats'  => [
+            'total_clients' => $totalClients,
+            'total_users'   => $totalUsers,
+            'average_per_user' => $averagePerUser,
+            'top_performer' => $topPerformer,
+            'period_label' => $mode === 'week' ? 'semana' : ($mode === 'month' ? 'mês' : 'dia'),
+            'date_range' => [
+                'start_formatted' => date('d/m/Y', strtotime($start)),
+                'end_formatted' => date('d/m/Y', strtotime($end)),
+                'duration_days' => (strtotime($end) - strtotime($start)) / (60 * 60 * 24) + 1
+            ]
+        ]
     ]);
 } catch (Throwable $e) {
     http_response_code(500);

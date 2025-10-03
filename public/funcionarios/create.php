@@ -34,47 +34,113 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 include __DIR__ . '/../../app/views/partials/header.php';
 ?>
-<div class="card" >
-  <h1>Novo funcionário</h1>
-  <?php if ($message): ?><div class="notice" style="background:#ffebee;border-color:#ffcdd2;color:#b71c1c"><?= e($message) ?></div><?php endif; ?>
-  <form method="post">
-    <?= CSRF::field() ?>
-    <div class="form-row">
-      <div class="col">
-        <label>Nome</label>
-        <input class="form-control" name="nome" required>
-      </div>
-      <div class="col">
-        <label>Login</label>
-        <input class="form-control" name="login" required>
-      </div>
+<div class="main-container">
+  <div class="form-container">
+    <!-- Cabeçalho do formulário -->
+    <div class="form-header">
+      <h1 class="form-title">👥 Novo Funcionário</h1>
+      <p class="form-subtitle">Cadastre um novo funcionário no sistema</p>
     </div>
-    <div class="form-row">
-      <div class="col">
-        <label>Senha</label>
-        <input class="form-control" type="password" name="senha" required>
+
+    <!-- Erros de validação -->
+    <?php if ($message): ?>
+      <div class="form-errors">
+        <h4>Erro encontrado:</h4>
+        <ul>
+          <li><?= e($message) ?></li>
+        </ul>
       </div>
-      <div class="col">
-        <label>Perfil</label>
-        <select class="form-control" name="role_id" required>
-          <option value="">Selecione</option>
-          <?php foreach ($roles as $r): ?>
-            <option value="<?= (int)$r['id'] ?>"><?= e($r['nome']) ?></option>
-          <?php endforeach; ?>
-        </select>
+    <?php endif; ?>
+
+    <!-- Formulário -->
+    <form method="post">
+      <?= CSRF::field() ?>
+      
+      <!-- Seção de Dados Pessoais -->
+      <div class="form-section">
+        <h3 class="form-section-title">👤 Dados Pessoais</h3>
+        
+        <div class="form-row double">
+          <div class="form-group">
+            <label class="form-label required" for="nome">📝 Nome Completo</label>
+            <input 
+              class="form-control" 
+              id="nome"
+              name="nome" 
+              type="text"
+              placeholder="Digite o nome completo do funcionário"
+              value="<?= e($_POST['nome'] ?? '') ?>"
+              required
+            >
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label required" for="login">🔑 Login de Acesso</label>
+            <input 
+              class="form-control" 
+              id="login"
+              name="login" 
+              type="text"
+              placeholder="usuario123"
+              value="<?= e($_POST['login'] ?? '') ?>"
+              required
+            >
+          </div>
+        </div>
       </div>
-      <div class="col" style="max-width:160px">
-        <label>Ativo</label>
-        <select class="form-control" name="is_ativo">
-          <option value="1">Sim</option>
-          <option value="0">Não</option>
-        </select>
+
+      <!-- Seção de Segurança -->
+      <div class="form-section">
+        <h3 class="form-section-title">🔒 Segurança e Acesso</h3>
+        
+        <div class="form-row single">
+          <div class="form-group">
+            <label class="form-label required" for="senha">🔐 Senha</label>
+            <input 
+              class="form-control" 
+              id="senha"
+              name="senha" 
+              type="password"
+              placeholder="Digite uma senha segura"
+              required
+            >
+          </div>
+        </div>
       </div>
-    </div>
-    <div style="margin-top:12px">
-      <button class="btn secondary" type="submit">Salvar</button>
-      <a class="btn danger" href="<?= e(base_url('funcionarios/index.php')) ?>">Cancelar</a>
-    </div>
-  </form>
+
+      <!-- Seção de Permissões -->
+      <div class="form-section">
+        <h3 class="form-section-title">⚙️ Permissões e Status</h3>
+        
+        <div class="form-row double">
+          <div class="form-group">
+            <label class="form-label required" for="role_id">👔 Perfil de Acesso</label>
+            <select class="form-control" id="role_id" name="role_id" required>
+              <option value="">Selecione o perfil...</option>
+              <?php foreach ($roles as $r): ?>
+                <option value="<?= (int)$r['id'] ?>" <?= (($_POST['role_id'] ?? '') == $r['id']) ? 'selected' : '' ?>>
+                  <?= e($r['nome']) ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label required" for="is_ativo">✅ Status da Conta</label>
+            <select class="form-control" id="is_ativo" name="is_ativo">
+              <option value="1" <?= (($_POST['is_ativo'] ?? '1') == '1') ? 'selected' : '' ?>>🟢 Ativo</option>
+              <option value="0" <?= (($_POST['is_ativo'] ?? '') == '0') ? 'selected' : '' ?>>🔴 Inativo</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botões de ação -->
+      <div class="form-actions">
+        <button class="btn-save" type="submit">Salvar Funcionário</button>
+        <a class="btn-cancel" href="<?= e(base_url('funcionarios/index.php')) ?>">Cancelar</a>
+      </div>
+    </form>
+  </div>
 </div>
 <?php include __DIR__ . '/../../app/views/partials/footer.php'; ?>
