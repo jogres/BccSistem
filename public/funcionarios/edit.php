@@ -28,7 +28,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($nome && $login && $role_id) {
         try {
+            // Verificar status anterior antes de atualizar
+            $oldStatus = $func['is_ativo'];
+            
             Funcionario::update($id, $nome, $login, $senha, $role_id, $is_ativo);
+            
+            // Notificar se funcionário foi inativado
+            if ($oldStatus == 1 && $is_ativo == 0) {
+                require_once __DIR__ . '/../../app/lib/Notification.php';
+                Notification::notifyInactiveUser($id, $nome);
+            }
+            
             header('Location: ' . base_url('funcionarios/index.php'));
             exit;
         } catch (PDOException $e) {

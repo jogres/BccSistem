@@ -35,6 +35,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'interesse'  => $interesse,
             'criado_por' => $user['id'],
         ]);
+        
+        // Notificar administradores sobre novo cliente
+        require_once __DIR__.'/../../app/lib/Notification.php';
+        Notification::notifyNewClient($id, $nome, $user['id']);
+        
         header('Location: '.base_url('clientes/index.php'), true, 303); // 303 opcional e recomendado
         exit;
     }
