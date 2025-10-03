@@ -163,7 +163,7 @@ $totalClients = $total;
           </div>
 
           <!-- Mês (aparece quando "Por mês" está selecionado) -->
-          <div class="clients-filters-month when-month" style="<?= $period === 'month' ? '' : 'display:none' ?>">
+          <div class="clients-filters-month when-month" style="display: <?= $period === 'month' ? 'flex' : 'none' ?>">
             <label class="clients-filters-label">Mês</label>
             <input class="clients-filter-control" type="month" name="m" value="<?= e($month) ?>">
           </div>
@@ -178,6 +178,12 @@ $totalClients = $total;
           <div class="clients-filters-field">
             <label class="clients-filters-label">📞 Telefone</label>
             <input class="clients-filter-control" type="text" name="f_telefone" value="<?= e($tel) ?>" placeholder="Número">
+          </div>
+
+          <!-- Cidade -->
+          <div class="clients-filters-field">
+            <label class="clients-filters-label">🏙️ Cidade</label>
+            <input class="clients-filter-control" type="text" name="f_cidade" value="<?= e($cidade) ?>" placeholder="Nome da cidade">
           </div>
 
           <!-- Estado -->

@@ -9,7 +9,7 @@ $user = Auth::user();
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>BCC - Gestão</title>
-  <link rel="stylesheet" href="<?= e(base_url('assets/css/main.css')) ?>">
+  <link rel="stylesheet" href="<?= e(base_url('assets/css/main.css')) ?>?v=<?= time() ?>">
  
   <script>
     window.APP = {

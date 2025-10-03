@@ -1,0 +1,181 @@
+/* ========================================
+   CORREÇÕES ESPECÍFICAS PARA FILTROS DE CLIENTES
+   ======================================== */
+
+/* Forçar visibilidade e organização dos filtros */
+.clients-filters-grid {
+  display: flex !important;
+  gap: 1rem !important;
+  align-items: end !important;
+  overflow: visible !important;
+  width: 100% !important;
+  padding: 1rem !important;
+  background: #f8f9fa !important;
+  border-radius: 6px !important;
+  border: 1px solid #e0e0e0 !important;
+  min-height: 80px !important;
+  flex-wrap: wrap !important;
+}
+
+/* Campos de filtro organizados */
+.clients-filters-field,
+.clients-filters-period,
+.clients-filters-month,
+.clients-filters-perpage,
+.clients-filters-apply {
+  background: white !important;
+  padding: 0.75rem !important;
+  border-radius: 6px !important;
+  border: 1px solid #ddd !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+  min-height: 70px !important;
+  overflow: visible !important;
+  flex-shrink: 0 !important;
+  min-width: 150px !important;
+}
+
+.clients-filters-period {
+  align-items: center !important;
+  flex-direction: row !important;
+  gap: 0.5rem !important;
+  min-width: 200px !important;
+}
+
+/* Campos específicos com larguras adequadas */
+.clients-filters-field:has([name="f_nome"]) {
+  min-width: 250px !important;
+  flex-grow: 1 !important;
+}
+
+.clients-filters-field:has([name="f_cidade"]) {
+  min-width: 200px !important;
+  flex-grow: 1 !important;
+}
+
+.clients-filters-field:has([name="f_telefone"]) {
+  min-width: 150px !important;
+}
+
+.clients-filters-apply {
+  align-items: end !important;
+  justify-content: center !important;
+}
+
+/* Controles de filtro funcionais */
+.clients-filter-control {
+  width: 100% !important;
+  padding: 0.5rem 0.75rem !important;
+  border: 2px solid #ddd !important;
+  border-radius: 6px !important;
+  font-size: 0.875rem !important;
+  background: white !important;
+  color: #333 !important;
+  height: 36px !important;
+  box-sizing: border-box !important;
+  appearance: auto !important;
+  -webkit-appearance: menulist !important;
+  -moz-appearance: menulist !important;
+  cursor: pointer !important;
+}
+
+/* Garantir que os dropdowns funcionem corretamente */
+.clients-filter-control select,
+select.clients-filter-control {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.75rem center !important;
+  background-size: 16px 12px !important;
+  padding-right: 2.5rem !important;
+}
+
+/* Garantir que as opções dos dropdowns sejam visíveis */
+.clients-filter-control option {
+  background: white !important;
+  color: #333 !important;
+  padding: 0.5rem !important;
+}
+
+/* Botão aplicar destacado */
+.clients-btn-apply {
+  background: linear-gradient(135deg, #007bff, #0056b3) !important;
+  color: white !important;
+  border: none !important;
+  padding: 0.75rem 1.5rem !important;
+  border-radius: 6px !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  justify-content: center !important;
+  width: 100% !important;
+  min-height: 48px !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+}
+
+.clients-btn-apply:hover {
+  background: linear-gradient(135deg, #0056b3, #004085) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3) !important;
+}
+
+/* Labels dos filtros */
+.clients-filters-label {
+  font-weight: bold !important;
+  margin-bottom: 0.5rem !important;
+  color: #333 !important;
+  font-size: 0.9rem !important;
+}
+
+/* Container de filtros */
+.clients-filters-container {
+  background: white !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+  margin: 1rem 0 !important;
+  overflow: visible !important;
+  padding: 1rem !important;
+}
+
+/* Responsividade */
+@media (max-width: 992px) {
+  .clients-filters-grid {
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+  
+  .clients-filters-period {
+    justify-content: center !important;
+    min-width: auto !important;
+  }
+  
+  .clients-filters-apply {
+    justify-content: center !important;
+  }
+  
+  .clients-filters-field,
+  .clients-filters-perpage {
+    min-width: auto !important;
+    flex-grow: 1 !important;
+  }
+}
+
+/* Forçar visibilidade dos campos específicos */
+.clients-filters-perpage {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.clients-filters-apply {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}

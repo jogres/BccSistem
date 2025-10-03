@@ -199,7 +199,7 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   margin-bottom: var(--space-6);
-  overflow: hidden;
+  overflow: visible !important;
   animation: filtersSlideIn 0.5s ease-out;
 }
 
@@ -246,10 +246,17 @@
 }
 
 .clients-filters-grid {
-  display: grid;
-  grid-template-columns: auto auto 1fr 2fr 1fr 1fr 1fr 1fr auto;
-  gap: var(--space-3);
+  display: flex;
+  gap: 1rem;
   align-items: end;
+  overflow: visible;
+  width: 100%;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  min-height: 80px;
+  flex-wrap: wrap;
 }
 
 /* Elementos específicos dos filtros de clientes */
@@ -257,6 +264,13 @@
   display: flex;
   gap: var(--space-2);
   align-items: center;
+  background: var(--bcc-white);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--bcc-gray-300);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  flex-shrink: 0;
+  min-width: 200px;
 }
 
 .clients-filters-period label {
@@ -291,24 +305,54 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  background: var(--bcc-white);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--bcc-gray-300);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .clients-filters-field {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  background: var(--bcc-white);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--bcc-gray-300);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  min-height: 70px;
+  overflow: visible;
+  flex-shrink: 0;
+  min-width: 150px;
 }
 
 .clients-filters-perpage {
-  display: flex;
+  display: flex !important;
   flex-direction: column;
   justify-content: flex-end;
+  visibility: visible !important;
+  opacity: 1 !important;
+  background: var(--bcc-white);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--bcc-gray-300);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  min-height: 70px;
+  overflow: visible;
 }
 
 .clients-filters-apply {
-  display: flex;
+  display: flex !important;
   align-items: end;
   justify-content: center;
+  visibility: visible !important;
+  opacity: 1 !important;
+  background: var(--bcc-white);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--bcc-gray-300);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .clients-filters-label {
@@ -333,6 +377,10 @@
   box-shadow: var(--shadow-sm);
   height: 36px;
   box-sizing: border-box;
+  appearance: auto;
+  -webkit-appearance: menulist;
+  -moz-appearance: menulist;
+  cursor: pointer;
 }
 
 .clients-filter-control:focus {
@@ -348,8 +396,12 @@
 }
 
 /* Campo nome com largura específica */
+.clients-filters-field:has([name="f_nome"]) {
+  min-width: 250px;
+  flex-grow: 1;
+}
+
 .clients-filter-control[name="f_nome"] {
-  min-width: 200px;
   width: 100%;
 }
 
@@ -359,25 +411,71 @@
   width: 100%;
 }
 
+/* Campo cidade com largura adequada */
+.clients-filters-field:has([name="f_cidade"]) {
+  min-width: 200px;
+  flex-grow: 1;
+}
+
+.clients-filter-control[name="f_cidade"] {
+  width: 100%;
+}
+
+/* Garantir que os dropdowns funcionem corretamente */
+.clients-filter-control select,
+select.clients-filter-control {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+  padding-right: 2.5rem;
+}
+
+/* Garantir que as opções dos dropdowns sejam visíveis */
+.clients-filter-control option {
+  background: var(--bcc-white);
+  color: var(--bcc-gray-900);
+  padding: 0.5rem;
+}
+
+/* Media queries específicas para o campo cidade */
+@media (max-width: 1200px) {
+  .clients-filter-control[name="f_cidade"] {
+    min-width: 160px;
+  }
+}
+
+@media (max-width: 992px) {
+  .clients-filter-control[name="f_cidade"] {
+    min-width: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .clients-filter-control[name="f_cidade"] {
+    min-width: 250px;
+  }
+}
+
 .clients-btn-apply {
   background: linear-gradient(135deg, var(--bcc-blue), var(--bcc-blue-light));
   color: var(--bcc-white);
   border: none;
-  padding: var(--space-2) var(--space-4);
+  padding: var(--space-3) var(--space-6);
   border-radius: var(--radius-md);
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
   transition: all var(--transition-normal);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   display: flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: var(--space-2);
   justify-content: center;
-  min-width: 120px;
-  height: 36px;
+  width: 100%;
+  min-height: 48px;
 }
 
 .clients-btn-apply:hover {
@@ -593,7 +691,7 @@
   }
   
   .clients-filters-grid {
-    grid-template-columns: auto auto 1fr 1.5fr 1fr 1fr 1fr auto;
+    grid-template-columns: auto auto 1fr 1.5fr 1fr 1.5fr 1fr 1fr auto;
     gap: var(--space-2);
   }
   
