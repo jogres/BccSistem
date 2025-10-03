@@ -2,7 +2,7 @@
 // app/config/interesses.php
 return[
   'Imoveis',
-  'Carro',
+  'Carros',
   'Motos',
   'Serviços',
   'Eletrodomésticos',
