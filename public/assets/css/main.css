@@ -24,6 +24,8 @@
   padding: var(--space-4) var(--space-6);
   max-width: 1280px;
   margin: 0 auto;
+  position: relative;
+  z-index: 100;
 }
 
 .navbar-nav {
@@ -40,6 +42,41 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
+}
+
+/* Backdrop para menu mobile (fica abaixo do header) */
+.nav-backdrop {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  background: rgba(0,0,0,0.12);
+  backdrop-filter: brightness(0.98) blur(2px);
+  -webkit-backdrop-filter: brightness(0.98) blur(2px);
+  z-index: 90;
+  transition: background var(--transition-normal);
+}
+
+.nav-backdrop.is-open { display: block; }
+
+/* Toggle do menu (hamburger) */
+.navbar-toggle {
+  display: none;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  background: var(--gray-50);
+  color: var(--gray-800);
+  cursor: pointer;
+}
+
+.navbar-toggle:focus {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 2px;
 }
 
 /* ---------- LAYOUT PRINCIPAL ---------- */
@@ -338,7 +375,18 @@
   
   .navbar-nav {
     gap: var(--space-4);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transition: max-height var(--transition-normal), opacity var(--transition-normal);
   }
+  .navbar-nav.is-open { max-height: 1000px; opacity: 1; pointer-events: auto; }
+  .navbar-toggle { display: inline-flex; align-self: flex-end; }
   
   .stats-grid {
     grid-template-columns: 1fr;
@@ -458,6 +506,12 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Bloqueio de scroll quando o menu está aberto */
+body.no-scroll {
+  overflow: hidden;
+  height: 100vh;
 }
 
 /* Alto contraste */

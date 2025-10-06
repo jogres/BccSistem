@@ -27,9 +27,10 @@ $user = Auth::user();
       <a href="<?= e(base_url('dashboard.php')) ?>" class="navbar-brand">
         🏢 Brasil Center Cred
       </a>
+      <button class="navbar-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" onclick="(function(btn){var nav=document.getElementById('primary-nav');var backdrop=document.getElementById('nav-backdrop');var open=nav.classList.toggle('is-open');btn.setAttribute('aria-expanded', open);if(backdrop){backdrop.classList.toggle('is-open', open);}document.body.classList.toggle('no-scroll', open);if(open){var first=nav.querySelector('a'); if(first) first.focus();}document.onkeydown=function(e){if(e.key==='Escape'){nav.classList.remove('is-open'); if(backdrop){backdrop.classList.remove('is-open');} document.body.classList.remove('no-scroll'); btn.setAttribute('aria-expanded','false');}}})(this)">☰ Menu</button>
       
       <?php if ($user): ?>
-        <nav class="navbar-nav">
+        <nav id="primary-nav" class="navbar-nav" onclick="event.stopPropagation()">
           <a href="<?= e(base_url('dashboard.php')) ?>" class="nav-link">
             📊 Dashboard
           </a>
@@ -62,6 +63,7 @@ $user = Auth::user();
         </nav>
       <?php endif; ?>
     </div>
+      <div id="nav-backdrop" class="nav-backdrop" onclick="(function(){var nav=document.getElementById('primary-nav');var btn=document.querySelector('.navbar-toggle');nav.classList.remove('is-open');document.body.classList.remove('no-scroll');if(btn){btn.setAttribute('aria-expanded','false');}})()"></div>
   </header>
   
   <main class="main-container">
