@@ -884,6 +884,7 @@ textarea.form-control {
   flex-wrap: wrap;
   gap: var(--space-4);
   align-items: center;
+  flex-direction: column;
 }
 
 .mt-3 { margin-top: var(--space-4); }
