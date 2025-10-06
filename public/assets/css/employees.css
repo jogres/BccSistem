@@ -69,6 +69,7 @@
   display: flex;
   gap: var(--space-3);
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .btn-new-employee {
@@ -475,7 +476,7 @@
   }
   
   .employees-table {
-    min-width: 800px;
+    min-width: 720px;
   }
   
   .employees-table th,
@@ -491,6 +492,7 @@
   .employee-actions {
     flex-direction: column;
     gap: var(--space-1);
+    align-items: stretch;
   }
 }
 

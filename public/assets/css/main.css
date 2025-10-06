@@ -4,14 +4,15 @@
    ======================================== */
 
 /* Importar sistemas de design */
-@import url('bcc-brand.css');
+/* Carregar correções legadas antes do tema para evitar sobrescritas indesejadas */
 @import url('fixes.css');
+@import url('bcc-brand.css');
 @import url('filters-compact.css');
 @import url('forms.css');
 @import url('dashboard.css');
 @import url('employees.css');
-@import url('clients.css');
 @import url('clients-fix.css');
+@import url('clients.css');
 
 /* ---------- COMPONENTES ESPECÍFICOS DO SISTEMA ---------- */
 

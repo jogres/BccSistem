@@ -509,6 +509,7 @@ select.clients-filter-control {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.875rem;
+  table-layout: auto;
 }
 
 .clients-table thead {
@@ -691,6 +692,7 @@ select.clients-filter-control {
   }
   
   .clients-filters-grid {
+    display: grid;
     grid-template-columns: auto auto 1fr 1.5fr 1fr 1.5fr 1fr 1fr auto;
     gap: var(--space-2);
   }
@@ -702,6 +704,7 @@ select.clients-filter-control {
 
 @media (max-width: 992px) {
   .clients-filters-grid {
+    display: grid;
     grid-template-columns: 1fr;
     gap: var(--space-3);
   }
@@ -752,7 +755,7 @@ select.clients-filter-control {
   }
   
   .clients-table {
-    min-width: 800px;
+    min-width: 720px;
   }
   
   .clients-table th,
@@ -768,6 +771,7 @@ select.clients-filter-control {
   .client-actions {
     flex-direction: column;
     gap: var(--space-1);
+    align-items: stretch;
   }
 }
 

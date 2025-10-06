@@ -62,8 +62,8 @@ include __DIR__ . '/../../app/views/partials/header.php';
   <div class="form-container">
     <!-- Cabeçalho do formulário -->
     <div class="form-header">
-      <h1 class="form-title">✏️ Editar Funcionário</h1>
-      <p class="form-subtitle">Editando dados de: <strong><?= e($func['nome']) ?></strong></p>
+      <h1 class="form-title text-balance leading-tight">✏️ Editar Funcionário</h1>
+      <p class="form-subtitle hyphens leading-relaxed line-clamp-2">Editando dados de: <strong><?= e($func['nome']) ?></strong></p>
     </div>
 
     <!-- Erros de validação -->

@@ -101,7 +101,7 @@
 /* Linhas do formulário melhoradas */
 .form-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: var(--space-4);
   margin-bottom: var(--space-4);
   align-items: end;
@@ -111,13 +111,9 @@
   grid-template-columns: 1fr;
 }
 
-.form-row.double {
-  grid-template-columns: 1fr 1fr;
-}
+.form-row.double { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
 
-.form-row.triple {
-  grid-template-columns: 1fr 1fr 1fr;
-}
+.form-row.triple { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 
 /* Campos do formulário */
 .form-group {

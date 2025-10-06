@@ -24,8 +24,8 @@ $inactiveFuncs = $totalFuncs - $activeFuncs;
     <!-- Cabeçalho -->
     <div class="employees-header">
       <div>
-        <h1 class="employees-title">🧑‍💼 Funcionários</h1>
-        <p class="employees-subtitle">Gestão completa da equipe</p>
+        <h1 class="employees-title text-balance leading-tight">🧑‍💼 Funcionários</h1>
+        <p class="employees-subtitle hyphens leading-relaxed line-clamp-2">Gestão completa da equipe</p>
       </div>
       <div class="employees-actions">
         <a class="btn-new-employee" href="<?= e(base_url('funcionarios/create.php')) ?>">
@@ -93,13 +93,13 @@ $inactiveFuncs = $totalFuncs - $activeFuncs;
             <tr class="<?= ((int)$f['is_ativo']===0 ? 'row-muted' : '') ?>">
               <td><?= (int)$f['id'] ?></td>
               <td>
-                <div class="employee-name"><?= e($f['nome']) ?></div>
+                <div class="employee-name hyphens line-clamp-2"><?= e($f['nome']) ?></div>
               </td>
               <td>
-                <span class="employee-login"><?= e($f['login']) ?></span>
+                <span class="employee-login hyphens line-clamp-2"><?= e($f['login']) ?></span>
               </td>
               <td>
-                <span class="badge-employee-role"><?= e($f['role_name']) ?></span>
+                <span class="badge-employee-role hyphens line-clamp-2"><?= e($f['role_name']) ?></span>
               </td>
               <td>
                 <?php if ((int)$f['is_ativo']===1): ?>

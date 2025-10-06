@@ -18,15 +18,15 @@ include __DIR__ . '/../app/views/partials/header.php';
 ?>
 
 <div class="page-header">
-  <h1 class="page-title">📊 Dashboard Analytics</h1>
-  <p class="page-subtitle">Visão geral da performance e métricas do sistema</p>
+  <h1 class="page-title text-balance leading-tight">📊 Dashboard Analytics</h1>
+  <p class="page-subtitle hyphens leading-relaxed line-clamp-2">Visão geral da performance e métricas do sistema</p>
 </div>
 
 <!-- Sistema de Filtros Compacto -->
 <div class="filters-container">
   <div class="filters-header">
-    <h3>🔧 Filtros e Configurações</h3>
-    <div class="filters-actions">
+    <h3 class="text-balance">🔧 Filtros e Configurações</h3>
+    <div class="filters-actions sm:stack">
       <button type="button" class="btn-secondary-compact" onclick="resetFilters()">
         🔄 Resetar
       </button>
@@ -167,7 +167,7 @@ include __DIR__ . '/../app/views/partials/header.php';
 <!-- Container do Gráfico Moderno -->
 <div class="card">
   <div class="chart-header">
-    <h3>📊 Performance Analytics</h3>
+    <h3 class="text-balance">📊 Performance Analytics</h3>
     <div class="chart-controls">
       <div class="control-group">
         <button type="button" class="control-btn active" onclick="toggleLegend()" title="Mostrar/Ocultar Legenda">

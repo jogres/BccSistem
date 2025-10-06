@@ -38,8 +38,8 @@ include __DIR__ . '/../../app/views/partials/header.php';
   <div class="form-container">
     <!-- Cabeçalho do formulário -->
     <div class="form-header">
-      <h1 class="form-title">👥 Novo Funcionário</h1>
-      <p class="form-subtitle">Cadastre um novo funcionário no sistema</p>
+      <h1 class="form-title text-balance leading-tight">👥 Novo Funcionário</h1>
+      <p class="form-subtitle hyphens leading-relaxed line-clamp-2">Cadastre um novo funcionário no sistema</p>
     </div>
 
     <!-- Erros de validação -->

@@ -103,8 +103,8 @@ $totalClients = $total;
     <!-- Cabeçalho -->
     <div class="clients-header">
       <div>
-        <h1 class="clients-title">👥 Clientes</h1>
-        <p class="clients-subtitle">Gestão completa do portfólio de clientes</p>
+        <h1 class="clients-title text-balance leading-tight">👥 Clientes</h1>
+        <p class="clients-subtitle hyphens leading-relaxed line-clamp-2">Gestão completa do portfólio de clientes</p>
       </div>
       <div class="clients-actions">
         <a class="btn-new-client" href="<?= e(base_url('clientes/create.php')) ?>">
@@ -145,7 +145,7 @@ $totalClients = $total;
     <!-- Sistema de Filtros Melhorado -->
     <div class="clients-filters-container">
       <div class="clients-filters-header">
-        <h3>🔍 Filtros de Busca</h3>
+        <h3 class="text-balance">🔍 Filtros de Busca</h3>
       </div>
       
       <form class="clients-filters-body" method="get">
@@ -256,14 +256,14 @@ $totalClients = $total;
             <tr>
               <td><?= (int)$r['id'] ?></td>
               <td>
-                <div class="client-name"><?= e($r['nome']) ?></div>
+                <div class="client-name hyphens line-clamp-2"><?= e($r['nome']) ?></div>
               </td>
               <td>
                 <span class="client-phone"><?= e($r['telefone']) ?></span>
               </td>
               <td>
                 <div class="client-location">
-                  <span class="client-city"><?= e($r['cidade']) ?></span>
+                  <span class="client-city hyphens line-clamp-2"><?= e($r['cidade']) ?></span>
                 </div>
               </td>
               <td>
@@ -271,7 +271,7 @@ $totalClients = $total;
               </td>
               <td>
                 <?php if ($r['interesse']): ?>
-                  <span class="badge-client-interest"><?= e($r['interesse']) ?></span>
+                  <span class="badge-client-interest hyphens line-clamp-2"><?= e($r['interesse']) ?></span>
                 <?php else: ?>
                   <span style="color: var(--bcc-gray-400); font-style: italic;">-</span>
                 <?php endif; ?>

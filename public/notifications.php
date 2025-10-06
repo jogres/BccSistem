@@ -30,7 +30,7 @@ include __DIR__ . '/../app/views/partials/header.php';
 ?>
 <div class="card">
   <div class="cluster" style="justify-content:space-between; align-items:center">
-    <h1>🔔 Notificações</h1>
+    <h1 class="text-balance leading-tight">🔔 Notificações</h1>
     <?php if ($unreadCount > 0): ?>
       <button class="btn secondary" onclick="markAllAsRead()">
         Marcar todas como lidas (<?= $unreadCount ?>)
@@ -49,12 +49,12 @@ include __DIR__ . '/../app/views/partials/header.php';
              data-id="<?= $notification['id'] ?>">
           <div class="notification-content">
             <div class="notification-header">
-              <h4 class="notification-title"><?= e($notification['title']) ?></h4>
+              <h4 class="notification-title text-balance line-clamp-2"><?= e($notification['title']) ?></h4>
               <span class="notification-time">
                 <?= date('d/m/Y H:i', strtotime($notification['created_at'])) ?>
               </span>
             </div>
-            <p class="notification-message"><?= e($notification['message']) ?></p>
+            <p class="notification-message hyphens line-clamp-3"><?= e($notification['message']) ?></p>
             <?php if ($notification['action_url']): ?>
               <a href="<?= e($notification['action_url']) ?>" class="notification-action">
                 Ver detalhes →
