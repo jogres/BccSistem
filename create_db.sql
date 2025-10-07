@@ -225,6 +225,21 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
+-- Estrutura para tabela `password_resets`
+--
+
+CREATE TABLE `password_resets` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `funcionario_id` bigint(20) UNSIGNED NOT NULL,
+  `token` varchar(64) NOT NULL,
+  `expira_em` timestamp NOT NULL,
+  `usado` tinyint(1) NOT NULL DEFAULT 0,
+  `criado_em` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estrutura para tabela `roles`
 --
 
@@ -304,6 +319,16 @@ ALTER TABLE `funcionarios`
   ADD KEY `fk_func_role` (`role_id`);
 
 --
+-- Índices de tabela `password_resets`
+--
+ALTER TABLE `password_resets`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_token` (`token`),
+  ADD KEY `idx_funcionario_id` (`funcionario_id`),
+  ADD KEY `idx_expira_em` (`expira_em`),
+  ADD KEY `idx_usado` (`usado`);
+
+--
 -- Índices de tabela `roles`
 --
 ALTER TABLE `roles`
@@ -333,6 +358,12 @@ ALTER TABLE `funcionarios`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
+-- AUTO_INCREMENT de tabela `password_resets`
+--
+ALTER TABLE `password_resets`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- Restrições para tabelas despejadas
 --
 
@@ -354,6 +385,12 @@ ALTER TABLE `clientes`
 --
 ALTER TABLE `funcionarios`
   ADD CONSTRAINT `fk_func_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON UPDATE CASCADE;
+
+--
+-- Restrições para tabelas `password_resets`
+--
+ALTER TABLE `password_resets`
+  ADD CONSTRAINT `fk_password_resets_funcionario` FOREIGN KEY (`funcionario_id`) REFERENCES `funcionarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
