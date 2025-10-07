@@ -50,47 +50,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $resetData) {
 
 include __DIR__ . '/../app/views/partials/header.php';
 ?>
-<div class="card" style="max-width:420px;margin:40px auto;">
-  <h1>Redefinir Senha</h1>
-  
-  <?php if ($message): ?>
-    <div class="notice success"><?= e($message) ?>
-      <br><small>Redirecionando para o login...</small>
+<div class="login-container">
+  <div class="card" style="max-width: 500px; width: 100%;">
+    <div class="card-header" style="text-align: center;">
+      <h1 class="card-title">🔐 Redefinir Senha</h1>
     </div>
-  <?php endif; ?>
-  
-  <?php if ($error): ?>
-    <div class="notice error"><?= e($error) ?></div>
-  <?php endif; ?>
-  
-  <?php if ($resetData && !$message): ?>
-    <p>Olá, <strong><?= e($resetData['nome']) ?></strong>!</p>
-    <p>Digite sua nova senha:</p>
     
-    <form method="post">
-      <?= CSRF::field() ?>
-      <div class="form-row">
-        <div class="col">
-          <label>Nova Senha</label>
-          <input class="form-control" type="password" name="password" required 
-                 minlength="8" placeholder="Mínimo 8 caracteres">
+    <div class="card-body">
+      <?php if ($message): ?>
+        <div class="notice notice-success" style="text-align: center;">
+          <strong>✅ Sucesso!</strong><br>
+          <?= e($message) ?>
+          <br><small style="color: var(--bcc-gray-600);">Redirecionando para o login...</small>
         </div>
-      </div>
-      <div class="form-row">
-        <div class="col">
-          <label>Confirmar Senha</label>
-          <input class="form-control" type="password" name="confirm_password" required 
-                 minlength="8">
+      <?php endif; ?>
+      
+      <?php if ($error): ?>
+        <div class="notice notice-error" style="text-align: center;">
+          <strong>❌ Erro!</strong><br>
+          <?= e($error) ?>
         </div>
+      <?php endif; ?>
+      
+      <?php if ($resetData && !$message): ?>
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+          <p style="font-size: var(--fs-16); color: var(--bcc-gray-700);">
+            Olá, <strong><?= e($resetData['nome']) ?></strong>! 👋
+          </p>
+          <p style="color: var(--bcc-gray-600); margin-top: 0.5rem;">
+            Digite sua nova senha abaixo:
+          </p>
+        </div>
+        
+        <form method="post">
+          <?= CSRF::field() ?>
+          
+          <div class="form-group">
+            <label class="form-label" for="password">🔑 Nova Senha</label>
+            <input class="form-control" type="password" id="password" name="password" required 
+                   minlength="8" placeholder="Mínimo 8 caracteres">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="confirm_password">🔑 Confirmar Senha</label>
+            <input class="form-control" type="password" id="confirm_password" name="confirm_password" required 
+                   minlength="8" placeholder="Digite a senha novamente">
+          </div>
+          
+          <div style="text-align: center; margin-top: 1.5rem;">
+            <button class="btn btn-primary" type="submit" style="min-width: 200px;">
+              ✅ Redefinir Senha
+            </button>
+          </div>
+        </form>
+      <?php endif; ?>
+      
+      <div style="margin-top: 1.5rem; text-align: center; padding-top: 1rem; border-top: 1px solid var(--bcc-gray-300);">
+        <a class="btn btn-secondary" href="<?= e(base_url('login.php')) ?>">
+          ← Voltar ao Login
+        </a>
       </div>
-      <div style="margin-top:12px">
-        <button class="btn" type="submit">Redefinir Senha</button>
-      </div>
-    </form>
-  <?php endif; ?>
-  
-  <div style="margin-top:16px; text-align:center">
-    <a href="<?= e(base_url('login.php')) ?>">← Voltar ao Login</a>
+    </div>
   </div>
 </div>
 <?php include __DIR__ . '/../app/views/partials/footer.php'; ?>

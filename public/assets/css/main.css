@@ -514,6 +514,139 @@ body.no-scroll {
   height: 100vh;
 }
 
+/* ========================================
+   Página de Recuperação de Senha
+   ======================================== */
+
+.reset-link-display {
+  max-width: 600px;
+  width: 100%;
+  margin: 2rem auto 0;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--bcc-blue);
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+}
+
+.reset-link-display h3 {
+  color: var(--bcc-blue);
+  margin-bottom: 1rem;
+  font-size: var(--fs-20);
+}
+
+.reset-link-display p {
+  color: var(--bcc-gray-700);
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.reset-url {
+  background: white;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--bcc-gray-300);
+  margin: 1.5rem 0;
+  font-family: 'Courier New', monospace;
+  font-size: var(--fs-13);
+  color: var(--bcc-blue);
+  word-break: break-all;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.reset-url:hover {
+  background: var(--bcc-gray-50);
+  border-color: var(--bcc-blue);
+}
+
+.copy-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--bcc-blue), var(--bcc-blue-dark));
+  color: white;
+  padding: 0.875rem 2rem;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--fs-15);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-md);
+}
+
+.copy-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.copy-btn:active {
+  transform: translateY(0);
+}
+
+.copy-success {
+  display: none;
+  background: #10b981;
+  color: white;
+  padding: 0.875rem 2rem;
+  border-radius: var(--radius-md);
+  font-size: var(--fs-15);
+  font-weight: 600;
+  margin-top: 1rem;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Link direto clicável */
+.reset-link-display .direct-link {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--bcc-green);
+  color: white;
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-sm);
+}
+
+.reset-link-display .direct-link:hover {
+  background: var(--bcc-green-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .reset-link-display {
+    padding: 1.5rem;
+    margin: 1.5rem 1rem 0;
+  }
+  
+  .reset-url {
+    font-size: var(--fs-12);
+    padding: 0.875rem;
+  }
+  
+  .copy-btn,
+  .copy-success {
+    width: 100%;
+    padding: 1rem;
+  }
+}
+
 /* Alto contraste */
 @media (prefers-contrast: high) {
   :root {
