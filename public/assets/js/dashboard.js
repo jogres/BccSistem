@@ -180,57 +180,150 @@ document.addEventListener('DOMContentLoaded', function () {
     return `${fmt(start)} – ${fmt(end)}`;
   }
 
-  // ---------- Parsing/formatadores (rótulos “amigáveis”) ----------
+  // ---------- Parsing/formatadores (rótulos "amigáveis") ----------
   // Esperado do backend: 'YYYY-W##' | 'YYYY-MM' | 'YYYY-MM-DD'
   function parsePeriod(raw) {
-    if (/^\d{4}-W(\d{1,2})$/.test(raw)) {
-      const m = raw.match(/^(\d{4})-W(\d{1,2})$/);
-      return { type: 'week', year: +m[1], week: +m[2] };
+    // Garantir que raw é uma string
+    const rawStr = String(raw || '');
+    
+    // Formato semana: YYYY-Wxx ou YYYY-Wx (com ou sem zero à esquerda)
+    if (/^\d{4}-W\d{1,2}$/.test(rawStr)) {
+      const m = rawStr.match(/^(\d{4})-W(\d{1,2})$/);
+      if (m) {
+        return { type: 'week', year: +m[1], week: +m[2] };
+      }
     }
-    if (/^\d{4}-\d{2}$/.test(raw)) {
-      const [y, mo] = raw.split('-').map(Number);
-      return { type: 'month', year: y, month: mo };
+    
+    // Formato mês: YYYY-MM
+    if (/^\d{4}-\d{2}$/.test(rawStr)) {
+      const parts = rawStr.split('-');
+      if (parts.length === 2) {
+        const y = parseInt(parts[0], 10);
+        const mo = parseInt(parts[1], 10);
+        if (!isNaN(y) && !isNaN(mo)) {
+          return { type: 'month', year: y, month: mo };
+        }
+      }
     }
-    if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
-      const [y, mo, d] = raw.split('-').map(Number);
-      return { type: 'day', year: y, month: mo, day: d };
+    
+    // Formato dia: YYYY-MM-DD
+    if (/^\d{4}-\d{2}-\d{2}$/.test(rawStr)) {
+      const parts = rawStr.split('-');
+      if (parts.length === 3) {
+        const y = parseInt(parts[0], 10);
+        const mo = parseInt(parts[1], 10);
+        const d = parseInt(parts[2], 10);
+        if (!isNaN(y) && !isNaN(mo) && !isNaN(d)) {
+          return { type: 'day', year: y, month: mo, day: d };
+        }
+      }
     }
-    return { type: 'raw', raw };
+    
+    return { type: 'raw', raw: rawStr };
   }
   function prettyForAxis(raw, groupMode) {
-    if (groupMode === 'user') return raw; // eixo mostra nomes
+    if (groupMode === 'user') return String(raw); // eixo mostra nomes
+    
     const p = parsePeriod(raw);
-    if (p.type === 'week')  return `${p.year}-SEMANA`;
-    if (p.type === 'month') return `${p.year}-MÊS`;
-    if (p.type === 'day')   return `${p.year}-DIA`;
-    return raw;
+    
+    if (p.type === 'week') {
+      const weekNum = String(p.week).padStart(2, '0');
+      return `Sem ${weekNum}/${p.year}`;
+    }
+    if (p.type === 'month') {
+      const monthNum = String(p.month).padStart(2, '0');
+      return `${monthNum}/${p.year}`;
+    }
+    if (p.type === 'day') {
+      const dayNum = String(p.day).padStart(2, '0');
+      const monthNum = String(p.month).padStart(2, '0');
+      return `${dayNum}/${monthNum}`;
+    }
+    
+    return String(raw);
   }
   function prettyForTooltipTitle(raw, groupMode) {
     const p = parsePeriod(raw);
-    if (groupMode === 'user') return `Usuário: ${raw}`;
-    if (p.type === 'week')  return `Semana ${p.week} (${isoWeekRangeStr(p.year, p.week)})`;
-    if (p.type === 'month') return `Mês ${String(p.month).padStart(2,'0')}/${p.year}`;
-    if (p.type === 'day')   return `Dia ${String(p.day).padStart(2,'0')}/${String(p.month).padStart(2,'0')}/${p.year}`;
-    return raw;
+    
+    if (groupMode === 'user') {
+      return `Usuário: ${String(raw)}`;
+    }
+    
+    if (p.type === 'week') {
+      const weekNum = String(p.week).padStart(2, '0');
+      try {
+        const dateRange = isoWeekRangeStr(p.year, p.week);
+        return `Semana ${weekNum} de ${p.year} (${dateRange})`;
+      } catch (e) {
+        console.warn('Erro ao formatar range de semana:', e);
+        return `Semana ${weekNum}/${p.year}`;
+      }
+    }
+    
+    if (p.type === 'month') {
+      const monthNum = String(p.month).padStart(2, '0');
+      const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      const monthName = monthNames[p.month - 1] || monthNum;
+      return `${monthName}/${p.year}`;
+    }
+    
+    if (p.type === 'day') {
+      const dayNum = String(p.day).padStart(2, '0');
+      const monthNum = String(p.month).padStart(2, '0');
+      return `${dayNum}/${monthNum}/${p.year}`;
+    }
+    
+    return String(raw);
   }
 
   // ---------- API ----------
   async function fetchData() {
     const params = new URLSearchParams(new FormData(form));
     
+    console.log('📡 Buscando dados da API...', params.toString());
+    
     // NUNCA apague users[] — preserva seleção e evita cair em TOTAL involuntário
     const res = await fetch('api/dashboard_counts.php?' + params.toString(), { cache: 'no-store' });
-    if (!res.ok) throw new Error('Falha ao consultar a API.');
+    
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error('❌ Erro na resposta da API:', res.status, errorText);
+      throw new Error('Falha ao consultar a API.');
+    }
+    
     const json = await res.json();
-    if (!json.ok) throw new Error(json.error || 'Erro ao consultar a API.');
+    console.log('📊 Dados recebidos da API:', json);
+    
+    if (!json.ok) {
+      console.error('❌ API retornou erro:', json.error);
+      throw new Error(json.error || 'Erro ao consultar a API.');
+    }
+    
+    // Validar estrutura de dados
+    if (!json.labels || !json.series) {
+      console.error('❌ Estrutura de dados inválida:', json);
+      throw new Error('Estrutura de dados inválida recebida da API.');
+    }
     
     return json; // {mode,start,end,labels,series}
   }
 
   // ---------- Transformação p/ barras com cor por funcionário ----------
   function transformForBar(json) {
+    console.log('🔄 Transformando dados para o gráfico...');
+    
     const { labels: periodLabels, series } = json;
+    
+    // Validar labels
+    if (!Array.isArray(periodLabels)) {
+      console.error('❌ Labels inválidos:', periodLabels);
+      return { labels: [], datasets: [], groupBy: 'period' };
+    }
+    
+    console.log('📋 Labels recebidos:', periodLabels);
+    
     const entries = Object.entries(series || {}); // [['12',{name,data}], ...]
+    console.log('👥 Séries recebidas:', entries.length, 'usuário(s)');
 
     const wantCompare = !!(toggler && toggler.checked);
 
@@ -239,7 +332,11 @@ document.addEventListener('DOMContentLoaded', function () {
       const totals = (periodLabels || []).map((_, i) =>
         entries.reduce((acc, [,u]) => acc + Number(u.data[i] || 0), 0)
       );
-      const c = { border: 'hsl(208 70% 45%)', fill: 'hsl(208 70% 45% / .35)' };
+      // Usar cores em formato compatível com Canvas
+      const c = { 
+        border: '#2563eb', // Azul equivalente a hsl(208 70% 45%)
+        fill: 'rgba(37, 99, 235, 0.35)' // Mesma cor com transparência
+      };
       return {
         labels: periodLabels,
         datasets: [{
@@ -522,28 +619,92 @@ document.addEventListener('DOMContentLoaded', function () {
     if (colorStr.startsWith && colorStr.startsWith('#')) {
       // Para cores hex, converter para rgba
       const hex = colorStr.replace('#', '');
-      const r = parseInt(hex.substr(0, 2), 16);
-      const g = parseInt(hex.substr(2, 2), 16);
-      const b = parseInt(hex.substr(4, 2), 16);
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 16);
+      const b = parseInt(hex.substring(4, 6), 16);
       
-      startColor = `rgba(${r}, ${g}, ${b}, 0.4)`;
-      endColor = `rgba(${r}, ${g}, ${b}, 0.1)`;
-    } else if (colorStr.startsWith && colorStr.startsWith('hsl(')) {
-      // Para cores HSL, usar fallback simples
-      startColor = colorStr.replace(')', ', 0.4)').replace('hsl', 'hsla');
-      endColor = colorStr.replace(')', ', 0.1)').replace('hsl', 'hsla');
+      if (!isNaN(r) && !isNaN(g) && !isNaN(b)) {
+        startColor = `rgba(${r}, ${g}, ${b}, 0.4)`;
+        endColor = `rgba(${r}, ${g}, ${b}, 0.1)`;
+      } else {
+        startColor = 'rgba(59, 130, 246, 0.4)';
+        endColor = 'rgba(59, 130, 246, 0.1)';
+      }
+    } else if (colorStr.startsWith && (colorStr.startsWith('hsl(') || colorStr.startsWith('hsla('))) {
+      // Para cores HSL, converter para formato com vírgulas (compatível)
+      // Formato: hsl(h, s%, l%) ou hsl(h s% l%)
+      const hslMatch = colorStr.match(/hsla?\(([^)]+)\)/);
+      if (hslMatch) {
+        const values = hslMatch[1].split(/[\s,\/]+/).filter(v => v);
+        if (values.length >= 3) {
+          const h = values[0];
+          const s = values[1];
+          const l = values[2];
+          startColor = `hsla(${h}, ${s}, ${l}, 0.4)`;
+          endColor = `hsla(${h}, ${s}, ${l}, 0.1)`;
+        } else {
+          // Fallback se não conseguir parsear
+          startColor = 'rgba(59, 130, 246, 0.4)';
+          endColor = 'rgba(59, 130, 246, 0.1)';
+        }
+      } else {
+        startColor = 'rgba(59, 130, 246, 0.4)';
+        endColor = 'rgba(59, 130, 246, 0.1)';
+      }
     } else if (colorStr.startsWith && colorStr.startsWith('rgba(')) {
       // Para cores rgba, ajustar opacidade
-      startColor = colorStr.replace(/[\d\.]+\)$/, '0.4)');
-      endColor = colorStr.replace(/[\d\.]+\)$/, '0.1)');
+      const rgbaMatch = colorStr.match(/rgba?\(([^)]+)\)/);
+      if (rgbaMatch) {
+        const values = rgbaMatch[1].split(',').map(v => v.trim());
+        if (values.length >= 3) {
+          const r = values[0];
+          const g = values[1];
+          const b = values[2];
+          startColor = `rgba(${r}, ${g}, ${b}, 0.4)`;
+          endColor = `rgba(${r}, ${g}, ${b}, 0.1)`;
+        } else {
+          startColor = 'rgba(59, 130, 246, 0.4)';
+          endColor = 'rgba(59, 130, 246, 0.1)';
+        }
+      } else {
+        startColor = 'rgba(59, 130, 246, 0.4)';
+        endColor = 'rgba(59, 130, 246, 0.1)';
+      }
+    } else if (colorStr.startsWith && colorStr.startsWith('rgb(')) {
+      // Para cores rgb, adicionar opacidade
+      const rgbMatch = colorStr.match(/rgb\(([^)]+)\)/);
+      if (rgbMatch) {
+        const values = rgbMatch[1].split(',').map(v => v.trim());
+        if (values.length >= 3) {
+          const r = values[0];
+          const g = values[1];
+          const b = values[2];
+          startColor = `rgba(${r}, ${g}, ${b}, 0.4)`;
+          endColor = `rgba(${r}, ${g}, ${b}, 0.1)`;
+        } else {
+          startColor = 'rgba(59, 130, 246, 0.4)';
+          endColor = 'rgba(59, 130, 246, 0.1)';
+        }
+      } else {
+        startColor = 'rgba(59, 130, 246, 0.4)';
+        endColor = 'rgba(59, 130, 246, 0.1)';
+      }
     } else {
       // Fallback para cor padrão
       startColor = 'rgba(59, 130, 246, 0.4)';
       endColor = 'rgba(59, 130, 246, 0.1)';
     }
     
-    gradient.addColorStop(0, startColor);
-    gradient.addColorStop(1, endColor);
+    try {
+      gradient.addColorStop(0, startColor);
+      gradient.addColorStop(1, endColor);
+    } catch (e) {
+      console.error('Erro ao criar gradiente:', e, 'Cores:', startColor, endColor);
+      // Fallback seguro
+      gradient.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
+      gradient.addColorStop(1, 'rgba(59, 130, 246, 0.1)');
+    }
+    
     return gradient;
   }
 
@@ -589,16 +750,42 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // ---------- Fluxo ----------
   async function run() {
+    console.log('🚀 Iniciando renderização do dashboard...');
+    
     try {
-      if (errBox) { errBox.classList.add('hidden'); errBox.textContent = ''; }
+      if (errBox) { 
+        errBox.classList.add('hidden'); 
+        errBox.textContent = ''; 
+      }
+      
+      console.log('⏳ Buscando dados...');
       const json = await fetchData();
+      
+      console.log('🔧 Transformando dados...');
       const cfg  = transformForBar(json);
+      
+      console.log('📊 Renderizando gráfico...');
       renderChart(cfg, { mode: json.mode, start: json.start, end: json.end }, json.stats);
       
       // Atualizar estatísticas na interface se disponível
+      console.log('📈 Atualizando estatísticas...');
       updateStatsDisplay(json.stats);
+      
+      console.log('✅ Dashboard renderizado com sucesso!');
     } catch (e) {
-      if (errBox) { errBox.classList.remove('hidden'); errBox.textContent = e.message || 'Erro inesperado.'; }
+      console.error('❌ Erro ao renderizar dashboard:', e);
+      console.error('Stack trace:', e.stack);
+      
+      const errorMessage = e.message || 'Erro inesperado ao carregar o dashboard.';
+      
+      if (errBox) { 
+        errBox.classList.remove('hidden'); 
+        errBox.innerHTML = `
+          <strong>Erro:</strong> ${errorMessage}
+          <br>
+          <small>Verifique o console do navegador (F12) para mais detalhes.</small>
+        `;
+      }
     }
   }
 

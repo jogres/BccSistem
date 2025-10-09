@@ -84,8 +84,9 @@ try {
     // -------- Label por modo --------
     switch ($mode) {
         case 'week':
-            // ISO week: YEARWEEK(dt,3) => 'YYYY-W##'
-            $labelExpr = "CONCAT(YEARWEEK(c.created_at, 3) DIV 100, '-W', LPAD(YEARWEEK(c.created_at, 3) % 100, 2, '0'))";
+            // ISO week: formato 'YYYY-Wxx' (ex: 2025-W01)
+            // Usando DATE_FORMAT para consistência com Dashboard.php
+            $labelExpr = "DATE_FORMAT(c.created_at, '%x-W%v')";
             break;
         case 'day':
             $labelExpr = "DATE_FORMAT(c.created_at, '%Y-%m-%d')";
