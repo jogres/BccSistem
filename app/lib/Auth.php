@@ -71,14 +71,18 @@ class Auth
                 'role_name' => $user['role_name'],
             ];
             
-            // Log de login bem-sucedido
-            Logger::login(true, $login, $user['id']);
+            // Log de login bem-sucedido (se Logger estiver disponível)
+            if (class_exists('Logger')) {
+                Logger::login(true, $login, $user['id']);
+            }
             
             return true;
         } else {
-            // Log de login falhado
-            $reason = $user ? 'Senha incorreta' : 'Usuário não encontrado';
-            Logger::login(false, $login, null, $reason);
+            // Log de login falhado (se Logger estiver disponível)
+            if (class_exists('Logger')) {
+                $reason = $user ? 'Senha incorreta' : 'Usuário não encontrado';
+                Logger::login(false, $login, null, $reason);
+            }
         }
         return false;
     }
@@ -89,8 +93,8 @@ class Auth
     public static function logout(): void
     {
         if (session_status() === PHP_SESSION_ACTIVE) {
-            // Log do logout
-            if (isset($_SESSION['user'])) {
+            // Log do logout (se Logger estiver disponível)
+            if (isset($_SESSION['user']) && class_exists('Logger')) {
                 Logger::action('Logout realizado', $_SESSION['user']['id']);
             }
             
