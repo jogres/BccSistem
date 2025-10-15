@@ -217,12 +217,32 @@ select.form-control {
   }
 }
 
+/* Valores informativos (view mode) */
+.info-value {
+  padding: var(--space-3) var(--space-4);
+  background: var(--bcc-gray-50);
+  border: 1px solid var(--bcc-gray-200);
+  border-radius: var(--radius-md);
+  color: var(--bcc-gray-800);
+  font-size: 1rem;
+  font-weight: 500;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  transition: all var(--transition-fast);
+}
+
+.info-value:hover {
+  background: var(--bcc-gray-100);
+  border-color: var(--bcc-gray-300);
+}
+
 /* Botões específicos para formulários */
 .btn-save {
   background: linear-gradient(135deg, var(--bcc-green), var(--bcc-green-dark));
   color: var(--bcc-white);
   border: none;
-  padding: var(--space-3) var(--space-8);
+  padding: var(--space-3) var(--space-6);
   border-radius: var(--radius-lg);
   font-size: 1rem;
   font-weight: 700;
@@ -231,10 +251,11 @@ select.form-control {
   box-shadow: var(--shadow-md);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  min-width: 140px;
+  min-width: 160px;
+  min-height: 44px;
   justify-content: center;
   position: relative;
   overflow: hidden;
@@ -257,10 +278,10 @@ select.form-control {
 }
 
 .btn-cancel {
-  background: linear-gradient(135deg, var(--bcc-red), var(--bcc-red-dark));
-  color: var(--bcc-white);
+  background: linear-gradient(135deg, var(--bcc-red), var(--bcc-red-dark)) !important;
+  color: var(--bcc-white) !important;
   border: none;
-  padding: var(--space-3) var(--space-8);
+  padding: var(--space-3) var(--space-6);
   border-radius: var(--radius-lg);
   font-size: 1rem;
   font-weight: 700;
@@ -269,10 +290,11 @@ select.form-control {
   box-shadow: var(--shadow-md);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  min-width: 140px;
+  min-width: 160px;
+  min-height: 44px;
   justify-content: center;
   text-decoration: none;
   position: relative;
@@ -285,10 +307,10 @@ select.form-control {
 }
 
 .btn-cancel:hover {
-  background: linear-gradient(135deg, var(--bcc-red-dark), var(--bcc-red));
+  background: linear-gradient(135deg, var(--bcc-red-dark), var(--bcc-red)) !important;
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
-  color: var(--bcc-white);
+  color: var(--bcc-white) !important;
   text-decoration: none;
 }
 

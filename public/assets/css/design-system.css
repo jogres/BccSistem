@@ -277,7 +277,8 @@ a:hover {
   text-decoration: none;
 }
 
-.btn-danger {
+/* .btn-danger movido para clients.css para consistência com o design BCC */
+/* .btn-danger {
   background-color: var(--error-500);
   color: white;
   border-color: var(--error-500);
@@ -288,7 +289,7 @@ a:hover {
   border-color: var(--error-600);
   color: white;
   text-decoration: none;
-}
+} */
 
 /* Tamanhos de Botões */
 .btn-sm {

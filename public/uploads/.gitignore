@@ -1,0 +1,7 @@
+# Ignorar todos os arquivos de upload
+contratos/*
+
+# Mas manter a estrutura de diretórios
+!contratos/.gitkeep
+!.gitignore
+

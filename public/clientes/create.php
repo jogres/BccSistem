@@ -2,6 +2,7 @@
 require __DIR__.'/../../app/lib/Database.php';
 require __DIR__.'/../../app/lib/Auth.php';
 require __DIR__.'/../../app/lib/Helpers.php';
+require __DIR__.'/../../app/lib/Logger.php';
 require __DIR__.'/../../app/lib/Request.php';
 require __DIR__.'/../../app/lib/CSRF.php';
 require __DIR__.'/../../app/middleware/require_login.php';
@@ -34,6 +35,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'estado'     => $estado,
             'interesse'  => $interesse,
             'criado_por' => $user['id'],
+        ]);
+        
+        // Log da criação
+        Logger::crud('CREATE', 'clientes', $id, $user['id'], [
+            'nome' => $nome,
+            'telefone' => $telefone,
+            'cidade' => $cidade,
+            'interesse' => $interesse
         ]);
         
         // Notificar administradores sobre novo cliente

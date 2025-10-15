@@ -46,6 +46,8 @@ class Auth
      */
     public static function login(string $login, string $password): bool
     {
+        require_once __DIR__ . '/Logger.php';
+        
         $pdo = Database::getConnection();
         $sql = "SELECT f.*, r.nome AS role_name
                   FROM funcionarios f
@@ -69,13 +71,14 @@ class Auth
                 'role_name' => $user['role_name'],
             ];
             
-            // Registrar login bem-sucedido
-            self::recordLoginAttempt($login, $_SERVER['REMOTE_ADDR'] ?? '', true);
+            // Log de login bem-sucedido
+            Logger::login(true, $login, $user['id']);
             
             return true;
         } else {
-            // Registrar tentativa falhada
-            self::recordLoginAttempt($login, $_SERVER['REMOTE_ADDR'] ?? '', false);
+            // Log de login falhado
+            $reason = $user ? 'Senha incorreta' : 'Usuário não encontrado';
+            Logger::login(false, $login, null, $reason);
         }
         return false;
     }
@@ -86,6 +89,11 @@ class Auth
     public static function logout(): void
     {
         if (session_status() === PHP_SESSION_ACTIVE) {
+            // Log do logout
+            if (isset($_SESSION['user'])) {
+                Logger::action('Logout realizado', $_SESSION['user']['id']);
+            }
+            
             // Limpa dados
             $_SESSION = [];
 

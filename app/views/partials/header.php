@@ -39,6 +39,9 @@ $user = Auth::user();
           <a href="<?= e(base_url('clientes/index.php')) ?>" class="nav-link">
             👥 Clientes
           </a>
+          <a href="<?= e(base_url('vendas/index.php')) ?>" class="nav-link">
+            🛒 Vendas
+          </a>
           <?php if (Auth::isAdmin()): ?>
             <a href="<?= e(base_url('funcionarios/index.php')) ?>" class="nav-link">
               🧑‍💼 Funcionários
@@ -57,6 +60,12 @@ $user = Auth::user();
               <span class="badge"><?= $unreadCount ?></span>
             <?php endif; ?>
           </a>
+
+          <?php if (Auth::isAdmin()): ?>
+            <a href="<?= e(base_url('logs.php')) ?>" class="nav-link">
+              📋 Logs
+            </a>
+          <?php endif; ?>
 
           <span class="nav-link">👋 Olá, <?= e($user['nome']) ?></span>
           <a href="<?= e(base_url('logout.php')) ?>" class="nav-link">

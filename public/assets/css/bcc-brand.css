@@ -84,6 +84,11 @@ body::before {
   --bcc-green-dark: #009653;
   --bcc-green-bg: #f0fdf8;
   
+  --bcc-red: #ef4444;
+  --bcc-red-light: #f87171;
+  --bcc-red-dark: #dc2626;
+  --bcc-red-bg: #fef2f2;
+  
   /* Neutros para equilíbrio */
   --bcc-gray-50: #f8fafc;
   --bcc-gray-100: #f1f5f9;
@@ -549,8 +554,8 @@ textarea.form-control {
   color: var(--bcc-white);
 }
 
-/* Botão de Perigo */
-.btn-danger {
+/* Botão de Perigo - movido para clients.css para consistência */
+/* .btn-danger {
   background: linear-gradient(135deg, #ef4444, #f87171);
   color: var(--bcc-white);
   border: 2px solid #ef4444;
@@ -560,7 +565,7 @@ textarea.form-control {
   background: linear-gradient(135deg, #dc2626, #ef4444);
   border-color: #dc2626;
   color: var(--bcc-white);
-}
+} */
 
 /* Botões Compactos */
 .btn-sm {
@@ -1300,8 +1305,8 @@ textarea.form-control {
   background: var(--bcc-white);
   color: var(--bcc-gray-700);
   border: 2px solid var(--bcc-gray-300);
-  padding: 0.625rem 1.25rem;
-  border-radius: 8px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
@@ -1310,8 +1315,9 @@ textarea.form-control {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: var(--space-2);
   text-decoration: none;
-  min-height: 40px;
+  min-height: 36px;
 }
 
 .btn-secondary-compact:hover {
