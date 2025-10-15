@@ -43,6 +43,41 @@ final class Cliente {
         ]);
     }
 
+    /**
+     * Atualiza apenas campos específicos do cliente
+     * @param int $id ID do cliente
+     * @param array $fields Array associativo com os campos a atualizar (ex: ['nome' => 'João'])
+     * @return void
+     */
+    public static function updateFields(int $id, array $fields): void {
+        if (empty($fields)) {
+            return;
+        }
+
+        $pdo = Database::getConnection();
+        
+        // Construir dinamicamente a query com apenas os campos fornecidos
+        $setClauses = [];
+        $params = [':id' => $id];
+        
+        $allowedFields = ['nome', 'telefone', 'cidade', 'estado', 'interesse'];
+        
+        foreach ($fields as $field => $value) {
+            if (in_array($field, $allowedFields, true)) {
+                $setClauses[] = "$field = :$field";
+                $params[":$field"] = $value;
+            }
+        }
+        
+        if (empty($setClauses)) {
+            return;
+        }
+        
+        $sql = "UPDATE clientes SET " . implode(', ', $setClauses) . " WHERE id = :id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+    }
+
     public static function find(int $id): ?array {
         $pdo = Database::getConnection();
         $st  = $pdo->prepare("SELECT * FROM clientes WHERE id=:id LIMIT 1");

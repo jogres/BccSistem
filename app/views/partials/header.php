@@ -1,4 +1,9 @@
 <?php
+// Definir header de conteúdo UTF-8 antes de qualquer saída
+if (!headers_sent()) {
+    header('Content-Type: text/html; charset=UTF-8');
+}
+
 Auth::startSessionSecure();
 $user = Auth::user();
 ?>

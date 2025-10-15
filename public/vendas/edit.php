@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Atualizar nome do cliente se foi editado
             $nomeEditado = trim($_POST['cliente_nome_editado']);
             if ($nomeEditado !== $cliente['nome']) {
-                Cliente::update($clienteId, ['nome' => $nomeEditado]);
+                Cliente::updateFields($clienteId, ['nome' => $nomeEditado]);
             }
             
             $vendaData = [

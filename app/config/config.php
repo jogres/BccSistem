@@ -5,7 +5,7 @@ date_default_timezone_set('America/Sao_Paulo');
 // Configurar codificação UTF-8 para caracteres especiais
 mb_internal_encoding('UTF-8');
 ini_set('default_charset', 'UTF-8');
-header('Content-Type: text/html; charset=UTF-8');
+// Nota: O header Content-Type será definido no header.php de cada página
 
 return [
     'db' => [

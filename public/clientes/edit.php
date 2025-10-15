@@ -4,6 +4,7 @@ require __DIR__.'/../../app/lib/Auth.php';
 require __DIR__.'/../../app/lib/Helpers.php';
 require __DIR__.'/../../app/lib/Request.php';
 require __DIR__.'/../../app/lib/CSRF.php';
+require __DIR__.'/../../app/lib/Logger.php';
 require __DIR__.'/../../app/middleware/require_login.php';
 require __DIR__.'/../../app/models/Cliente.php';
 
@@ -30,14 +31,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!in_array($interesse, $opcoesInteresse, true)) $errors[] = 'Interesse inválido.';
 
     if (!$errors) {
-        Cliente::update($id, [
-            'nome'      => $nome,
-            'telefone'  => $telefone,
-            'cidade'    => $cidade,
-            'estado'    => $estado,
-            'interesse' => $interesse,
-        ]);
-        header('Location: '.base_url('clientes/index.php')); exit;
+        try {
+            Cliente::update($id, [
+                'nome'      => $nome,
+                'telefone'  => $telefone,
+                'cidade'    => $cidade,
+                'estado'    => $estado,
+                'interesse' => $interesse,
+            ]);
+            
+            // Log da atualização
+            Logger::crud('UPDATE', 'clientes', $id, Auth::user()['id'], [
+                'nome' => $nome,
+                'telefone' => $telefone,
+                'cidade' => $cidade,
+                'interesse' => $interesse
+            ]);
+            
+            $_SESSION['success'] = 'Cliente atualizado com sucesso!';
+            header('Location: '.base_url('clientes/index.php')); 
+            exit;
+        } catch (Exception $e) {
+            Logger::error('Erro ao atualizar cliente', [
+                'user_id' => Auth::user()['id'],
+                'cliente_id' => $id,
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            $errors[] = 'Erro ao atualizar cliente: ' . $e->getMessage();
+        }
     }
 }
 
