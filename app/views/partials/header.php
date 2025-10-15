@@ -20,7 +20,7 @@ $user = Auth::user();
   <script>
     window.APP = {
       isAdmin: <?= Auth::isAdmin() ? 'true' : 'false' ?>,
-      userId: <?= (int)Auth::user()['id'] ?>
+      userId: <?= $user ? (int)$user['id'] : 0 ?>
     };
   </script>
 
