@@ -151,6 +151,16 @@ class Notification
     {
         $pdo = Database::getConnection();
         
+        // Buscar nome do funcionário que criou o cliente
+        $stmtCreator = $pdo->prepare("SELECT nome FROM funcionarios WHERE id = :id");
+        $stmtCreator->execute([':id' => $createdBy]);
+        $creatorName = $stmtCreator->fetchColumn();
+        
+        // Fallback se não encontrar o funcionário
+        if (!$creatorName) {
+            $creatorName = "Funcionário ID {$createdBy}";
+        }
+        
         // Busca todos os administradores
         $stmt = $pdo->prepare("
             SELECT id FROM funcionarios 
@@ -163,7 +173,7 @@ class Notification
             self::create(
                 $admin['id'],
                 'Novo Cliente Cadastrado',
-                "Cliente '{$clientName}' foi cadastrado no sistema",
+                "Cliente '{$clientName}' foi cadastrado por {$creatorName}",
                 self::TYPE_INFO,
                 base_url("clientes/edit.php?id={$clientId}")
             );
@@ -173,9 +183,19 @@ class Notification
     /**
      * Notifica sobre funcionário inativado
      */
-    public static function notifyInactiveUser(int $userId, string $userName): void
+    public static function notifyInactiveUser(int $userId, string $userName, int $inactivatedBy): void
     {
         $pdo = Database::getConnection();
+        
+        // Buscar nome do funcionário que inativou
+        $stmtInactivator = $pdo->prepare("SELECT nome FROM funcionarios WHERE id = :id");
+        $stmtInactivator->execute([':id' => $inactivatedBy]);
+        $inactivatorName = $stmtInactivator->fetchColumn();
+        
+        // Fallback se não encontrar o funcionário
+        if (!$inactivatorName) {
+            $inactivatorName = "Funcionário ID {$inactivatedBy}";
+        }
         
         // Busca todos os administradores
         $stmt = $pdo->prepare("
@@ -189,7 +209,7 @@ class Notification
             self::create(
                 $admin['id'],
                 'Funcionário Inativado',
-                "Funcionário '{$userName}' foi inativado no sistema",
+                "Funcionário '{$userName}' foi inativado por {$inactivatorName}",
                 self::TYPE_WARNING,
                 base_url("funcionarios/edit.php?id={$userId}")
             );

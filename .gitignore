@@ -1,0 +1,140 @@
+# BccSistem - Git Ignore
+# Arquivos e pastas que não devem ser versionados
+
+# ===================================
+# CONFIGURAÇÕES SENSÍVEIS
+# ===================================
+# Arquivo principal de configuração (contém credenciais do banco)
+app/config/config.php
+
+# ===================================
+# LOGS
+# ===================================
+logs/
+logs/*.log
+*.log
+
+# ===================================
+# UPLOADS DE USUÁRIOS
+# ===================================
+public/uploads/**/*
+!public/uploads/.htaccess
+!public/uploads/.gitkeep
+!public/uploads/**/.gitkeep
+
+# ===================================
+# DEPENDÊNCIAS
+# ===================================
+vendor/
+composer.lock
+node_modules/
+package-lock.json
+
+# ===================================
+# CACHE E TEMPORÁRIOS
+# ===================================
+cache/
+tmp/
+temp/
+*.cache
+*.tmp
+
+# ===================================
+# ARQUIVOS DO SISTEMA OPERACIONAL
+# ===================================
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+*~
+.directory
+
+# ===================================
+# IDEs E EDITORES
+# ===================================
+# Visual Studio Code
+.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# PhpStorm / JetBrains
+.idea/
+*.iml
+*.iws
+.idea_modules/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Eclipse
+.buildpath
+.project
+.settings/
+
+# NetBeans
+nbproject/
+
+# ===================================
+# BACKUP E DUMPS
+# ===================================
+*.sql
+*.sql.gz
+*.sql.zip
+backup/
+backups/
+dump.sql
+
+# ===================================
+# ARQUIVOS PHP
+# ===================================
+*.php~
+*.php.bak
+
+# ===================================
+# OUTROS
+# ===================================
+# Arquivos de ambiente
+.env
+.env.local
+.env.*.local
+
+# Documentos temporários de markdown
+*.md~
+
+# Arquivos de testes
+phpunit.xml
+.phpunit.result.cache
+
+# Arquivos compactados
+*.zip
+*.rar
+*.7z
+*.tar
+*.tar.gz
+!vendor.zip
+
+# Certificados e chaves
+*.pem
+*.key
+*.crt
+*.p12
+
+# Arquivos de debug
+xdebug.log
+error.log
+php_errors.log
+

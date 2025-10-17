@@ -49,10 +49,30 @@ try {
     $logs = Logger::search($level, $date, $userId ?: null, $limit);
     $stats = Logger::getStats($date);
     
-    // Buscar usuários para filtro
+    // Buscar usuários para filtro e mapeamento
     $pdo = Database::getConnection();
-    $stmt = $pdo->query("SELECT id, nome FROM funcionarios WHERE is_ativo = 1 ORDER BY nome");
+    $stmt = $pdo->query("SELECT id, nome FROM funcionarios ORDER BY nome");
     $funcionarios = $stmt->fetchAll();
+    
+    // Criar mapeamento de ID para nome
+    $funcionariosMap = [];
+    foreach ($funcionarios as $func) {
+        $funcionariosMap[$func['id']] = $func['nome'];
+    }
+    
+    // Adicionar nomes dos funcionários aos logs
+    foreach ($logs as &$log) {
+        $logUserId = $log['user_id'];
+        if ($logUserId === 'system') {
+            $log['user_name'] = 'Sistema';
+        } elseif (isset($funcionariosMap[$logUserId])) {
+            $log['user_name'] = $funcionariosMap[$logUserId];
+        } else {
+            $log['user_name'] = "ID: {$logUserId}";
+        }
+    }
+    unset($log); // Quebrar referência
+    
 } catch (Exception $e) {
     error_log("Erro em logs.php: " . $e->getMessage());
     $_SESSION['warning'] = "Erro ao carregar alguns dados: " . $e->getMessage();
@@ -155,7 +175,8 @@ include __DIR__ . '/../app/views/partials/header.php';
                 <div class="form-group">
                     <label class="form-label">👤 Usuário</label>
                     <select name="user_id" class="form-control">
-                        <option value="">Todos</option>
+                        <option value="">Todos os Usuários</option>
+                        <option value="system" <?= $userId === 'system' ? 'selected' : '' ?>>Sistema</option>
                         <?php foreach ($funcionarios as $func): ?>
                             <option value="<?= $func['id'] ?>" <?= $userId == $func['id'] ? 'selected' : '' ?>>
                                 <?= e($func['nome']) ?>
@@ -226,7 +247,8 @@ include __DIR__ . '/../app/views/partials/header.php';
                                     </span>
                                 </td>
                                 <td>
-                                    <small><?= e($log['user_id']) ?></small>
+                                    <strong><?= e($log['user_name'] ?? 'Desconhecido') ?></strong>
+                                    <br><small style="color: #999;">ID: <?= e($log['user_id']) ?></small>
                                 </td>
                                 <td>
                                     <div style="max-width: 400px; word-wrap: break-word;">

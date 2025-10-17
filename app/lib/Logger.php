@@ -148,8 +148,8 @@ class Logger {
     /**
      * Obter arquivo de log baseado no nível
      */
-    private static function getLogFile($level) {
-        $date = date('Y-m-d');
+    private static function getLogFile($level, $date = null) {
+        $date = $date ?: date('Y-m-d');
         
         switch ($level) {
             case 'ERROR':
@@ -221,14 +221,14 @@ class Logger {
         
         $logFiles = [];
         if ($level) {
-            $logFiles[] = self::getLogFile($level);
+            $logFiles[] = self::getLogFile($level, $date);
         } else {
             $logFiles = [
-                self::getLogFile('ERROR'),
-                self::getLogFile('WARNING'),
-                self::getLogFile('INFO'),
-                self::getLogFile('SECURITY'),
-                self::getLogFile('ACTION')
+                self::getLogFile('ERROR', $date),
+                self::getLogFile('WARNING', $date),
+                self::getLogFile('INFO', $date),
+                self::getLogFile('SECURITY', $date),
+                self::getLogFile('ACTION', $date)
             ];
         }
         
@@ -239,7 +239,7 @@ class Logger {
                 foreach ($lines as $line) {
                     $log = self::parseLogLine($line);
                     if ($log) {
-                        if ($userId && $log['user_id'] !== $userId) {
+                        if ($userId && $log['user_id'] != $userId) {
                             continue;
                         }
                         $logs[] = $log;
@@ -312,11 +312,11 @@ class Logger {
         ];
         
         $logFiles = [
-            'errors' => self::getLogFile('ERROR'),
-            'warnings' => self::getLogFile('WARNING'),
-            'info' => self::getLogFile('INFO'),
-            'security' => self::getLogFile('SECURITY'),
-            'actions' => self::getLogFile('ACTION')
+            'errors' => self::getLogFile('ERROR', $date),
+            'warnings' => self::getLogFile('WARNING', $date),
+            'info' => self::getLogFile('INFO', $date),
+            'security' => self::getLogFile('SECURITY', $date),
+            'actions' => self::getLogFile('ACTION', $date)
         ];
         
         foreach ($logFiles as $type => $file) {

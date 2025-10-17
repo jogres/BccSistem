@@ -222,7 +222,7 @@ include __DIR__ . '/../../app/views/partials/header.php';
                                                 data-telefone="<?= e($cli['telefone']) ?>"
                                                 data-cidade="<?= e($cli['cidade']) ?>"
                                                 data-estado="<?= e($cli['estado']) ?>">
-                                            <?= e($cli['nome']) ?> - <?= e($cli['telefone']) ?> (<?= e($cli['cidade']) ?>/<?= e($cli['estado']) ?>)
+                                            <?= e($cli['telefone']) ?> - <?= e($cli['nome']) ?> (<?= e($cli['cidade']) ?>/<?= e($cli['estado']) ?>)
                                         </option>
                                     <?php endforeach; ?>
                                 </select>

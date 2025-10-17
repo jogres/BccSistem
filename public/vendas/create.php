@@ -162,7 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 Notification::create(
                     $vendaData['vendedor_id'],
                     'Nova Venda Registrada',
-                    "Venda #{$numeroContrato} foi registrada em seu nome. Cliente: {$cliente['nome']}",
+                    "Venda #{$numeroContrato} foi registrada em seu nome por {$user['nome']}. Cliente: {$cliente['nome']}",
                     Notification::TYPE_SUCCESS,
                     base_url("vendas/view.php?id={$vendaId}")
                 );
@@ -173,7 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 Notification::create(
                     $vendaData['virador_id'],
                     'Nova Venda Registrada',
-                    "Venda #{$numeroContrato} foi registrada com você como virador. Cliente: {$cliente['nome']}",
+                    "Venda #{$numeroContrato} foi registrada com você como virador por {$user['nome']}. Cliente: {$cliente['nome']}",
                     Notification::TYPE_SUCCESS,
                     base_url("vendas/view.php?id={$vendaId}")
                 );
@@ -257,7 +257,7 @@ include __DIR__ . '/../../app/views/partials/header.php';
                                                 data-cidade="<?= e($cli['cidade']) ?>"
                                                 data-estado="<?= e($cli['estado']) ?>"
                                                 data-interesse="<?= e($cli['interesse']) ?>">
-                                            <?= e($cli['nome']) ?> - <?= e($cli['telefone']) ?> (<?= e($cli['cidade']) ?>/<?= e($cli['estado']) ?>)
+                                            <?= e($cli['telefone']) ?> - <?= e($cli['nome']) ?> (<?= e($cli['cidade']) ?>/<?= e($cli['estado']) ?>)
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
