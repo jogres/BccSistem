@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/Database.php';
+
 class Notification
 {
     /**
@@ -14,22 +16,28 @@ class Notification
      */
     public static function create(int $userId, string $title, string $message, string $type = self::TYPE_INFO, ?string $actionUrl = null): int
     {
-        $pdo = Database::getConnection();
-        
-        $stmt = $pdo->prepare("
-            INSERT INTO notifications (user_id, title, message, type, action_url, created_at)
-            VALUES (:user_id, :title, :message, :type, :action_url, NOW())
-        ");
-        
-        $stmt->execute([
-            ':user_id' => $userId,
-            ':title' => $title,
-            ':message' => $message,
-            ':type' => $type,
-            ':action_url' => $actionUrl
-        ]);
-        
-        return (int)$pdo->lastInsertId();
+        try {
+            $pdo = Database::getConnection();
+            
+            $stmt = $pdo->prepare("
+                INSERT INTO notifications (user_id, title, message, type, action_url, created_at)
+                VALUES (:user_id, :title, :message, :type, :action_url, NOW())
+            ");
+            
+            $stmt->execute([
+                ':user_id' => $userId,
+                ':title' => $title,
+                ':message' => $message,
+                ':type' => $type,
+                ':action_url' => $actionUrl
+            ]);
+            
+            return (int)$pdo->lastInsertId();
+        } catch (Throwable $e) {
+            // Log erro silenciosamente para não quebrar o fluxo
+            error_log("Erro ao criar notificação: " . $e->getMessage());
+            return 0;
+        }
     }
     
     /**

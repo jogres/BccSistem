@@ -266,6 +266,35 @@ CREATE DATABASE bcc CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 mysql -u root -p bcc < database/schema.sql
 ```
 
+**3.3. Crie a tabela de comissões (se necessário):**
+   ```bash
+mysql -u root -p bcc < scripts/create_comissoes_table.sql
+```
+   
+   Ou execute diretamente no MySQL:
+   ```sql
+   CREATE TABLE `comissoes` (
+     `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+     `venda_id` bigint(20) UNSIGNED NOT NULL,
+     `funcionario_id` bigint(20) UNSIGNED NOT NULL,
+     `tipo_comissao` enum('vendedor','virador') NOT NULL,
+     `parcela` varchar(50) NOT NULL,
+     `numero_parcela` int(11) NOT NULL,
+     `porcentagem` decimal(5,2) NOT NULL,
+     `valor_base` decimal(10,2) NOT NULL,
+     `valor_comissao` decimal(10,2) NOT NULL,
+     `created_by` bigint(20) UNSIGNED NOT NULL,
+     `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+     PRIMARY KEY (`id`),
+     KEY `idx_venda_id` (`venda_id`),
+     KEY `idx_funcionario_id` (`funcionario_id`),
+     KEY `idx_tipo_comissao` (`tipo_comissao`),
+     CONSTRAINT `fk_comissoes_venda` FOREIGN KEY (`venda_id`) REFERENCES `vendas` (`id`) ON DELETE CASCADE,
+     CONSTRAINT `fk_comissoes_funcionario` FOREIGN KEY (`funcionario_id`) REFERENCES `funcionarios` (`id`) ON DELETE CASCADE,
+     CONSTRAINT `fk_comissoes_created_by` FOREIGN KEY (`created_by`) REFERENCES `funcionarios` (`id`) ON DELETE CASCADE
+   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+   ```
+
 #### 4️⃣ Configure a Aplicação
 
 **4.1. Copie o arquivo de configuração:**
@@ -354,7 +383,8 @@ BccSistem/
 │   │   ├── Cliente.php              # Model de clientes
 │   │   ├── Funcionario.php          # Model de funcionários
 │   │   ├── Venda.php                # Model de vendas
-│   │   └── Dashboard.php            # Model do dashboard
+│   │   ├── Dashboard.php            # Model do dashboard
+│   │   └── Comissao.php             # Model de comissões
 │   │
 │   └── 📁 views/                    # Views compartilhadas
 │       └── 📁 partials/
@@ -404,6 +434,10 @@ BccSistem/
 │   │   ├── create.php               # Criar (admin)
 │   │   └── edit.php                 # Editar (admin)
 │   │
+│   ├── 📁 comissoes/                # Sistema de Comissões (admin)
+│   │   ├── index.php                # Tela principal
+│   │   └── create.php               # Gerar comissão
+│   │
 │   ├── 📁 api/                      # APIs REST
 │   │   ├── clients.php              # API de clientes
 │   │   ├── dashboard_counts.php     # API do dashboard
@@ -421,7 +455,8 @@ BccSistem/
 ├── 📁 scripts/                      # Scripts auxiliares
 │   ├── seed_admin.php               # Criar admin
 │   ├── cleanup_logs.php             # Limpar logs antigos
-│   └── health_check.php             # Verificar saúde do sistema
+│   ├── health_check.php             # Verificar saúde do sistema
+│   └── create_comissoes_table.sql   # Script SQL da tabela comissões
 │
 ├── 📁 vendor/                       # Dependências Composer (não versionado)
 │
@@ -589,7 +624,47 @@ GET /api/dashboard_counts.php?mode=week&start=2025-01-01&end=2025-01-07
 
 ---
 
-### 6. 🔔 Sistema de Notificações
+### 6. 💰 Sistema de Comissões
+
+**Funcionalidades:**
+- Gestão completa de comissões de vendedores e viradores
+- Comissões separadas por tipo (vendedor/virador)
+- Controle de parcelas até parcela final
+- Regra especial para Gazin + Meia Parcela (50% do valor base)
+- Visualização de comissões por funcionário
+- Filtro por mês
+- Estatísticas de comissões geradas
+- Logs e notificações automáticas
+
+**Acesso:**
+- **Apenas Administradores** podem acessar e gerenciar comissões
+
+**Rotas:**
+- `GET /comissoes/index.php` - Tela principal de comissões
+- `GET /comissoes/index.php?tipo=vendedor&funcionario_id={id}` - Listar vendas do vendedor
+- `GET /comissoes/index.php?tipo=virador&funcionario_id={id}` - Listar vendas do virador
+- `GET /comissoes/index.php?visualizar=comissoes&funcionario_comissao_id={id}` - Visualizar comissões geradas
+- `GET/POST /comissoes/create.php` - Gerar nova comissão
+
+**Regras Especiais:**
+
+- **Gazin + Meia Parcela:** Se administradora = "Gazin" E tipo de venda = "Meia", o valor base para cálculo de comissão será 50% do valor do crédito
+- **Controle de Parcelas:** Vendedores e viradores têm parcelas independentes. Quando "Parcela Final" é gerada para um tipo, a venda não aparece mais para aquele tipo (mas pode aparecer para o outro tipo se ainda houver parcelas pendentes)
+
+**Exemplo de Cálculo:**
+```
+Venda: R$ 1.000,00
+Administradora: Gazin
+Tipo: Meia Parcela
+Porcentagem: 5,50%
+
+Valor Base = 1.000,00 ÷ 2 = R$ 500,00
+Valor Comissão = 500,00 × 5,50% = R$ 27,50
+```
+
+---
+
+### 7. 🔔 Sistema de Notificações
 
 **Funcionalidades:**
 - Notificações em tempo real
@@ -615,10 +690,11 @@ GET /api/dashboard_counts.php?mode=week&start=2025-01-01&end=2025-01-07
 - Nova venda registrada (notifica vendedor e virador)
 - Funcionário inativado (notifica admins)
 - Tentativas de login suspeitas (notifica admins)
+- Comissão gerada (notifica admins)
 
 ---
 
-### 7. 📝 Sistema de Logs
+### 8. 📝 Sistema de Logs
 
 **Funcionalidades:**
 - Logs detalhados de todas as operações
@@ -847,6 +923,10 @@ O BccSistem possui um sistema completo de logs que registra todas as operações
    - UPDATE - Atualizações de registro
    - DELETE - Exclusões de registro
    - READ - Consultas importantes
+
+6. **Comissões (COMISSAO_CREATED)**
+   - Geração de comissões de vendedores e viradores
+   - Registra todos os detalhes: parcela, porcentagem, valores
 
 #### Visualização de Logs
 

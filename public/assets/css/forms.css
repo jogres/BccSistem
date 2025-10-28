@@ -266,6 +266,11 @@ select.form-control {
   font-size: 1.2rem;
 }
 
+/* Botão salvar sem emoji duplicado (para casos específicos) */
+.btn-save.no-icon::before {
+  content: '';
+}
+
 .btn-save:hover {
   background: linear-gradient(135deg, var(--bcc-green-dark), var(--bcc-green));
   transform: translateY(-2px);
@@ -304,6 +309,11 @@ select.form-control {
 .btn-cancel::before {
   content: '❌';
   font-size: 1.2rem;
+}
+
+/* Botão cancelar sem emoji duplicado (para casos específicos) */
+.btn-cancel.no-icon::before {
+  content: '';
 }
 
 .btn-cancel:hover {

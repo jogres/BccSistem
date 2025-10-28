@@ -1,0 +1,291 @@
+/* ========================================
+   SISTEMA DE COMISSÕES
+   ======================================== */
+
+/* Seletor de Tipo (Vendedor/Virador/Visualizar) */
+.comissoes-type-selector {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-6);
+  margin: var(--space-8) 0;
+}
+
+@media (min-width: 900px) {
+  .comissoes-type-selector {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.comissoes-type-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  background: var(--bcc-white);
+  border: 2px solid var(--bcc-gray-200);
+  border-radius: var(--radius-xl);
+  text-decoration: none;
+  color: var(--bcc-gray-700);
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-md);
+  min-height: 250px;
+}
+
+.comissoes-type-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--bcc-blue);
+}
+
+.comissoes-type-vendedor:hover {
+  background: linear-gradient(135deg, rgba(1, 41, 128, 0.05), rgba(1, 41, 128, 0.1));
+  border-color: var(--bcc-blue);
+}
+
+.comissoes-type-virador:hover {
+  background: linear-gradient(135deg, rgba(34, 139, 34, 0.05), rgba(34, 139, 34, 0.1));
+  border-color: var(--bcc-green);
+}
+
+.comissoes-type-icon {
+  font-size: 4rem;
+  margin-bottom: var(--space-4);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+.comissoes-type-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--bcc-blue);
+  margin-bottom: var(--space-2);
+}
+
+.comissoes-type-virador .comissoes-type-title {
+  color: var(--bcc-green);
+}
+
+.comissoes-type-desc {
+  font-size: 1rem;
+  color: var(--bcc-gray-600);
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* Lista de Funcionários */
+.comissoes-funcionarios-list {
+  margin: var(--space-6) 0;
+}
+
+.comissoes-funcionarios-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.comissoes-funcionarios-header h2 {
+  font-size: 1.5rem;
+  color: var(--bcc-blue);
+  margin: 0;
+}
+
+.comissoes-funcionarios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+
+.comissoes-funcionario-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-6);
+  background: var(--bcc-white);
+  border: 2px solid var(--bcc-gray-200);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  color: var(--bcc-gray-700);
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-sm);
+}
+
+.comissoes-funcionario-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--bcc-blue);
+  background: linear-gradient(135deg, rgba(1, 41, 128, 0.02), rgba(1, 41, 128, 0.05));
+}
+
+.comissoes-funcionario-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--bcc-blue-light), var(--bcc-blue));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin-bottom: var(--space-3);
+  box-shadow: var(--shadow-md);
+}
+
+.comissoes-funcionario-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--bcc-blue);
+  text-align: center;
+  margin-bottom: var(--space-2);
+}
+
+.comissoes-funcionario-action {
+  font-size: 0.875rem;
+  color: var(--bcc-gray-600);
+  margin-top: auto;
+}
+
+/* Lista de Vendas */
+.comissoes-vendas-list {
+  margin: var(--space-6) 0;
+}
+
+.comissoes-vendas-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-4);
+  border-bottom: 2px solid var(--bcc-gray-200);
+}
+
+.comissoes-vendas-header h2 {
+  font-size: 1.5rem;
+  color: var(--bcc-blue);
+  margin: 0;
+}
+
+.comissoes-vendas-header h2 strong {
+  color: var(--bcc-blue-dark);
+}
+
+/* Formulário de Comissão */
+.comissoes-form {
+  margin-top: var(--space-6);
+}
+
+.comissoes-preview {
+  background: linear-gradient(135deg, rgba(1, 41, 128, 0.05), rgba(1, 41, 128, 0.1));
+  border: 2px solid var(--bcc-blue-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.comissoes-preview-value {
+  font-size: 1.25rem;
+  color: var(--bcc-gray-700);
+  margin-top: var(--space-2);
+}
+
+.comissoes-preview-value strong {
+  color: var(--bcc-green);
+  font-size: 1.5rem;
+}
+
+/* Alerta de erro */
+.alert-error {
+  background: #fee;
+  border: 2px solid #fcc;
+  color: #c33;
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-6);
+}
+
+.alert-error ul {
+  margin: var(--space-2) 0 0 0;
+  padding-left: var(--space-6);
+}
+
+.alert-error li {
+  margin: var(--space-1) 0;
+}
+
+/* Visualização de Comissões */
+.comissoes-type-view {
+  background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(138, 43, 226, 0.2));
+  border-color: #8a2be2;
+}
+
+.comissoes-type-view:hover {
+  background: linear-gradient(135deg, rgba(138, 43, 226, 0.15), rgba(138, 43, 226, 0.25));
+  border-color: #8a2be2;
+}
+
+.comissoes-type-view .comissoes-type-title {
+  color: #8a2be2;
+}
+
+.comissoes-funcionario-stats {
+  margin: var(--space-3) 0;
+  padding: var(--space-3);
+  background: var(--bcc-gray-50);
+  border-radius: var(--radius-md);
+  width: 100%;
+}
+
+.comissoes-stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-1) 0;
+  font-size: 0.875rem;
+}
+
+.comissoes-stat-label {
+  color: var(--bcc-gray-600);
+  font-weight: 500;
+}
+
+.comissoes-stat-value {
+  color: var(--bcc-blue);
+  font-weight: 600;
+}
+
+.comissoes-list-container {
+  margin: var(--space-6) 0;
+}
+
+.clients-table tfoot tr {
+  border-top: 3px solid var(--bcc-gray-300);
+}
+
+.clients-table tfoot td {
+  padding: var(--space-4);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .comissoes-type-selector {
+    grid-template-columns: 1fr;
+  }
+  
+  .comissoes-funcionarios-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .comissoes-type-btn {
+    min-height: 200px;
+  }
+  
+  .comissoes-type-icon {
+    font-size: 3rem;
+  }
+  
+  .comissoes-type-title {
+    font-size: 1.5rem;
+  }
+  
+}
+

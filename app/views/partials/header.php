@@ -51,6 +51,9 @@ $user = Auth::user();
             <a href="<?= e(base_url('funcionarios/index.php')) ?>" class="nav-link">
               🧑‍💼 Funcionários
             </a>
+            <a href="<?= e(base_url('comissoes/index.php')) ?>" class="nav-link">
+              💰 Comissões
+            </a>
           <?php endif; ?>
 
           <?php

@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . '/Database.php';
+require_once __DIR__ . '/Auth.php';
+
 class ActivityLogger
 {
     /**
@@ -6,26 +9,31 @@ class ActivityLogger
      */
     public static function log(string $action, string $description, ?int $userId = null): void
     {
-        $pdo = Database::getConnection();
-        
-        // Se não especificado, pega do usuário logado
-        if ($userId === null) {
-            $user = Auth::user();
-            $userId = $user ? $user['id'] : null;
+        try {
+            $pdo = Database::getConnection();
+            
+            // Se não especificado, pega do usuário logado
+            if ($userId === null) {
+                $user = Auth::user();
+                $userId = $user ? $user['id'] : null;
+            }
+            
+            $stmt = $pdo->prepare("
+                INSERT INTO activity_logs (user_id, action, description, ip_address, user_agent)
+                VALUES (:user_id, :action, :description, :ip, :user_agent)
+            ");
+            
+            $stmt->execute([
+                ':user_id' => $userId,
+                ':action' => $action,
+                ':description' => $description,
+                ':ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
+                ':user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'unknown'
+            ]);
+        } catch (Throwable $e) {
+            // Log erro silenciosamente para não quebrar o fluxo
+            error_log("Erro ao registrar log de atividade: " . $e->getMessage());
         }
-        
-        $stmt = $pdo->prepare("
-            INSERT INTO activity_logs (user_id, action, description, ip_address, user_agent)
-            VALUES (:user_id, :action, :description, :ip, :user_agent)
-        ");
-        
-        $stmt->execute([
-            ':user_id' => $userId,
-            ':action' => $action,
-            ':description' => $description,
-            ':ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
-            ':user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'unknown'
-        ]);
     }
     
     /**
@@ -177,6 +185,21 @@ class ActivityLogger
     public static function logSystemError(string $error, string $file, int $line): void
     {
         self::log('system_error', "Erro em {$file}:{$line} - {$error}");
+    }
+    
+    /**
+     * Log de comissão criada
+     */
+    public static function logComissaoCreated(int $comissaoId, string $funcionarioNome, string $tipoComissao, string $parcela, float $porcentagem, float $valorBase, float $valorComissao, string $numeroContrato): void
+    {
+        $porcentagemFormatada = number_format($porcentagem, 2, ',', '.');
+        $valorBaseFormatado = number_format($valorBase, 2, ',', '.');
+        $valorComissaoFormatado = number_format($valorComissao, 2, ',', '.');
+        
+        self::log(
+            'comissao_created',
+            "Comissão gerada para {$funcionarioNome} ({$tipoComissao}): Parcela {$parcela} - {$porcentagemFormatada}% sobre R$ {$valorBaseFormatado} = R$ {$valorComissaoFormatado} (Venda #{$numeroContrato})"
+        );
     }
     
     /**
