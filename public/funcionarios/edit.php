@@ -36,7 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Notificar se funcionário foi inativado
             if ($oldStatus == 1 && $is_ativo == 0) {
                 require_once __DIR__ . '/../../app/lib/Notification.php';
-                Notification::notifyInactiveUser($id, $nome, $user['id']);
+                $currentUser = Auth::user();
+                Notification::notifyInactiveUser($id, $nome, $currentUser['id']);
             }
             
             header('Location: ' . base_url('funcionarios/index.php'));
