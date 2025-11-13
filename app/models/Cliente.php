@@ -1,7 +1,4 @@
 <?php
-
-use PDO;
-
 final class Cliente {
     private static function normalizePhone(string $phone): string
     {
@@ -27,7 +24,7 @@ final class Cliente {
         $stmt->bindValue(':telefone', $cleanPhone);
 
         if ($ignoreId !== null) {
-            $stmt->bindValue(':ignore_id', $ignoreId, PDO::PARAM_INT);
+            $stmt->bindValue(':ignore_id', $ignoreId, \PDO::PARAM_INT);
         }
 
         $stmt->execute();
