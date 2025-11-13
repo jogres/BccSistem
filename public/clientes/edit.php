@@ -31,6 +31,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!in_array($interesse, $opcoesInteresse, true)) $errors[] = 'Interesse inválido.';
 
     if (!$errors && Cliente::isPhoneTaken($telefone, $id)) {
+        Logger::warning('Tentativa de atualização de cliente com telefone duplicado', [
+            'telefone' => $telefone,
+            'cliente_id' => $id,
+            'user_id' => Auth::user()['id'] ?? null
+        ]);
         $errors[] = 'Já existe um cliente cadastrado com este telefone.';
     }
 

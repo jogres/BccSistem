@@ -179,6 +179,10 @@ function handlePost(array $user, bool $isAdmin): void
     }
     
     if (!$errors && Cliente::isPhoneTaken($telefone)) {
+        Logger::warning('API: tentativa de cadastro de cliente com telefone duplicado', [
+            'telefone' => $telefone,
+            'user_id' => $user['id']
+        ]);
         $errors['telefone'] = 'Já existe um cliente cadastrado com este telefone.';
     }
 
@@ -272,6 +276,11 @@ function handlePut(array $user, bool $isAdmin): void
     }
     
     if (!$errors && Cliente::isPhoneTaken($telefone, $id)) {
+        Logger::warning('API: tentativa de atualização de cliente com telefone duplicado', [
+            'telefone' => $telefone,
+            'cliente_id' => $id,
+            'user_id' => $user['id']
+        ]);
         $errors['telefone'] = 'Já existe um cliente cadastrado com este telefone.';
     }
 
