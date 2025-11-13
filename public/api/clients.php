@@ -178,6 +178,10 @@ function handlePost(array $user, bool $isAdmin): void
         $errors['interesse'] = 'Interesse é obrigatório';
     }
     
+    if (!$errors && Cliente::isPhoneTaken($telefone)) {
+        $errors['telefone'] = 'Já existe um cliente cadastrado com este telefone.';
+    }
+
     if ($errors) {
         http_response_code(400);
         echo json_encode(['success' => false, 'errors' => $errors], JSON_UNESCAPED_UNICODE);
@@ -267,6 +271,10 @@ function handlePut(array $user, bool $isAdmin): void
         $errors['interesse'] = 'Interesse é obrigatório';
     }
     
+    if (!$errors && Cliente::isPhoneTaken($telefone, $id)) {
+        $errors['telefone'] = 'Já existe um cliente cadastrado com este telefone.';
+    }
+
     if ($errors) {
         http_response_code(400);
         echo json_encode(['success' => false, 'errors' => $errors], JSON_UNESCAPED_UNICODE);

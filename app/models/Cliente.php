@@ -1,5 +1,40 @@
 <?php
+
+use PDO;
+
 final class Cliente {
+    private static function normalizePhone(string $phone): string
+    {
+        return preg_replace('/\D/', '', $phone);
+    }
+
+    public static function isPhoneTaken(string $phone, ?int $ignoreId = null): bool
+    {
+        $pdo = Database::getConnection();
+        $cleanPhone = self::normalizePhone($phone);
+
+        $phoneExpression = "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(telefone, '(', ''), ')', ''), '-', ''), ' ', ''), '.', ''), '+', '')";
+
+        $sql = "SELECT 1 FROM clientes WHERE {$phoneExpression} = :telefone AND deleted_at IS NULL";
+
+        if ($ignoreId !== null) {
+            $sql .= " AND id <> :ignore_id";
+        }
+
+        $sql .= " LIMIT 1";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindValue(':telefone', $cleanPhone);
+
+        if ($ignoreId !== null) {
+            $stmt->bindValue(':ignore_id', $ignoreId, PDO::PARAM_INT);
+        }
+
+        $stmt->execute();
+
+        return (bool) $stmt->fetchColumn();
+    }
+
     public static function softDelete($id) {
         $pdo = Database::getConnection();
         $stmt = $pdo->prepare("UPDATE clientes SET deleted_at = NOW() WHERE id = ?");

@@ -30,6 +30,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (strlen($estado) !== 2) $errors[] = 'Estado deve ter 2 letras.';
     if (!in_array($interesse, $opcoesInteresse, true)) $errors[] = 'Interesse inválido.';
 
+    if (!$errors && Cliente::isPhoneTaken($telefone, $id)) {
+        $errors[] = 'Já existe um cliente cadastrado com este telefone.';
+    }
+
     if (!$errors) {
         try {
             Cliente::update($id, [
