@@ -3,6 +3,6 @@
 return [
     'Gazin ',
     'Tradição',
-    'Acora'
+    'Ancora'
 ];
 
