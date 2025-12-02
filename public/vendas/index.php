@@ -130,7 +130,7 @@ include __DIR__ . '/../../app/views/partials/header.php';
     <div class="stat-card stat-success">
         <div class="stat-icon">💰</div>
         <div class="stat-content">
-            <div class="stat-value">R$ <?= number_format($stats['total_credito'], 2, ',', '.') ?></div>
+            <div class="stat-value">R$ <?= number_format($stats['valor_total'] ?? 0, 2, ',', '.') ?></div>
             <div class="stat-label">Valor Total</div>
         </div>
     </div>
@@ -138,7 +138,7 @@ include __DIR__ . '/../../app/views/partials/header.php';
     <div class="stat-card stat-info">
         <div class="stat-icon">📈</div>
         <div class="stat-content">
-            <div class="stat-value">R$ <?= number_format($stats['media_credito'], 2, ',', '.') ?></div>
+            <div class="stat-value">R$ <?= number_format($stats['valor_medio'] ?? 0, 2, ',', '.') ?></div>
             <div class="stat-label">Ticket Médio</div>
         </div>
     </div>
@@ -146,7 +146,7 @@ include __DIR__ . '/../../app/views/partials/header.php';
     <div class="stat-card stat-warning">
         <div class="stat-icon">👥</div>
         <div class="stat-content">
-            <div class="stat-value"><?= number_format($stats['total_vendedores'], 0, ',', '.') ?></div>
+            <div class="stat-value"><?= number_format($stats['total_vendedores'] ?? 0, 0, ',', '.') ?></div>
             <div class="stat-label">Vendedores Ativos</div>
         </div>
     </div>
