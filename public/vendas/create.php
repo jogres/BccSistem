@@ -63,13 +63,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Validações específicas
     if (!$errors) {
-        $clienteId = (int)$_POST['cliente_id'];
-        $numeroContrato = trim($_POST['numero_contrato']);
+        $clienteId = (int)($_POST['cliente_id'] ?? 0);
+        $numeroContrato = trim($_POST['numero_contrato'] ?? '');
         
-        // Verificar se cliente existe
-        $cliente = Cliente::find($clienteId);
-        if (!$cliente) {
-            $errors[] = 'Cliente não encontrado';
+        // Verificar se cliente foi selecionado
+        if ($clienteId <= 0) {
+            $errors[] = 'Selecione um cliente';
+        } else {
+            // Verificar se cliente existe e não foi deletado
+            $cliente = Cliente::find($clienteId);
+            if (!$cliente) {
+                $errors[] = 'Cliente não encontrado ou foi removido';
+            }
+        }
+        
+        // Verificar se número de contrato foi informado
+        if (empty($numeroContrato)) {
+            $errors[] = 'Número de contrato é obrigatório';
         }
         
         // Verificar se contrato já existe
@@ -89,10 +99,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors[] = 'CEP inválido';
         }
         
-        // Validar valor
-        $valorCredito = str_replace(['.', ','], ['', '.'], $_POST['valor_credito']);
+        // Validar valor (formato brasileiro: 2.000.000,00)
+        $valorCreditoStr = $_POST['valor_credito'] ?? '';
+        // Remove espaços e caracteres não numéricos exceto ponto e vírgula
+        $valorCreditoStr = preg_replace('/[^\d,.]/', '', $valorCreditoStr);
+        
+        // Se tem vírgula, assume formato brasileiro (ponto = milhar, vírgula = decimal)
+        if (strpos($valorCreditoStr, ',') !== false) {
+            // Remove pontos (separadores de milhar) e converte vírgula para ponto
+            $valorCredito = str_replace('.', '', $valorCreditoStr); // Remove pontos de milhar
+            $valorCredito = str_replace(',', '.', $valorCredito); // Converte vírgula para ponto decimal
+        } else {
+            // Se não tem vírgula, pode ter ponto como decimal ou como milhar
+            // Se tem múltiplos pontos, são separadores de milhar
+            $partes = explode('.', $valorCreditoStr);
+            if (count($partes) > 2) {
+                // Múltiplos pontos = separadores de milhar, remove todos
+                $valorCredito = str_replace('.', '', $valorCreditoStr);
+            } else {
+                // Um ponto = pode ser decimal ou milhar
+                // Se a parte após o ponto tem 3 dígitos, é milhar; se tem 1-2, é decimal
+                if (count($partes) === 2 && strlen($partes[1]) === 3) {
+                    // É milhar, remove o ponto
+                    $valorCredito = str_replace('.', '', $valorCreditoStr);
+                } else {
+                    // É decimal, mantém
+                    $valorCredito = $valorCreditoStr;
+                }
+            }
+        }
+        
         if (!is_numeric($valorCredito) || $valorCredito <= 0) {
-            $errors[] = 'Valor do crédito inválido';
+            $errors[] = 'Valor do crédito inválido. Use o formato: 2.000.000,00 ou 2000000,00';
+        } else {
+            // Garantir que é float
+            $valorCredito = (float)$valorCredito;
         }
     }
     
@@ -200,12 +241,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: index.php');
             exit;
             
+        } catch (PDOException $e) {
+            Logger::error('Erro ao cadastrar venda (PDO)', [
+                'user_id' => $user['id'],
+                'error' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'errorInfo' => $e->errorInfo ?? null,
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'data' => $vendaData ?? null
+            ]);
+            
+            // Mensagem mais amigável para o usuário
+            $errorMsg = 'Erro ao cadastrar venda';
+            if ($e->getCode() === '23000') {
+                $errorMsg .= ': Dados duplicados ou inválidos';
+            } else {
+                $errorMsg .= ': ' . $e->getMessage();
+            }
+            $errors[] = $errorMsg;
         } catch (Exception $e) {
             Logger::error('Erro ao cadastrar venda', [
                 'user_id' => $user['id'],
                 'error' => $e->getMessage(),
                 'file' => $e->getFile(),
-                'line' => $e->getLine()
+                'line' => $e->getLine(),
+                'data' => $vendaData ?? null
             ]);
             $errors[] = 'Erro ao cadastrar venda: ' . $e->getMessage();
         }

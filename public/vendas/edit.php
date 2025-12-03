@@ -92,10 +92,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors[] = 'CEP inválido';
         }
         
-        // Validar valor
-        $valorCredito = str_replace(['.', ','], ['', '.'], $_POST['valor_credito']);
+        // Validar valor (formato brasileiro: 2.000.000,00)
+        $valorCreditoStr = $_POST['valor_credito'] ?? '';
+        // Remove espaços e caracteres não numéricos exceto ponto e vírgula
+        $valorCreditoStr = preg_replace('/[^\d,.]/', '', $valorCreditoStr);
+        
+        // Se tem vírgula, assume formato brasileiro (ponto = milhar, vírgula = decimal)
+        if (strpos($valorCreditoStr, ',') !== false) {
+            // Remove pontos (separadores de milhar) e converte vírgula para ponto
+            $valorCredito = str_replace('.', '', $valorCreditoStr); // Remove pontos de milhar
+            $valorCredito = str_replace(',', '.', $valorCredito); // Converte vírgula para ponto decimal
+        } else {
+            // Se não tem vírgula, pode ter ponto como decimal ou como milhar
+            // Se tem múltiplos pontos, são separadores de milhar
+            $partes = explode('.', $valorCreditoStr);
+            if (count($partes) > 2) {
+                // Múltiplos pontos = separadores de milhar, remove todos
+                $valorCredito = str_replace('.', '', $valorCreditoStr);
+            } else {
+                // Um ponto = pode ser decimal ou milhar
+                // Se a parte após o ponto tem 3 dígitos, é milhar; se tem 1-2, é decimal
+                if (count($partes) === 2 && strlen($partes[1]) === 3) {
+                    // É milhar, remove o ponto
+                    $valorCredito = str_replace('.', '', $valorCreditoStr);
+                } else {
+                    // É decimal, mantém
+                    $valorCredito = $valorCreditoStr;
+                }
+            }
+        }
+        
         if (!is_numeric($valorCredito) || $valorCredito <= 0) {
-            $errors[] = 'Valor do crédito inválido';
+            $errors[] = 'Valor do crédito inválido. Use o formato: 2.000.000,00 ou 2000000,00';
+        } else {
+            // Garantir que é float
+            $valorCredito = (float)$valorCredito;
         }
     }
     

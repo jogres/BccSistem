@@ -161,7 +161,7 @@ final class Cliente {
     public static function find(int $id): ?array {
         try {
             $pdo = Database::getConnection();
-            $st  = $pdo->prepare("SELECT * FROM clientes WHERE id=:id LIMIT 1");
+            $st  = $pdo->prepare("SELECT * FROM clientes WHERE id=:id AND deleted_at IS NULL LIMIT 1");
             $st->execute([':id'=>$id]);
             return $st->fetch() ?: null;
         } catch (PDOException $e) {
