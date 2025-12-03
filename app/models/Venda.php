@@ -114,6 +114,49 @@ final class Venda
     }
     
     /**
+     * Verifica se um número de contrato já existe
+     * 
+     * @param string $numeroContrato Número do contrato a verificar
+     * @param int|null $ignoreId ID da venda a ignorar (útil na edição)
+     * @return bool True se o contrato já existe, False caso contrário
+     */
+    public static function contratoExists(string $numeroContrato, ?int $ignoreId = null): bool
+    {
+        try {
+            $pdo = Database::getConnection();
+            
+            $sql = "SELECT 1 FROM vendas 
+                    WHERE numero_contrato = :numero_contrato 
+                    AND deleted_at IS NULL";
+            
+            if ($ignoreId !== null) {
+                $sql .= " AND id <> :ignore_id";
+            }
+            
+            $sql .= " LIMIT 1";
+            
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindValue(':numero_contrato', $numeroContrato);
+            
+            if ($ignoreId !== null) {
+                $stmt->bindValue(':ignore_id', $ignoreId, \PDO::PARAM_INT);
+            }
+            
+            $stmt->execute();
+            
+            return (bool) $stmt->fetchColumn();
+        } catch (PDOException $e) {
+            require_once __DIR__ . '/../lib/Logger.php';
+            Logger::error('Erro ao verificar existência de contrato', [
+                'numero_contrato' => $numeroContrato,
+                'ignore_id' => $ignoreId,
+                'error' => $e->getMessage()
+            ]);
+            throw $e;
+        }
+    }
+    
+    /**
      * Busca uma venda por ID
      */
     public static function find(int $id): ?array
