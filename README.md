@@ -1065,7 +1065,7 @@ SOFTWARE.
 
 Para dúvidas, sugestões ou problemas:
 
-- 📧 **E-mail:** suporte@bccsistem.com
+- 📧 **E-mail:** www.silvarocha.com@gmail.com
 - 🐛 **Issues:** [GitHub Issues](https://github.com/seu-usuario/BccSistem/issues)
 - 📖 **Documentação:** [Wiki do Projeto](https://github.com/seu-usuario/BccSistem/wiki)
 
