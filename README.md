@@ -1073,7 +1073,7 @@ Para dúvidas, sugestões ou problemas:
 
 ## 🏆 Agradecimentos
 
-Desenvolvido com ❤️ pela equipe BccSistem
+Desenvolvido com ❤️ por Wesley Rocha
 
 ---
 
