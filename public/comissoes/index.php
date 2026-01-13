@@ -365,6 +365,7 @@ include __DIR__ . '/../../app/views/partials/header.php';
                     <th>Porcentagem</th>
                     <th>Valor Base</th>
                     <th>Valor Comissão</th>
+                    <th class="text-center">Ações</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -393,6 +394,13 @@ include __DIR__ . '/../../app/views/partials/header.php';
                         R$ <?= number_format($com['valor_comissao'], 2, ',', '.') ?>
                       </strong>
                     </td>
+                    <td class="actions-cell">
+                      <a href="edit.php?id=<?= $com['id'] ?>" 
+                         class="btn-primary-compact" 
+                         title="Editar comissão">
+                        ✏️ Editar
+                      </a>
+                    </td>
                   </tr>
                   <?php endforeach; ?>
                 </tbody>
@@ -402,6 +410,7 @@ include __DIR__ . '/../../app/views/partials/header.php';
                     <td style="color: var(--bcc-green); font-size: 1.125rem;">
                       R$ <?= number_format($totalComissao, 2, ',', '.') ?>
                     </td>
+                    <td></td>
                   </tr>
                 </tfoot>
               </table>

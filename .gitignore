@@ -7,37 +7,86 @@
 # Arquivo principal de configuração (contém credenciais do banco)
 app/config/config.php
 
+# Manter apenas o exemplo de configuração
+!app/config/config.php.example
+
 # ===================================
 # LOGS
 # ===================================
+# Logs do sistema
 logs/
-logs/*.log
 *.log
+*.log.*
+
+# Logs do PHP (XAMPP e outros)
+php_error.log
+php_errors.log
+php_error_log
+php_errors_log
+
+# Logs de aplicação
+app/logs/
+public/logs/
 
 # ===================================
 # UPLOADS DE USUÁRIOS
 # ===================================
+# Ignorar todos os arquivos de upload, mas manter estrutura
 public/uploads/**/*
 !public/uploads/.htaccess
 !public/uploads/.gitkeep
 !public/uploads/**/.gitkeep
 
+# Uploads específicos por tipo
+public/uploads/contratos/*
+!public/uploads/contratos/.gitkeep
+
 # ===================================
 # DEPENDÊNCIAS
 # ===================================
+# Dependências do Composer
 vendor/
-composer.lock
+# NOTA: composer.lock geralmente NÃO deve ser ignorado
+# para garantir versões consistentes entre ambientes
+# Se necessário ignorar, descomente a linha abaixo:
+# composer.lock
+
+# Dependências do NPM (se houver)
 node_modules/
 package-lock.json
+yarn.lock
+.npm
+.yarn
 
 # ===================================
 # CACHE E TEMPORÁRIOS
 # ===================================
+# Diretórios de cache
 cache/
 tmp/
 temp/
+app/cache/
+public/cache/
+
+# Arquivos de cache
 *.cache
 *.tmp
+*.swp
+*.swo
+*~
+
+# Cache de sessão PHP
+sessions/
+app/sessions/
+
+# Cache do Composer
+composer/cache/
+
+# Arquivos temporários de exportação Excel
+*.xlsx.tmp
+*.xls.tmp
+export_*.xlsx
+export_*.xls
 
 # ===================================
 # ARQUIVOS DO SISTEMA OPERACIONAL
@@ -48,27 +97,35 @@ ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 *.lnk
+[Dd]esktop.ini
+*.stackdump
 
 # macOS
 .DS_Store
 .AppleDouble
 .LSOverride
 ._*
+.Spotlight-V100
+.Trashes
 
 # Linux
-*~
 .directory
+.dolphin
+.Trash-*
+.nfs*
 
 # ===================================
 # IDEs E EDITORES
 # ===================================
-# Visual Studio Code
+# Visual Studio Code / Cursor
 .vscode/
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+.cursor/
+.cursor/*
 
 # PhpStorm / JetBrains
 .idea/
@@ -91,12 +148,20 @@ nbproject/
 # ===================================
 # BACKUP E DUMPS
 # ===================================
+# Backups do sistema
+backup/
+backups/
+*.backup
+*.bak
+
+# Dumps de banco de dados
 *.sql
 *.sql.gz
 *.sql.zip
-backup/
-backups/
+*.sql.bz2
 dump.sql
+database.sql
+*.dump
 
 # ===================================
 # ARQUIVOS PHP
@@ -107,17 +172,13 @@ dump.sql
 # ===================================
 # OUTROS
 # ===================================
-# Arquivos de ambiente
-.env
-.env.local
-.env.*.local
-
 # Documentos temporários de markdown
 *.md~
 
 # Arquivos de testes
 phpunit.xml
 .phpunit.result.cache
+.phpunit.cache/
 
 # Arquivos compactados
 *.zip
@@ -125,16 +186,62 @@ phpunit.xml
 *.7z
 *.tar
 *.tar.gz
-!vendor.zip
+*.tar.bz2
+*.gz
+*.bz2
+# Exceções (se necessário manter algum arquivo específico)
+# !vendor.zip
 
 # Certificados e chaves
 *.pem
 *.key
 *.crt
 *.p12
+*.pfx
+*.cer
+*.der
+*.p7b
+*.p7c
+*.jks
 
 # Arquivos de debug
 xdebug.log
 error.log
 php_errors.log
+*.stackdump
+*.core
+*.dmp
+
+# ===================================
+# DOCUMENTOS E MÍDIA
+# ===================================
+# Documentos grandes (opcional - ajuste conforme necessidade)
+# *.pdf
+# *.docx
+# *.xlsx
+
+# Imagens temporárias
+*.tmp.jpg
+*.tmp.png
+*.tmp.gif
+
+# ===================================
+# AMBIENTE E CONFIGURAÇÃO LOCAL
+# ===================================
+# Arquivos de ambiente específicos
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+.env.testing
+
+# Configurações locais do XAMPP
+xampp/
+!xampp/.gitkeep
+
+# Arquivos de configuração de servidor
+.htpasswd
+httpd.conf.local
+php.ini.local
 

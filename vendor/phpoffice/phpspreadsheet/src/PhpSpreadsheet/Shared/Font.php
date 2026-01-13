@@ -563,7 +563,7 @@ class Font
         if (mb_strlen(self::$trueTypeFontPath) > 1 && mb_substr(self::$trueTypeFontPath, -1) !== '/' && mb_substr(self::$trueTypeFontPath, -1) !== '\\') {
             $separator = DIRECTORY_SEPARATOR;
         }
-        $fontFileAbsolute = preg_match('~^([A-Za-z]:)?[/\\\\]~', $fontFile) === 1;
+        $fontFileAbsolute = preg_match('~^([A-Za-z]:)?[/\\\]~', $fontFile) === 1;
         if (!$fontFileAbsolute) {
             $fontFile = self::findFontFile(self::$trueTypeFontPath, $fontFile) ?? self::$trueTypeFontPath . $separator . $fontFile;
         }
@@ -695,8 +695,10 @@ class Font
                     $it,
                     RecursiveIteratorIterator::LEAVES_ONLY,
                     RecursiveIteratorIterator::CATCH_GET_CHILD
-                ) as $file
+                ) as $filex
             ) {
+                /** @var string */
+                $file = $filex;
                 if (basename($file) === $desiredFont) {
                     $fontPath = $file;
 

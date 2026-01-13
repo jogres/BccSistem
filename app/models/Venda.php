@@ -309,7 +309,7 @@ final class Venda
     /**
      * Estatísticas de vendas para um período
      */
-    public static function getStats(?int $userId, int $mes, int $ano): array
+    public static function getStats(?int $userId, ?int $mes, ?int $ano): array
     {
         try {
             $pdo = Database::getConnection();
@@ -323,9 +323,11 @@ final class Venda
                 $params[] = $userId;
             }
             
-            $where[] = "MONTH(v.created_at) = ? AND YEAR(v.created_at) = ?";
-            $params[] = $mes;
-            $params[] = $ano;
+            if ($mes !== null && $ano !== null) {
+                $where[] = "MONTH(v.created_at) = ? AND YEAR(v.created_at) = ?";
+                $params[] = $mes;
+                $params[] = $ano;
+            }
             
             $whereSql = implode(' AND ', $where);
             

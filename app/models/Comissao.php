@@ -435,4 +435,59 @@ final class Comissao
             ];
         }
     }
+    
+    /**
+     * Atualiza uma comissão existente
+     */
+    public static function update(int $id, array $data): void
+    {
+        try {
+            $pdo = Database::getConnection();
+            
+            // Buscar comissão atual para obter informações da venda
+            $comissao = self::find($id);
+            if (!$comissao) {
+                throw new Exception('Comissão não encontrada');
+            }
+            
+            // Buscar informações da venda para recalcular valor base
+            $venda = Venda::find($comissao['venda_id']);
+            if (!$venda) {
+                throw new Exception('Venda não encontrada');
+            }
+            
+            // Recalcular valor base se necessário
+            $valorBase = isset($data['recalcular_valor_base']) && $data['recalcular_valor_base'] 
+                ? self::calcularValorBase($venda)
+                : (float)$comissao['valor_base'];
+            
+            // Recalcular valor da comissão se porcentagem foi alterada
+            $porcentagem = isset($data['porcentagem']) ? (float)$data['porcentagem'] : (float)$comissao['porcentagem'];
+            $valorComissao = ($valorBase * $porcentagem) / 100;
+            
+            $sql = "UPDATE comissoes SET
+                        parcela = :parcela,
+                        porcentagem = :porcentagem,
+                        valor_base = :valor_base,
+                        valor_comissao = :valor_comissao
+                    WHERE id = :id";
+            
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+                ':parcela' => $data['parcela'] ?? $comissao['parcela'],
+                ':porcentagem' => $porcentagem,
+                ':valor_base' => $valorBase,
+                ':valor_comissao' => $valorComissao,
+                ':id' => $id
+            ]);
+        } catch (Exception $e) {
+            require_once __DIR__ . '/../lib/Logger.php';
+            Logger::error('Erro ao atualizar comissão', [
+                'id' => $id,
+                'data' => $data,
+                'error' => $e->getMessage()
+            ]);
+            throw $e;
+        }
+    }
 }

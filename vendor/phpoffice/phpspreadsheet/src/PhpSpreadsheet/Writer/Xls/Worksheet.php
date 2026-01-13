@@ -459,7 +459,7 @@ class Worksheet extends BIFFwriter
                 $url = str_replace('sheet://', 'internal:', $url);
             } elseif (preg_match('/^(http:|https:|ftp:|mailto:)/', $url)) {
                 // URL
-            } elseif (!empty($hyperlinkbase) && preg_match('~^([A-Za-z]:)?[/\\\\]~', $url) !== 1) {
+            } elseif (!empty($hyperlinkbase) && preg_match('~^([A-Za-z]:)?[/\\\]~', $url) !== 1) {
                 $url = "$hyperlinkbase$url";
                 if (preg_match('/^(http:|https:|ftp:|mailto:)/', $url) !== 1) {
                     $url = 'external:' . $url;
@@ -1017,7 +1017,7 @@ class Worksheet extends BIFFwriter
     {
         // Network drives are different. We will handle them separately
         // MS/Novell network drives and shares start with \\
-        if (preg_match('[^external:\\\\]', $url)) {
+        if (preg_match('[^external:\\\]', $url)) {
             return;
         }
 
@@ -1042,7 +1042,7 @@ class Worksheet extends BIFFwriter
         // parameters accordingly.
         // Split the dir name and sheet name (if it exists)
         $dir_long = $url;
-        if (preg_match('/\\#/', $url)) {
+        if (preg_match('/\#/', $url)) {
             $link_type |= 0x08;
         }
 
@@ -1050,11 +1050,11 @@ class Worksheet extends BIFFwriter
         $link_type = pack('V', $link_type);
 
         // Calculate the up-level dir count e.g.. (..\..\..\ == 3)
-        $up_count = preg_match_all('/\\.\\.\\\\/', $dir_long, $useless);
+        $up_count = preg_match_all('/\.\.\\\/', $dir_long, $useless);
         $up_count = pack('v', $up_count);
 
         // Store the short dos dir name (null terminated)
-        $dir_short = (string) preg_replace('/\\.\\.\\\\/', '', $dir_long) . "\0";
+        $dir_short = (string) preg_replace('/\.\.\\\/', '', $dir_long) . "\0";
 
         // Store the long dir name as a wchar string (non-null terminated)
         //$dir_long = $dir_long . "\0";
@@ -1496,7 +1496,8 @@ class Worksheet extends BIFFwriter
      */
     private function writeRangeProtection(): void
     {
-        foreach ($this->phpSheet->getProtectedCells() as $range => $password) {
+        foreach ($this->phpSheet->getProtectedCellRanges() as $range => $protectedCells) {
+            $password = $protectedCells->getPassword();
             // number of ranges, e.g. 'A1:B3 C20:D25'
             $cellRanges = explode(' ', $range);
             $cref = count($cellRanges);
@@ -2373,7 +2374,7 @@ class Worksheet extends BIFFwriter
         }
 
         // Slurp the file into a string.
-        $data = (string) fread($bmp_fd, (int) filesize($bitmap));
+        $data = (string) fread($bmp_fd, (int) filesize($bitmap)); // @phpstan-ignore-line
 
         // Check that the file is big enough to be a bitmap.
         if (strlen($data) <= 0x36) {

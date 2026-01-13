@@ -143,7 +143,7 @@ class AutoFilter implements Stringable
         $this->evaluated = false;
         if ($this->workSheet !== null) {
             $thisrange = $this->range;
-            $range = (string) preg_replace('/\\d+$/', (string) $this->workSheet->getHighestRow(), $thisrange);
+            $range = (string) preg_replace('/\d+$/', (string) $this->workSheet->getHighestRow(), $thisrange);
             if ($range !== $thisrange) {
                 $this->setRange($range);
             }
@@ -810,7 +810,7 @@ class AutoFilter implements Stringable
                             'method' => 'filterTestInSimpleDataSet',
                             'arguments' => ['filterValues' => $ruleDataSet, 'blanks' => $blanks],
                         ];
-                    } else {
+                    } elseif ($ruleType !== null) {
                         //    Filter on date group values
                         $arguments = [
                             'date' => [],
@@ -1001,9 +1001,10 @@ class AutoFilter implements Stringable
             foreach ($columnFilterTests as $columnID => $columnFilterTest) {
                 $cellValue = $this->workSheet->getCell($columnID . $row)->getCalculatedValue();
                 //    Execute the filter test
+                /** @var callable */
+                $temp = [self::class, $columnFilterTest['method']];
                 $result // $result && // phpstan says $result is always true here
-                    // @phpstan-ignore-next-line
-                    = call_user_func_array([self::class, $columnFilterTest['method']], [$cellValue, $columnFilterTest['arguments']]);
+                    = call_user_func_array($temp, [$cellValue, $columnFilterTest['arguments']]);
                 //    If filter test has resulted in FALSE, exit the loop straightaway rather than running any more tests
                 if (!$result) {
                     break;
