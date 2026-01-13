@@ -2,6 +2,9 @@
 // public/clientes/export_excel.php
 declare(strict_types=1);
 
+// PhpSpreadsheet (via Composer) - Carregar primeiro
+require __DIR__ . '/../../vendor/autoload.php';
+
 require __DIR__ . '/../../app/lib/Database.php';
 require __DIR__ . '/../../app/lib/Auth.php';
 require __DIR__ . '/../../app/lib/Helpers.php';
@@ -13,9 +16,6 @@ if (!Auth::isAdmin()) {
   echo 'Acesso negado.';
   exit;
 }
-
-// PhpSpreadsheet (via Composer)
-require __DIR__ . '/../../vendor/autoload.php';
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
