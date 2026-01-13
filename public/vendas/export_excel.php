@@ -2,8 +2,24 @@
 // public/vendas/export_excel.php
 declare(strict_types=1);
 
-// PhpSpreadsheet (via Composer) - Carregar primeiro
-require __DIR__ . '/../../vendor/autoload.php';
+// PhpSpreadsheet (via Composer) - Carregar primeiro e garantir que funciona
+$autoloadPath = __DIR__ . '/../../vendor/autoload.php';
+if (!file_exists($autoloadPath)) {
+    die('Erro: autoload.php não encontrado. Execute: composer install');
+}
+
+// Carregar e executar o autoload explicitamente
+$loader = require_once $autoloadPath;
+
+// Garantir que o autoloader está registrado
+if (!$loader instanceof \Composer\Autoload\ClassLoader) {
+    die('Erro: Autoloader não foi inicializado corretamente');
+}
+
+// Forçar carregamento da classe necessária para garantir que está disponível
+if (!class_exists('Composer\Pcre\Preg', true)) {
+    die('Erro: Classe Composer\Pcre\Preg não encontrada. Execute: composer dump-autoload');
+}
 
 require __DIR__ . '/../../app/lib/Database.php';
 require __DIR__ . '/../../app/lib/Auth.php';
