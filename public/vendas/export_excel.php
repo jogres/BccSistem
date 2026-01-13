@@ -43,7 +43,6 @@ if (!class_exists('Composer\Pcre\Preg', false)) {
     if ($pregPathReal && file_exists($pregPathReal)) {
         require_once $pregPathReal;
     } else {
-        // Tentar caminho alternativo
         $altPath = dirname(__DIR__, 2) . '/vendor/composer/pcre/src/Preg.php';
         $altPathReal = realpath($altPath);
         if ($altPathReal && file_exists($altPathReal)) {
@@ -68,7 +67,6 @@ spl_autoload_register(function($class) {
 
 // Verificar novamente se a classe está disponível após todas as tentativas
 if (!class_exists('Composer\Pcre\Preg', false)) {
-    // Última tentativa: carregar diretamente usando vários caminhos possíveis
     $baseDir = dirname(__DIR__, 2);
     $possiblePaths = [
         $baseDir . '/vendor/composer/pcre/src/Preg.php',
@@ -93,17 +91,11 @@ if (!class_exists('Composer\Pcre\Preg', false)) {
         }
         http_response_code(500);
         header('Content-Type: text/plain; charset=utf-8');
-        // Debug: mostrar caminhos tentados
-        $debug = 'Erro: Classe Composer\Pcre\Preg não encontrada. Caminhos tentados:' . PHP_EOL;
-        foreach ($possiblePaths as $path) {
-            $debug .= '  - ' . ($path ?: 'NULL') . ' (' . ($path && file_exists($path) ? 'existe' : 'não existe') . ')' . PHP_EOL;
-        }
-        die($debug);
+        die('Erro: Classe Composer\Pcre\Preg não encontrada. Execute: composer dump-autoload');
     }
 }
 
 // Verificar autenticação antes de carregar classes que podem gerar output
-// Carregar Auth primeiro para verificar sem iniciar sessão que gere output
 require __DIR__ . '/../../app/lib/Database.php';
 require __DIR__ . '/../../app/lib/Auth.php';
 
@@ -143,6 +135,9 @@ if (!Auth::isAdmin()) {
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Color;
 
 try {
     // ---------- Coleta filtros (apenas MÊS por padrão) ----------
@@ -179,17 +174,17 @@ try {
     if ($q !== '') {
         $vendas = array_filter($vendas, function($venda) use ($q) {
             $searchFields = [
-                $venda['numero_contrato'],
-                $venda['cliente_nome'],
-                $venda['cpf'],
-                $venda['vendedor_nome'],
-                $venda['virador_nome'],
-                $venda['administradora'],
-                $venda['tipo'],
-                $venda['segmento']
+                $venda['numero_contrato'] ?? '',
+                $venda['cliente_nome'] ?? '',
+                $venda['cpf'] ?? '',
+                $venda['vendedor_nome'] ?? '',
+                $venda['virador_nome'] ?? '',
+                $venda['administradora'] ?? '',
+                $venda['tipo'] ?? '',
+                $venda['segmento'] ?? ''
             ];
             
-            $searchText = implode(' ', $searchFields);
+            $searchText = implode(' ', array_filter($searchFields));
             return stripos($searchText, $q) !== false;
         });
     }
@@ -208,7 +203,7 @@ try {
     $sheet = $ss->getActiveSheet();
     $sheet->setTitle('Vendas');
 
-    // Cabeçalho - apenas os campos solicitados
+    // Cabeçalho
     $headers = [
         'Nome do Cliente',
         'Nome do Vendedor', 
@@ -217,20 +212,46 @@ try {
     ];
     $sheet->fromArray($headers, null, 'A1');
 
-    // Deixa o cabeçalho em negrito
-    $sheet->getStyle('A1:D1')->getFont()->setBold(true);
-    $sheet->getStyle('A1:D1')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+    // Estilizar cabeçalho
+    $headerStyle = $sheet->getStyle('A1:D1');
+    $headerStyle->getFont()
+        ->setBold(true)
+        ->setSize(11)
+        ->setColor(new Color(Color::COLOR_WHITE));
+    $headerStyle->getFill()
+        ->setFillType(Fill::FILL_SOLID)
+        ->getStartColor()->setARGB('FF4472C4'); // Azul BCC
+    $headerStyle->getAlignment()
+        ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+        ->setVertical(Alignment::VERTICAL_CENTER);
+    $headerStyle->getBorders()
+        ->getAllBorders()
+        ->setBorderStyle(Border::BORDER_THIN);
 
     // Dados
     $startRow = 2;
     $r = $startRow;
     foreach ($vendas as $venda) {
-      $sheet->setCellValue("A{$r}", $venda['cliente_nome']);
-      $sheet->setCellValue("B{$r}", $venda['vendedor_nome']);
-      $sheet->setCellValue("C{$r}", $venda['virador_nome']);
+      $sheet->setCellValue("A{$r}", (string)($venda['cliente_nome'] ?? ''));
+      $sheet->setCellValue("B{$r}", (string)($venda['vendedor_nome'] ?? ''));
+      $sheet->setCellValue("C{$r}", (string)($venda['virador_nome'] ?? ''));
       
-      // Valor como número; a formatação de moeda é aplicada via NumberFormat
-      $sheet->setCellValue("D{$r}", (float)$venda['valor_credito']);
+      // Valor como número
+      $valorCredito = (float)($venda['valor_credito'] ?? 0);
+      $sheet->setCellValue("D{$r}", $valorCredito);
+      
+      // Aplicar bordas nas células de dados
+      $dataStyle = $sheet->getStyle("A{$r}:D{$r}");
+      $dataStyle->getBorders()
+          ->getAllBorders()
+          ->setBorderStyle(Border::BORDER_THIN);
+      
+      // Alternar cor de fundo para melhor visualização
+      if ($r % 2 == 0) {
+          $dataStyle->getFill()
+              ->setFillType(Fill::FILL_SOLID)
+              ->getStartColor()->setARGB('FFF2F2F2');
+      }
       
       $r++;
     }
@@ -238,12 +259,26 @@ try {
     // Auto largura das colunas
     foreach (range('A','D') as $col) {
       $sheet->getColumnDimension($col)->setAutoSize(true);
+      $sheet->getColumnDimension($col)->setAutoSize(false);
+      $currentWidth = $sheet->getColumnDimension($col)->getWidth();
+      if ($currentWidth > 50) {
+          $sheet->getColumnDimension($col)->setWidth(50);
+      }
     }
 
     // Formatar coluna de valor como moeda (apenas se houver dados)
     if ($r > 2) {
         $sheet->getStyle('D2:D' . ($r - 1))->getNumberFormat()->setFormatCode('"R$ "#,##0.00');
+        // Alinhar valores à direita
+        $sheet->getStyle('D2:D' . ($r - 1))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
     }
+    
+    // Definir altura do cabeçalho
+    $sheet->getRowDimension(1)->setRowHeight(20);
+    
+    // Congelar primeira linha (cabeçalho)
+    $sheet->freezePane('A2');
+    
 } catch (Exception $e) {
     while (ob_get_level() > 0) {
         ob_end_clean();
@@ -255,10 +290,9 @@ try {
 
 // ---------- Envia para o navegador ----------
 try {
-    $filename = 'vendas_' . ($period === 'month' ? $month : 'todos') . '.xlsx';
+    $filename = 'vendas_' . ($period === 'month' ? $month : 'todos') . '_' . date('Y-m-d') . '.xlsx';
 
     // Limpar qualquer output anterior e desabilitar qualquer buffer adicional
-    // Fazer isso ANTES de qualquer operação que possa gerar output
     while (ob_get_level() > 0) {
         ob_end_clean();
     }
@@ -277,15 +311,15 @@ try {
     header('Content-Transfer-Encoding: binary', true);
 
     $writer = new Xlsx($ss);
-    $writer->setPreCalculateFormulas(false); // performance
+    $writer->setPreCalculateFormulas(false);
     
     // Salvar para arquivo temporário primeiro para garantir integridade
-    $tempFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('excel_', true) . '.xlsx';
-    
-    if (!is_writable(sys_get_temp_dir())) {
-        throw new Exception('Diretório temporário não é gravável: ' . sys_get_temp_dir());
+    $tempDir = sys_get_temp_dir();
+    if (!is_writable($tempDir)) {
+        throw new Exception('Diretório temporário não é gravável: ' . $tempDir);
     }
     
+    $tempFile = $tempDir . DIRECTORY_SEPARATOR . uniqid('excel_', true) . '.xlsx';
     $writer->save($tempFile);
     
     if (!file_exists($tempFile) || filesize($tempFile) === 0) {
@@ -307,7 +341,6 @@ try {
         ob_end_clean();
     }
     
-    // Verificar se headers já foram enviados
     if (!headers_sent()) {
         http_response_code(500);
         header('Content-Type: text/plain; charset=utf-8');

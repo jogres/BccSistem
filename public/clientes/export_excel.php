@@ -14,7 +14,9 @@ if (!ob_get_level()) {
 // PhpSpreadsheet (via Composer) - Carregar primeiro e garantir que funciona
 $autoloadPath = __DIR__ . '/../../vendor/autoload.php';
 if (!file_exists($autoloadPath)) {
-    ob_clean();
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
     http_response_code(500);
     header('Content-Type: text/plain; charset=utf-8');
     die('Erro: autoload.php não encontrado. Execute: composer install');
@@ -25,7 +27,9 @@ $loader = require_once $autoloadPath;
 
 // Garantir que o autoloader está registrado
 if (!$loader instanceof \Composer\Autoload\ClassLoader) {
-    ob_clean();
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
     http_response_code(500);
     header('Content-Type: text/plain; charset=utf-8');
     die('Erro: Autoloader não foi inicializado corretamente');
@@ -84,20 +88,16 @@ if (!class_exists('Composer\Pcre\Preg', false)) {
     }
     
     if (!$loaded) {
-        ob_clean();
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
         http_response_code(500);
         header('Content-Type: text/plain; charset=utf-8');
-        // Debug: mostrar caminhos tentados
-        $debug = 'Erro: Classe Composer\Pcre\Preg não encontrada. Caminhos tentados:' . PHP_EOL;
-        foreach ($possiblePaths as $path) {
-            $debug .= '  - ' . ($path ?: 'NULL') . ' (' . ($path && file_exists($path) ? 'existe' : 'não existe') . ')' . PHP_EOL;
-        }
-        die($debug);
+        die('Erro: Classe Composer\Pcre\Preg não encontrada. Execute: composer dump-autoload');
     }
 }
 
 // Verificar autenticação antes de carregar classes que podem gerar output
-// Carregar Auth primeiro para verificar sem iniciar sessão que gere output
 require __DIR__ . '/../../app/lib/Database.php';
 require __DIR__ . '/../../app/lib/Auth.php';
 
@@ -136,6 +136,9 @@ if (!Auth::isAdmin()) {
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Color;
 
 try {
     $pdo = Database::getConnection();
@@ -145,9 +148,9 @@ try {
     $month  = $_GET['m'] ?? date('Y-m');
 
     // filtros avançados (iguais aos da listagem)
-    $nome      = trim($_GET['f_nome']     ?? '');
+    $nome      = trim($_GET['f_nome'] ?? '');
     $tel       = trim($_GET['f_telefone'] ?? '');
-    $cidade    = trim($_GET['f_cidade']   ?? '');
+    $cidade    = trim($_GET['f_cidade'] ?? '');
     $estado    = strtoupper(substr(trim($_GET['f_estado'] ?? ''), 0, 2));
     $interesse = trim($_GET['f_interesse'] ?? '');
     $q         = trim($_GET['q'] ?? '');
@@ -159,7 +162,7 @@ try {
     if ($period === 'month' && preg_match('/^\d{4}-\d{2}$/', $month)) {
       $start = $month . '-01';
       $end   = date('Y-m-d', strtotime('last day of ' . $start));
-      $where[]        = "c.created_at BETWEEN :start AND :end";
+      $where[] = "c.created_at BETWEEN :start AND :end";
       $params[':start'] = $start . ' 00:00:00';
       $params[':end']   = $end   . ' 23:59:59';
     }
@@ -202,32 +205,82 @@ try {
     $sheet->setTitle('Clientes');
 
     // Cabeçalho
-    $headers = ['ID','Nome','Telefone','Cidade','Estado','Interesse','Criado por','Criado em'];
+    $headers = ['ID', 'Nome', 'Telefone', 'Cidade', 'Estado', 'Interesse', 'Criado por', 'Criado em'];
     $sheet->fromArray($headers, null, 'A1');
-    // Deixa o cabeçalho em negrito
-    $sheet->getStyle('A1:H1')->getFont()->setBold(true);
-    $sheet->getStyle('A1:H1')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+    
+    // Estilizar cabeçalho
+    $headerStyle = $sheet->getStyle('A1:H1');
+    $headerStyle->getFont()
+        ->setBold(true)
+        ->setSize(11)
+        ->setColor(new Color(Color::COLOR_WHITE));
+    $headerStyle->getFill()
+        ->setFillType(Fill::FILL_SOLID)
+        ->getStartColor()->setARGB('FF4472C4'); // Azul BCC
+    $headerStyle->getAlignment()
+        ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+        ->setVertical(Alignment::VERTICAL_CENTER);
+    $headerStyle->getBorders()
+        ->getAllBorders()
+        ->setBorderStyle(Border::BORDER_THIN);
 
     // Dados
     $startRow = 2;
     $r = $startRow;
     foreach ($rows as $row) {
-      $sheet->setCellValue("A{$r}", (int)$row['id']);
-      $sheet->setCellValue("B{$r}", $row['nome']);
-      $sheet->setCellValue("C{$r}", $row['telefone']);
-      $sheet->setCellValue("D{$r}", $row['cidade']);
-      $sheet->setCellValue("E{$r}", $row['estado']);
+      $sheet->setCellValue("A{$r}", (int)($row['id'] ?? 0));
+      $sheet->setCellValue("B{$r}", (string)($row['nome'] ?? ''));
+      $sheet->setCellValue("C{$r}", (string)($row['telefone'] ?? ''));
+      $sheet->setCellValue("D{$r}", (string)($row['cidade'] ?? ''));
+      $sheet->setCellValue("E{$r}", (string)($row['estado'] ?? ''));
       $sheet->setCellValue("F{$r}", (string)($row['interesse'] ?? ''));
-      $sheet->setCellValue("G{$r}", $row['criado_por']);
-      // formata data/hora como texto legível
-      $sheet->setCellValue("H{$r}", date('d/m/Y H:i:s', strtotime((string)$row['created_at'])));
+      $sheet->setCellValue("G{$r}", (string)($row['criado_por'] ?? ''));
+      
+      // Formatar data/hora
+      if (!empty($row['created_at'])) {
+          try {
+              $dateStr = date('d/m/Y H:i:s', strtotime((string)$row['created_at']));
+              $sheet->setCellValue("H{$r}", $dateStr);
+          } catch (Exception $e) {
+              $sheet->setCellValue("H{$r}", (string)$row['created_at']);
+          }
+      } else {
+          $sheet->setCellValue("H{$r}", '');
+      }
+      
+      // Aplicar bordas nas células de dados
+      $dataStyle = $sheet->getStyle("A{$r}:H{$r}");
+      $dataStyle->getBorders()
+          ->getAllBorders()
+          ->setBorderStyle(Border::BORDER_THIN);
+      
+      // Alternar cor de fundo para melhor visualização
+      if ($r % 2 == 0) {
+          $dataStyle->getFill()
+              ->setFillType(Fill::FILL_SOLID)
+              ->getStartColor()->setARGB('FFF2F2F2');
+      }
+      
       $r++;
     }
 
     // Auto largura das colunas
     foreach (range('A','H') as $col) {
       $sheet->getColumnDimension($col)->setAutoSize(true);
+      // Limitar largura máxima para não ficar muito largo
+      $sheet->getColumnDimension($col)->setAutoSize(false);
+      $currentWidth = $sheet->getColumnDimension($col)->getWidth();
+      if ($currentWidth > 50) {
+          $sheet->getColumnDimension($col)->setWidth(50);
+      }
     }
+    
+    // Definir altura do cabeçalho
+    $sheet->getRowDimension(1)->setRowHeight(20);
+    
+    // Congelar primeira linha (cabeçalho)
+    $sheet->freezePane('A2');
+    
 } catch (Exception $e) {
     while (ob_get_level() > 0) {
         ob_end_clean();
@@ -239,10 +292,9 @@ try {
 
 // ---------- Envia para o navegador ----------
 try {
-    $filename = 'clientes_' . ($period === 'month' ? $month : 'todos') . '.xlsx';
+    $filename = 'clientes_' . ($period === 'month' ? $month : 'todos') . '_' . date('Y-m-d') . '.xlsx';
 
     // Limpar qualquer output anterior e desabilitar qualquer buffer adicional
-    // Fazer isso ANTES de qualquer operação que possa gerar output
     while (ob_get_level() > 0) {
         ob_end_clean();
     }
@@ -261,15 +313,15 @@ try {
     header('Content-Transfer-Encoding: binary', true);
 
     $writer = new Xlsx($ss);
-    $writer->setPreCalculateFormulas(false); // performance
+    $writer->setPreCalculateFormulas(false);
     
     // Salvar para arquivo temporário primeiro para garantir integridade
-    $tempFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('excel_', true) . '.xlsx';
-    
-    if (!is_writable(sys_get_temp_dir())) {
-        throw new Exception('Diretório temporário não é gravável: ' . sys_get_temp_dir());
+    $tempDir = sys_get_temp_dir();
+    if (!is_writable($tempDir)) {
+        throw new Exception('Diretório temporário não é gravável: ' . $tempDir);
     }
     
+    $tempFile = $tempDir . DIRECTORY_SEPARATOR . uniqid('excel_', true) . '.xlsx';
     $writer->save($tempFile);
     
     if (!file_exists($tempFile) || filesize($tempFile) === 0) {
@@ -291,7 +343,6 @@ try {
         ob_end_clean();
     }
     
-    // Verificar se headers já foram enviados
     if (!headers_sent()) {
         http_response_code(500);
         header('Content-Type: text/plain; charset=utf-8');

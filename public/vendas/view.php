@@ -125,11 +125,11 @@ include __DIR__ . '/../../app/views/partials/header.php';
                         </div>
                         <div class="form-group" style="flex: 1;">
                             <label class="form-label">CPF</label>
-                            <div class="info-value"><?= formatCpf($venda['cpf']) ?></div>
+                            <div class="info-value"><?= !empty($venda['cpf']) ? formatCpf($venda['cpf']) : '-' ?></div>
                         </div>
                         <div class="form-group" style="flex: 1;">
                             <label class="form-label">Telefone</label>
-                            <div class="info-value"><?= e($venda['cliente_telefone']) ?></div>
+                            <div class="info-value"><?= !empty($venda['cliente_telefone']) ? formatTelefone($venda['cliente_telefone']) : '-' ?></div>
                         </div>
                     </div>
                     
@@ -144,18 +144,18 @@ include __DIR__ . '/../../app/views/partials/header.php';
                         </div>
                         <div class="form-group" style="flex: 1;">
                             <label class="form-label">CEP</label>
-                            <div class="info-value"><?= formatCep($venda['cep']) ?></div>
+                            <div class="info-value"><?= !empty($venda['cep']) ? formatCep($venda['cep']) : '-' ?></div>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group" style="flex: 1;">
                             <label class="form-label">Cidade</label>
-                            <div class="info-value"><?= e($venda['cliente_cidade']) ?></div>
+                            <div class="info-value"><?= e($venda['cliente_cidade'] ?? '-') ?></div>
                         </div>
                         <div class="form-group" style="flex: 1;">
                             <label class="form-label">Estado</label>
-                            <div class="info-value"><?= strtoupper(e($venda['cliente_estado'])) ?></div>
+                            <div class="info-value"><?= strtoupper(e($venda['cliente_estado'] ?? '-')) ?></div>
                         </div>
                     </div>
                 </div>
@@ -279,11 +279,13 @@ include __DIR__ . '/../../app/views/partials/header.php';
                             <strong>Cadastrado em:</strong> 
                             <?= date('d/m/Y \à\s H:i', strtotime($venda['created_at'])) ?>
                         </div>
+                        <?php if (!empty($venda['updated_at'])): ?>
                         <div class="col-md-6">
                             <i class="bi bi-arrow-repeat"></i>
                             <strong>Última atualização:</strong> 
                             <?= date('d/m/Y \à\s H:i', strtotime($venda['updated_at'])) ?>
                         </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -319,16 +321,6 @@ function confirmDelete() {
 </script>
 <?php endif; ?>
 
-<?php
-// Funções auxiliares para formatação
-function formatCpf($cpf) {
-    return preg_replace('/(\d{3})(\d{3})(\d{3})(\d{2})/', '$1.$2.$3-$4', $cpf);
-}
-
-function formatCep($cep) {
-    return preg_replace('/(\d{5})(\d{3})/', '$1-$2', $cep);
-}
-?>
 
 <?php include __DIR__ . '/../../app/views/partials/footer.php'; ?>
 

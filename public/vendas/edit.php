@@ -306,14 +306,14 @@ include __DIR__ . '/../../app/views/partials/header.php';
                                 <label class="form-label">CEP *</label>
                                 <input type="text" name="cep" class="form-control" 
                                        placeholder="00000-000" 
-                                       value="<?= formatCep($venda['cep']) ?>" 
+                                       value="<?= !empty($venda['cep']) ? formatCep($venda['cep']) : '' ?>" 
                                        maxlength="9" required>
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">CPF do Cliente *</label>
                                 <input type="text" name="cpf" class="form-control" 
                                        placeholder="000.000.000-00" 
-                                       value="<?= formatCpf($venda['cpf']) ?>" 
+                                       value="<?= !empty($venda['cpf']) ? formatCpf($venda['cpf']) : '' ?>" 
                                        maxlength="14" required>
                             </div>
                         </div>
@@ -475,16 +475,6 @@ document.querySelector('input[name="valor_credito"]').addEventListener('input', 
 });
 </script>
 
-<?php
-// Funções auxiliares
-function formatCpf($cpf) {
-    return preg_replace('/(\d{3})(\d{3})(\d{3})(\d{2})/', '$1.$2.$3-$4', $cpf);
-}
-
-function formatCep($cep) {
-    return preg_replace('/(\d{5})(\d{3})/', '$1-$2', $cep);
-}
-?>
 
 <?php include __DIR__ . '/../../app/views/partials/footer.php'; ?>
 
