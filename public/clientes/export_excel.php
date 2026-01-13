@@ -96,17 +96,41 @@ if (!class_exists('Composer\Pcre\Preg', false)) {
     }
 }
 
+// Verificar autenticação antes de carregar classes que podem gerar output
+// Carregar Auth primeiro para verificar sem iniciar sessão que gere output
 require __DIR__ . '/../../app/lib/Database.php';
 require __DIR__ . '/../../app/lib/Auth.php';
+
+// Verificar autenticação manualmente para evitar headers de redirecionamento
+try {
+    Auth::startSessionSecure();
+    if (!Auth::check()) {
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        http_response_code(403);
+        header('Content-Type: text/plain; charset=utf-8');
+        die('Acesso negado. Faça login primeiro.');
+    }
+} catch (Exception $e) {
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+    http_response_code(500);
+    header('Content-Type: text/plain; charset=utf-8');
+    die('Erro de autenticação: ' . $e->getMessage());
+}
+
 require __DIR__ . '/../../app/lib/Helpers.php';
-require __DIR__ . '/../../app/middleware/require_login.php';
 
 // Somente ADMIN
 if (!Auth::isAdmin()) {
-  ob_clean();
+  while (ob_get_level() > 0) {
+    ob_end_clean();
+  }
   http_response_code(403);
   header('Content-Type: text/plain; charset=utf-8');
-  die('Acesso negado.');
+  die('Acesso negado. Apenas administradores podem exportar.');
 }
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -199,13 +223,9 @@ foreach (range('A','H') as $col) {
 $filename = 'clientes_' . ($period === 'month' ? $month : 'todos') . '.xlsx';
 
 // Limpar qualquer output anterior e desabilitar qualquer buffer adicional
+// Fazer isso ANTES de qualquer operação que possa gerar output
 while (ob_get_level() > 0) {
     ob_end_clean();
-}
-
-// Limpar qualquer output anterior antes de enviar os headers
-if (ob_get_level() > 0) {
-    ob_clean();
 }
 
 // É importante NÃO mandar nenhum echo/HTML antes dos headers:
