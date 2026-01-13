@@ -2,9 +2,15 @@
 // public/vendas/export_excel.php
 declare(strict_types=1);
 
+// Iniciar buffer de saída para evitar que erros quebrem o download
+ob_start();
+
 // PhpSpreadsheet (via Composer) - Carregar primeiro e garantir que funciona
 $autoloadPath = __DIR__ . '/../../vendor/autoload.php';
 if (!file_exists($autoloadPath)) {
+    ob_clean();
+    http_response_code(500);
+    header('Content-Type: text/plain; charset=utf-8');
     die('Erro: autoload.php não encontrado. Execute: composer install');
 }
 
@@ -13,6 +19,9 @@ $loader = require_once $autoloadPath;
 
 // Garantir que o autoloader está registrado
 if (!$loader instanceof \Composer\Autoload\ClassLoader) {
+    ob_clean();
+    http_response_code(500);
+    header('Content-Type: text/plain; charset=utf-8');
     die('Erro: Autoloader não foi inicializado corretamente');
 }
 
@@ -69,12 +78,15 @@ if (!class_exists('Composer\Pcre\Preg', false)) {
     }
     
     if (!$loaded) {
+        ob_clean();
+        http_response_code(500);
+        header('Content-Type: text/plain; charset=utf-8');
         // Debug: mostrar caminhos tentados
         $debug = 'Erro: Classe Composer\Pcre\Preg não encontrada. Caminhos tentados:' . PHP_EOL;
         foreach ($possiblePaths as $path) {
             $debug .= '  - ' . ($path ?: 'NULL') . ' (' . ($path && file_exists($path) ? 'existe' : 'não existe') . ')' . PHP_EOL;
         }
-        die(htmlspecialchars($debug));
+        die($debug);
     }
 }
 
@@ -86,9 +98,10 @@ require __DIR__ . '/../../app/middleware/require_login.php';
 
 // Somente ADMIN
 if (!Auth::isAdmin()) {
+  ob_clean();
   http_response_code(403);
-  echo 'Acesso negado.';
-  exit;
+  header('Content-Type: text/plain; charset=utf-8');
+  die('Acesso negado.');
 }
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -189,12 +202,24 @@ $sheet->getStyle('D2:D' . ($r - 1))->getNumberFormat()->setFormatCode('"R$ "#,##
 // ---------- Envia para o navegador ----------
 $filename = 'vendas_' . ($period === 'month' ? $month : 'todos') . '.xlsx';
 
+// Limpar qualquer output anterior antes de enviar os headers
+ob_clean();
+
 // É importante NÃO mandar nenhum echo/HTML antes dos headers:
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 header('Content-Disposition: attachment; filename="'.$filename.'"');
 header('Cache-Control: max-age=0');
+header('Pragma: public');
 
-$writer = new Xlsx($ss);
-$writer->setPreCalculateFormulas(false); // performance
-$writer->save('php://output');
+try {
+    $writer = new Xlsx($ss);
+    $writer->setPreCalculateFormulas(false); // performance
+    $writer->save('php://output');
+} catch (Exception $e) {
+    // Em caso de erro, limpar output e mostrar erro
+    ob_clean();
+    http_response_code(500);
+    header('Content-Type: text/plain; charset=utf-8');
+    die('Erro ao gerar arquivo Excel: ' . $e->getMessage());
+}
 exit;
