@@ -26,7 +26,7 @@ php_errors_log
 
 # Logs de aplicação
 app/logs/
-public/logs/
+public/logs
 
 # ===================================
 # UPLOADS DE USUÁRIOS
