@@ -2,8 +2,14 @@
 // public/vendas/export_excel.php
 declare(strict_types=1);
 
+// Desabilitar display de erros para evitar que quebrem o arquivo
+ini_set('display_errors', '0');
+error_reporting(0);
+
 // Iniciar buffer de saída para evitar que erros quebrem o download
-ob_start();
+if (!ob_get_level()) {
+    ob_start();
+}
 
 // PhpSpreadsheet (via Composer) - Carregar primeiro e garantir que funciona
 $autoloadPath = __DIR__ . '/../../vendor/autoload.php';
@@ -202,22 +208,42 @@ $sheet->getStyle('D2:D' . ($r - 1))->getNumberFormat()->setFormatCode('"R$ "#,##
 // ---------- Envia para o navegador ----------
 $filename = 'vendas_' . ($period === 'month' ? $month : 'todos') . '.xlsx';
 
+// Limpar qualquer output anterior e desabilitar qualquer buffer adicional
+while (ob_get_level() > 0) {
+    ob_end_clean();
+}
+
 // Limpar qualquer output anterior antes de enviar os headers
-ob_clean();
+if (ob_get_level() > 0) {
+    ob_clean();
+}
 
 // É importante NÃO mandar nenhum echo/HTML antes dos headers:
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-header('Content-Disposition: attachment; filename="'.$filename.'"');
+header('Content-Disposition: attachment; filename="' . addslashes($filename) . '"');
 header('Cache-Control: max-age=0');
 header('Pragma: public');
+header('Content-Transfer-Encoding: binary');
 
 try {
     $writer = new Xlsx($ss);
     $writer->setPreCalculateFormulas(false); // performance
-    $writer->save('php://output');
+    
+    // Salvar para arquivo temporário primeiro para garantir integridade
+    $tempFile = sys_get_temp_dir() . '/' . uniqid('excel_') . '.xlsx';
+    $writer->save($tempFile);
+    
+    // Ler e enviar arquivo
+    readfile($tempFile);
+    
+    // Remover arquivo temporário
+    @unlink($tempFile);
+    
 } catch (Exception $e) {
     // Em caso de erro, limpar output e mostrar erro
-    ob_clean();
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
     http_response_code(500);
     header('Content-Type: text/plain; charset=utf-8');
     die('Erro ao gerar arquivo Excel: ' . $e->getMessage());
