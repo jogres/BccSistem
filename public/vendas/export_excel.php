@@ -14,7 +14,9 @@ if (!ob_get_level()) {
 // PhpSpreadsheet (via Composer) - Carregar primeiro e garantir que funciona
 $autoloadPath = __DIR__ . '/../../vendor/autoload.php';
 if (!file_exists($autoloadPath)) {
-    ob_clean();
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
     http_response_code(500);
     header('Content-Type: text/plain; charset=utf-8');
     die('Erro: autoload.php não encontrado. Execute: composer install');
@@ -25,7 +27,9 @@ $loader = require_once $autoloadPath;
 
 // Garantir que o autoloader está registrado
 if (!$loader instanceof \Composer\Autoload\ClassLoader) {
-    ob_clean();
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
     http_response_code(500);
     header('Content-Type: text/plain; charset=utf-8');
     die('Erro: Autoloader não foi inicializado corretamente');
@@ -84,7 +88,9 @@ if (!class_exists('Composer\Pcre\Preg', false)) {
     }
     
     if (!$loaded) {
-        ob_clean();
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
         http_response_code(500);
         header('Content-Type: text/plain; charset=utf-8');
         // Debug: mostrar caminhos tentados
@@ -126,144 +132,189 @@ require __DIR__ . '/../../app/models/Venda.php';
 
 // Somente ADMIN
 if (!Auth::isAdmin()) {
-  ob_clean();
+  while (ob_get_level() > 0) {
+    ob_end_clean();
+  }
   http_response_code(403);
   header('Content-Type: text/plain; charset=utf-8');
-  die('Acesso negado.');
+  die('Acesso negado. Apenas administradores podem exportar.');
 }
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
-$pdo = Database::getConnection();
-
-// ---------- Coleta filtros (apenas MÊS por padrão) ----------
-$period = ($_GET['period'] ?? 'month') === 'all' ? 'all' : 'month';
-$month  = $_GET['m'] ?? date('Y-m');
-
-// filtros avançados (iguais aos da listagem)
-$vendedorId = isset($_GET['vendedor_id']) && $_GET['vendedor_id'] !== '' ? (int)$_GET['vendedor_id'] : null;
-$viradorId = isset($_GET['virador_id']) && $_GET['virador_id'] !== '' ? (int)$_GET['virador_id'] : null;
-$administradora = trim($_GET['administradora'] ?? '');
-$tipo = trim($_GET['tipo'] ?? '');
-$segmento = trim($_GET['segmento'] ?? '');
-$q = trim($_GET['q'] ?? '');
-
-// Montar filtros
-$filters = [];
-
-// Adicionar filtro de período
-if ($period === 'month' && preg_match('/^\d{4}-\d{2}$/', $month)) {
-    $filters['mes'] = (int)date('n', strtotime($month . '-01'));
-    $filters['ano'] = (int)date('Y', strtotime($month . '-01'));
-}
-
-if ($vendedorId) $filters['vendedor_id'] = $vendedorId;
-if ($viradorId) $filters['virador_id'] = $viradorId;
-if ($administradora !== '') $filters['administradora'] = $administradora;
-if ($tipo !== '') $filters['tipo'] = $tipo;
-if ($segmento !== '') $filters['segmento'] = $segmento;
-
-// Buscar vendas (todas, sem paginação)
-$vendas = Venda::all(null, $filters);
-
-// Se há busca geral, filtrar localmente
-if ($q !== '') {
-    $vendas = array_filter($vendas, function($venda) use ($q) {
-        $searchFields = [
-            $venda['numero_contrato'],
-            $venda['cliente_nome'],
-            $venda['cpf'],
-            $venda['vendedor_nome'],
-            $venda['virador_nome'],
-            $venda['administradora'],
-            $venda['tipo'],
-            $venda['segmento']
-        ];
-        
-        $searchText = implode(' ', $searchFields);
-        return stripos($searchText, $q) !== false;
-    });
-}
-
-// ---------- Monta planilha ----------
-$ss = new Spreadsheet();
-$sheet = $ss->getActiveSheet();
-$sheet->setTitle('Vendas');
-
-// Cabeçalho - apenas os campos solicitados
-$headers = [
-    'Nome do Cliente',
-    'Nome do Vendedor', 
-    'Nome do Virador',
-    'Valor da Venda'
-];
-$sheet->fromArray($headers, null, 'A1');
-
-// Deixa o cabeçalho em negrito
-$sheet->getStyle('A1:D1')->getFont()->setBold(true);
-$sheet->getStyle('A1:D1')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
-
-// Dados
-$startRow = 2;
-$r = $startRow;
-foreach ($vendas as $venda) {
-  $sheet->setCellValue("A{$r}", $venda['cliente_nome']);
-  $sheet->setCellValue("B{$r}", $venda['vendedor_nome']);
-  $sheet->setCellValue("C{$r}", $venda['virador_nome']);
-  
-  // Valor como número; a formatação de moeda é aplicada via NumberFormat
-  $sheet->setCellValue("D{$r}", (float)$venda['valor_credito']);
-  
-  $r++;
-}
-
-// Auto largura das colunas
-foreach (range('A','D') as $col) {
-  $sheet->getColumnDimension($col)->setAutoSize(true);
-}
-
-// Formatar coluna de valor como moeda
-$sheet->getStyle('D2:D' . ($r - 1))->getNumberFormat()->setFormatCode('"R$ "#,##0.00');
-
-// ---------- Envia para o navegador ----------
-$filename = 'vendas_' . ($period === 'month' ? $month : 'todos') . '.xlsx';
-
-// Limpar qualquer output anterior e desabilitar qualquer buffer adicional
-// Fazer isso ANTES de qualquer operação que possa gerar output
-while (ob_get_level() > 0) {
-    ob_end_clean();
-}
-
-// É importante NÃO mandar nenhum echo/HTML antes dos headers:
-header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-header('Content-Disposition: attachment; filename="' . addslashes($filename) . '"');
-header('Cache-Control: max-age=0');
-header('Pragma: public');
-header('Content-Transfer-Encoding: binary');
-
 try {
-    $writer = new Xlsx($ss);
-    $writer->setPreCalculateFormulas(false); // performance
-    
-    // Salvar para arquivo temporário primeiro para garantir integridade
-    $tempFile = sys_get_temp_dir() . '/' . uniqid('excel_') . '.xlsx';
-    $writer->save($tempFile);
-    
-    // Ler e enviar arquivo
-    readfile($tempFile);
-    
-    // Remover arquivo temporário
-    @unlink($tempFile);
-    
+    // ---------- Coleta filtros (apenas MÊS por padrão) ----------
+    $period = ($_GET['period'] ?? 'month') === 'all' ? 'all' : 'month';
+    $month  = $_GET['m'] ?? date('Y-m');
+
+    // filtros avançados (iguais aos da listagem)
+    $vendedorId = isset($_GET['vendedor_id']) && $_GET['vendedor_id'] !== '' ? (int)$_GET['vendedor_id'] : null;
+    $viradorId = isset($_GET['virador_id']) && $_GET['virador_id'] !== '' ? (int)$_GET['virador_id'] : null;
+    $administradora = trim($_GET['administradora'] ?? '');
+    $tipo = trim($_GET['tipo'] ?? '');
+    $segmento = trim($_GET['segmento'] ?? '');
+    $q = trim($_GET['q'] ?? '');
+
+    // Montar filtros
+    $filters = [];
+
+    // Adicionar filtro de período
+    if ($period === 'month' && preg_match('/^\d{4}-\d{2}$/', $month)) {
+        $filters['mes'] = (int)date('n', strtotime($month . '-01'));
+        $filters['ano'] = (int)date('Y', strtotime($month . '-01'));
+    }
+
+    if ($vendedorId) $filters['vendedor_id'] = $vendedorId;
+    if ($viradorId) $filters['virador_id'] = $viradorId;
+    if ($administradora !== '') $filters['administradora'] = $administradora;
+    if ($tipo !== '') $filters['tipo'] = $tipo;
+    if ($segmento !== '') $filters['segmento'] = $segmento;
+
+    // Buscar vendas (todas, sem paginação)
+    $vendas = Venda::all(null, $filters);
+
+    // Se há busca geral, filtrar localmente
+    if ($q !== '') {
+        $vendas = array_filter($vendas, function($venda) use ($q) {
+            $searchFields = [
+                $venda['numero_contrato'],
+                $venda['cliente_nome'],
+                $venda['cpf'],
+                $venda['vendedor_nome'],
+                $venda['virador_nome'],
+                $venda['administradora'],
+                $venda['tipo'],
+                $venda['segmento']
+            ];
+            
+            $searchText = implode(' ', $searchFields);
+            return stripos($searchText, $q) !== false;
+        });
+    }
 } catch (Exception $e) {
-    // Em caso de erro, limpar output e mostrar erro
     while (ob_get_level() > 0) {
         ob_end_clean();
     }
     http_response_code(500);
     header('Content-Type: text/plain; charset=utf-8');
-    die('Erro ao gerar arquivo Excel: ' . $e->getMessage());
+    die('Erro ao buscar dados: ' . $e->getMessage());
+}
+
+// ---------- Monta planilha ----------
+try {
+    $ss = new Spreadsheet();
+    $sheet = $ss->getActiveSheet();
+    $sheet->setTitle('Vendas');
+
+    // Cabeçalho - apenas os campos solicitados
+    $headers = [
+        'Nome do Cliente',
+        'Nome do Vendedor', 
+        'Nome do Virador',
+        'Valor da Venda'
+    ];
+    $sheet->fromArray($headers, null, 'A1');
+
+    // Deixa o cabeçalho em negrito
+    $sheet->getStyle('A1:D1')->getFont()->setBold(true);
+    $sheet->getStyle('A1:D1')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+
+    // Dados
+    $startRow = 2;
+    $r = $startRow;
+    foreach ($vendas as $venda) {
+      $sheet->setCellValue("A{$r}", $venda['cliente_nome']);
+      $sheet->setCellValue("B{$r}", $venda['vendedor_nome']);
+      $sheet->setCellValue("C{$r}", $venda['virador_nome']);
+      
+      // Valor como número; a formatação de moeda é aplicada via NumberFormat
+      $sheet->setCellValue("D{$r}", (float)$venda['valor_credito']);
+      
+      $r++;
+    }
+
+    // Auto largura das colunas
+    foreach (range('A','D') as $col) {
+      $sheet->getColumnDimension($col)->setAutoSize(true);
+    }
+
+    // Formatar coluna de valor como moeda (apenas se houver dados)
+    if ($r > 2) {
+        $sheet->getStyle('D2:D' . ($r - 1))->getNumberFormat()->setFormatCode('"R$ "#,##0.00');
+    }
+} catch (Exception $e) {
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+    http_response_code(500);
+    header('Content-Type: text/plain; charset=utf-8');
+    die('Erro ao criar planilha: ' . $e->getMessage());
+}
+
+// ---------- Envia para o navegador ----------
+try {
+    $filename = 'vendas_' . ($period === 'month' ? $month : 'todos') . '.xlsx';
+
+    // Limpar qualquer output anterior e desabilitar qualquer buffer adicional
+    // Fazer isso ANTES de qualquer operação que possa gerar output
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+
+    // Verificar se headers já foram enviados
+    if (headers_sent($file, $line)) {
+        error_log("Headers já enviados em $file:$line");
+        throw new Exception('Headers já foram enviados. Não é possível enviar arquivo Excel.');
+    }
+
+    // É importante NÃO mandar nenhum echo/HTML antes dos headers:
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', true);
+    header('Content-Disposition: attachment; filename="' . addslashes($filename) . '"', true);
+    header('Cache-Control: max-age=0', true);
+    header('Pragma: public', true);
+    header('Content-Transfer-Encoding: binary', true);
+
+    $writer = new Xlsx($ss);
+    $writer->setPreCalculateFormulas(false); // performance
+    
+    // Salvar para arquivo temporário primeiro para garantir integridade
+    $tempFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('excel_', true) . '.xlsx';
+    
+    if (!is_writable(sys_get_temp_dir())) {
+        throw new Exception('Diretório temporário não é gravável: ' . sys_get_temp_dir());
+    }
+    
+    $writer->save($tempFile);
+    
+    if (!file_exists($tempFile) || filesize($tempFile) === 0) {
+        throw new Exception('Arquivo temporário não foi criado corretamente');
+    }
+    
+    // Ler e enviar arquivo
+    $filesize = filesize($tempFile);
+    header('Content-Length: ' . $filesize, true);
+    
+    readfile($tempFile);
+    
+    // Remover arquivo temporário
+    @unlink($tempFile);
+    
+} catch (Throwable $e) {
+    // Em caso de erro, limpar output e mostrar erro
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+    
+    // Verificar se headers já foram enviados
+    if (!headers_sent()) {
+        http_response_code(500);
+        header('Content-Type: text/plain; charset=utf-8');
+        die('Erro ao gerar arquivo Excel: ' . $e->getMessage() . ' (Linha: ' . $e->getLine() . ')');
+    } else {
+        error_log('Erro ao gerar Excel: ' . $e->getMessage() . ' em ' . $e->getFile() . ':' . $e->getLine());
+        exit;
+    }
 }
 exit;
