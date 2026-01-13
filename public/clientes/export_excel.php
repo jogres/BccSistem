@@ -16,7 +16,15 @@ if (!$loader instanceof \Composer\Autoload\ClassLoader) {
     die('Erro: Autoloader não foi inicializado corretamente');
 }
 
-// Forçar carregamento da classe necessária para garantir que está disponível
+// Forçar carregamento manual da classe se necessário (workaround para Windows)
+if (!class_exists('Composer\Pcre\Preg', false)) {
+    $pregPath = __DIR__ . '/../../vendor/composer/pcre/src/Preg.php';
+    if (file_exists($pregPath)) {
+        require_once $pregPath;
+    }
+}
+
+// Verificar novamente se a classe está disponível
 if (!class_exists('Composer\Pcre\Preg', true)) {
     die('Erro: Classe Composer\Pcre\Preg não encontrada. Execute: composer dump-autoload');
 }
