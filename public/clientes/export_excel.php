@@ -19,14 +19,63 @@ if (!$loader instanceof \Composer\Autoload\ClassLoader) {
 // Forçar carregamento manual da classe se necessário (workaround para Windows)
 if (!class_exists('Composer\Pcre\Preg', false)) {
     $pregPath = __DIR__ . '/../../vendor/composer/pcre/src/Preg.php';
-    if (file_exists($pregPath)) {
-        require_once $pregPath;
+    $pregPathReal = realpath($pregPath);
+    
+    if ($pregPathReal && file_exists($pregPathReal)) {
+        require_once $pregPathReal;
+    } else {
+        // Tentar caminho alternativo
+        $altPath = dirname(__DIR__, 2) . '/vendor/composer/pcre/src/Preg.php';
+        $altPathReal = realpath($altPath);
+        if ($altPathReal && file_exists($altPathReal)) {
+            require_once $altPathReal;
+        }
     }
 }
 
-// Verificar novamente se a classe está disponível
-if (!class_exists('Composer\Pcre\Preg', true)) {
-    die('Erro: Classe Composer\Pcre\Preg não encontrada. Execute: composer dump-autoload');
+// Registrar autoloader manual como fallback
+spl_autoload_register(function($class) {
+    if (strpos($class, 'Composer\\Pcre\\') === 0) {
+        $basePath = dirname(__DIR__, 2) . '/vendor/composer/pcre/src/';
+        $file = $basePath . str_replace('\\', '/', substr($class, 15)) . '.php';
+        $realPath = realpath($file);
+        if ($realPath && file_exists($realPath)) {
+            require_once $realPath;
+            return true;
+        }
+    }
+    return false;
+}, true, true);
+
+// Verificar novamente se a classe está disponível após todas as tentativas
+if (!class_exists('Composer\Pcre\Preg', false)) {
+    // Última tentativa: carregar diretamente usando vários caminhos possíveis
+    $baseDir = dirname(__DIR__, 2);
+    $possiblePaths = [
+        $baseDir . '/vendor/composer/pcre/src/Preg.php',
+        __DIR__ . '/../../vendor/composer/pcre/src/Preg.php',
+        realpath($baseDir . '/vendor/composer/pcre/src/Preg.php'),
+    ];
+    
+    $loaded = false;
+    foreach ($possiblePaths as $path) {
+        if ($path && file_exists($path)) {
+            require_once $path;
+            if (class_exists('Composer\Pcre\Preg', false)) {
+                $loaded = true;
+                break;
+            }
+        }
+    }
+    
+    if (!$loaded) {
+        // Debug: mostrar caminhos tentados
+        $debug = 'Erro: Classe Composer\Pcre\Preg não encontrada. Caminhos tentados:' . PHP_EOL;
+        foreach ($possiblePaths as $path) {
+            $debug .= '  - ' . ($path ?: 'NULL') . ' (' . ($path && file_exists($path) ? 'existe' : 'não existe') . ')' . PHP_EOL;
+        }
+        die(htmlspecialchars($debug));
+    }
 }
 
 require __DIR__ . '/../../app/lib/Database.php';
